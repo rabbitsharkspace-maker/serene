@@ -1,0 +1,40 @@
+{
+  "collections": [
+    {
+      "name": "appeals",
+      "fields": [
+        { "name": "uid", "type": "string", "description": "User ID" },
+        { "name": "type", "type": "string", "description": "Type of appeal (fine, bill, warning)" },
+        { "name": "content", "type": "string", "description": "Extracted text content" },
+        { "name": "analysis", "type": "string", "description": "Gemini analysis in Chinese" },
+        { "name": "draft", "type": "string", "description": "Draft response in English" },
+        { "name": "createdAt", "type": "timestamp" }
+      ]
+    },
+    {
+      "name": "userProfiles",
+      "fields": [
+        { "name": "uid", "type": "string", "description": "User ID" },
+        { "name": "visaType", "type": "string", "description": "User visa details (e.g., 500 student visa)" },
+        { "name": "school", "type": "string", "description": "User university / school name" },
+        { "name": "leaseKeyTerms", "type": "string", "description": "User lease key terms (e.g., lease ends 30 June)" },
+        { "name": "additionalDetails", "type": "string", "description": "Any additional academic or personal details" },
+        { "name": "updatedAt", "type": "timestamp" }
+      ]
+    },
+    {
+      "name": "kanbanTasks",
+      "fields": [
+        { "name": "uid", "type": "string", "description": "User ID" },
+        { "name": "title", "type": "string", "description": "Task name or step description" },
+        { "name": "dueDate", "type": "string", "description": "Task deadline" },
+        { "name": "status", "type": "string", "description": "Task status (todo, in_progress, completed)" },
+        { "name": "priority", "type": "string", "description": "Task priority (red, yellow, green)" },
+        { "name": "channel", "type": "string", "description": "Official communication channel or entity name" },
+        { "name": "url", "type": "string", "description": "External resource URL" },
+        { "name": "sourceLetter", "type": "string", "description": "Subject of the appeal letter this task originated from" },
+        { "name": "createdAt", "type": "timestamp" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+/* Serene — redesigned on the Claude "warm-canvas editorial" design language (see /DESIGN.md).
+   Cream canvas + coral CTA + humanist serif display, deliberately warm where most
+   AI brands run cool blue + slate. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Noto+Serif+SC:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  /* Type */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Newsreader", "Noto Serif SC", Georgia, serif;
+
+  /* Claude palette — semantic design tokens (usable as bg-*, text-*, border-*) */
+  --color-canvas: #faf9f5;            /* page background — tinted cream */
+  --color-surface-soft: #f5f0e8;      /* soft cream panels */
+  --color-surface-card: #efe9de;      /* feature cards */
+  --color-surface-strong: #e8e0d2;    /* strong cream */
+  --color-ink: #141413;               /* near-black display */
+  --color-body: #3d3d3a;              /* body text */
+  --color-body-strong: #252523;
+  --color-muted: #6c6a64;             /* secondary text */
+  --color-muted-soft: #8e8b82;
+  --color-hairline: #e6dfd8;          /* warm borders */
+  --color-hairline-soft: #ebe6df;
+  --color-primary: #cc785c;           /* coral — single brand voltage */
+  --color-primary-active: #a9583e;
+  --color-primary-disabled: #e6dfd8;
+  --color-on-primary: #ffffff;
+  --color-surface-dark: #181715;      /* dark product surfaces */
+  --color-surface-dark-elevated: #252320;
+  --color-on-dark: #faf9f5;
+  --color-on-dark-soft: #a09d96;
+  --color-accent-teal: #5db8a6;
+  --color-accent-amber: #e8a55a;
+  --color-success: #5db872;
+  --color-warning: #d4a017;
+  --color-error: #c64545;
+}
+
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+}
+
+@layer base {
+  body {
+    background-color: var(--color-canvas);
+    font-family: "Inter", var(--font-sans);
+    color: var(--color-body);
+  }
+
+  /* Humanist serif display for headings (Latin + 中文) */
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display) !important;
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+    font-weight: 500;
+  }
+
+  p, span, li, label {
+    font-family: "Inter", sans-serif;
+  }
+
+  /* Warm, soft card elevation (cream-tinted shadows) */
+  .bg-white.rounded-3xl,
+  .bg-canvas.rounded-3xl {
+    border: 1px solid var(--color-hairline-soft) !important;
+    box-shadow: 0 1px 2px rgba(20, 20, 19, 0.03), 0 8px 24px -12px rgba(61, 61, 58, 0.10) !important;
+    transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  .bg-white.rounded-3xl:hover,
+  .bg-canvas.rounded-3xl:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(20, 20, 19, 0.04), 0 18px 40px -14px rgba(61, 61, 58, 0.16) !important;
+  }
+
+  button, input, textarea, select {
+    transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    filter: brightness(1.03);
+  }
+  button:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  .animate-in {
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  /* Markdown rendering inside results */
+  .markdown-body strong {
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+  .markdown-body p {
+    margin-bottom: 0.75em;
+    line-height: 1.6;
+    color: var(--color-body);
+  }
+  .markdown-body p:last-child {
+    margin-bottom: 0;
+  }
+  .markdown-body ul {
+    list-style-type: disc;
+    padding-left: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  .markdown-body ol {
+    list-style-type: decimal;
+    padding-left: 1.5em;
+    margin-bottom: 0.5em;
+  }
+}
