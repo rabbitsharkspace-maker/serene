@@ -2505,6 +2505,72 @@ WRITE ALL HUMAN-READABLE VALUES IN ${langName}. Do NOT invent fake laws, agencie
   }
 });
 
+// Photo translate: a newcomer photographs a sign / menu / letter / label;
+// Gemini Vision OCRs it, detects the source language, and translates into the user's language.
+app.post("/api/photo-translate", upload.single("image"), async (req, res) => {
+  try {
+    const file = req.file;
+    if (!file) {
+      return res.status(400).json({ error: "No image file provided" });
+    }
+    const langName = getLang(req.body.language);
+    const aiClient = getAI();
+    const prompt = `You are a visual translator for a newcomer living in a foreign country. The user photographed a sign, menu, official letter, label, or phone screen.
+1. OCR all meaningful text in the image.
+2. Detect the source language.
+3. Translate everything into ${langName}.
+Return ONLY raw JSON (NO markdown code fences):
+{
+  "detectedLanguage": "(name of the detected source language, written in ${langName})",
+  "originalText": "the raw extracted text, kept in its original language",
+  "translation": "the full, natural translation in ${langName}",
+  "note": "(optional, in ${langName}) one short helpful tip if this looks like an official / time-sensitive document; otherwise empty string"
+}`;
+    const response = await generateWithRetry(aiClient, 'generateContent', {
+      model: "gemini-2.5-flash",
+      contents: [{ role: "user", parts: [
+        { text: prompt },
+        { inlineData: { data: file.buffer.toString("base64"), mimeType: file.mimetype } },
+      ] }],
+      config: { responseMimeType: "application/json" },
+    }) as any;
+    let text = response.text || "";
+    text = text.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/, '').trim();
+    return res.json(JSON.parse(text));
+  } catch (error: any) {
+    console.warn("photo-translate failed:", error?.message || error);
+    return res.status(502).json({ error: "photo_translate_failed" });
+  }
+});
+
+// Live exchange rate via Google Search grounding (not the model's memory).
+app.post("/api/exchange-rate", async (req, res) => {
+  try {
+    const from = String(req.body.from || "").toUpperCase().slice(0, 3);
+    const to = String(req.body.to || "").toUpperCase().slice(0, 3);
+    if (!from || !to) {
+      return res.status(400).json({ error: "from and to currency codes required" });
+    }
+    const aiClient = getAI();
+    const prompt = `Use your Google Search tool to find the CURRENT foreign-exchange rate right now. How many units of ${to} equal 1 ${from}? Use today's live mid-market rate, not memory. Return ONLY raw JSON (NO markdown fences): {"from":"${from}","to":"${to}","rate": <number: units of ${to} per 1 ${from}>, "asOf":"<the date/time of the rate you found>"}`;
+    const response = await generateWithRetry(aiClient, 'generateContent', {
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: { tools: [{ googleSearch: {} }] },
+    }) as any;
+    let text = response.text || "";
+    text = text.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/, '').trim();
+    const data = JSON.parse(text);
+    if (typeof data.rate !== "number" || !isFinite(data.rate)) {
+      throw new Error("invalid rate");
+    }
+    return res.json(data);
+  } catch (error: any) {
+    console.warn("exchange-rate failed:", error?.message || error);
+    return res.status(502).json({ error: "exchange_rate_failed" });
+  }
+});
+
 async function startServer() {
   // API Catch-all: Ensure API requests never fall through to Vite's HTML fallback
   app.all("/api/*", (req, res) => {

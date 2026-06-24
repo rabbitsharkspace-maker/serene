@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useLocale } from '../lib/locale';
+import EcoTools from './EcoTools';
 
 // Interfaces
 interface Guide {
@@ -172,7 +173,7 @@ const DEFAULT_ITEMS: MarketplaceItem[] = [
 
 export default function EcosystemHub() {
   const { country, language, region } = useLocale();
-  const [activeTab, setActiveTab] = useState<'guides' | 'private_chef' | 'marketplace'>('guides');
+  const [activeTab, setActiveTab] = useState<'guides' | 'private_chef' | 'marketplace' | 'tools'>('guides');
 
   // Multi-tab role toggling
   const [guideRole, setGuideRole] = useState<'student' | 'guide'>('student');
@@ -785,7 +786,20 @@ export default function EcosystemHub() {
           <ShoppingBag size={18} />
           <span>二手闲置防坑街 (Market)</span>
         </button>
+        <button
+          onClick={() => { setActiveTab('tools'); setSelectedGuide(null); setSelectedMeal(null); setSelectedItem(null); }}
+          className={`px-5 py-3 rounded-t-2xl font-black text-sm transition-all flex items-center gap-2 shrink-0 ${activeTab === 'tools' ? 'border-b-4 border-[#141413] text-[#141413] bg-white bg-opacity-50' : 'text-gray-400 hover:text-gray-900'}`}
+        >
+          <span>🧰</span>
+          <span>实用工具 (Tools)</span>
+        </button>
       </div>
+
+      {activeTab === 'tools' && (
+        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <EcoTools />
+        </div>
+      )}
 
       {/* Main Panel views */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -1823,7 +1837,7 @@ export default function EcosystemHub() {
         </div>
 
         {/* Right Details inspector sidebar & Dynamic simulation panels */}
-        <div className="lg:col-span-4 space-y-6">
+        <div className={`lg:col-span-4 space-y-6 ${activeTab === 'tools' ? 'hidden' : ''}`}>
 
           {/* 1. Dynamic Detail Inspector */}
           <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-xs relative">
