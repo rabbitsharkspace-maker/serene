@@ -6,6 +6,7 @@ import { db } from '../lib/firebase';
 import { saveExtractedTasks, KanbanTask } from '../lib/kanbanService';
 import Markdown from 'react-markdown';
 import { useLocale, getCountryContent } from '../lib/locale';
+import GroundingSources from './GroundingSources';
 
 type AppState = 'upload' | 'analyzing' | 'result' | 'sent';
 
@@ -1525,6 +1526,9 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                          </div>
                        </div>
                      )}
+
+                     <GroundingSources grounding={(analysis as any)._grounding} />
+
                        <div className="flex items-center space-x-3 bg-gray-50/80 p-3 rounded-xl border border-gray-100 focus-within:border-gray-300 focus-within:bg-white transition-colors">
                           <span className="text-xs font-bold text-gray-400 whitespace-nowrap uppercase tracking-wider w-12">发给</span>
                           <input 

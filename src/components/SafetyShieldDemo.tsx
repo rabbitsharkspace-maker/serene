@@ -3,6 +3,7 @@ import { Camera, ShieldCheck, ArrowRight, ShieldAlert, FileText, CheckCircle2, R
 import { motion, AnimatePresence } from 'motion/react';
 import Markdown from 'react-markdown';
 import { useLocale } from '../lib/locale';
+import GroundingSources from './GroundingSources';
 
 type AppState = 'upload' | 'analyzing' | 'result';
 type SubmoduleType = 'valuation' | 'scamCheck';
@@ -620,6 +621,8 @@ export default function SafetyShieldDemo() {
                     </div>
                   </div>
                 )}
+
+                <GroundingSources grounding={(analysis as any)._grounding} />
               </motion.div>
             )}
 
@@ -704,6 +707,8 @@ export default function SafetyShieldDemo() {
                     {scamAnalysis.reassurance}
                   </p>
                 </div>
+
+                <GroundingSources grounding={(scamAnalysis as any)._grounding} />
               </motion.div>
             )}
 

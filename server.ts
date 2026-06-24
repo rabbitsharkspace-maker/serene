@@ -101,6 +101,25 @@ function getLang(code?: string): string {
   return LANGUAGES[String(code || "zh").toLowerCase()] || LANGUAGES.zh;
 }
 
+// Pull the REAL Google Search grounding citations out of a Gemini response so the UI can
+// show evidence (clickable sources + the queries it ran + a retrieval timestamp). This is
+// the actual proof that the answer was searched, not produced from memory.
+function extractGrounding(response: any) {
+  try {
+    const gm = response?.candidates?.[0]?.groundingMetadata;
+    if (!gm) return null;
+    const sources = (gm.groundingChunks || [])
+      .map((c: any) => c?.web)
+      .filter((w: any) => w?.uri)
+      .map((w: any) => ({ uri: w.uri, title: w.title || w.uri }));
+    const queries: string[] = gm.webSearchQueries || [];
+    if (sources.length === 0 && queries.length === 0) return null;
+    return { sources, queries, retrievedAt: new Date().toISOString() };
+  } catch {
+    return null;
+  }
+}
+
 // ==========================================
 // PRESET DATA FOR ULTRAROBURST CAPABILITIES
 // ==========================================
@@ -1609,7 +1628,8 @@ Please output a JSON response matching this schema:
     text = text.replace(/^```json\s*/, '').replace(/```\s*$/, '').trim();
 
     const result = JSON.parse(text);
-    
+    result._grounding = extractGrounding(response);
+
     // Supplement old properties for perfect compatibility
     result.type = result.documentType;
     result.summary = result.summaryPlain;
@@ -1703,6 +1723,7 @@ Output JSON (DO NOT WRAP IN MARKDOWN BLOCK, JUST RAW JSON):
     text = text.replace(/^```json\s*/, '').replace(/```\s*$/, '').trim();
 
     const result = JSON.parse(text);
+    result._grounding = extractGrounding(response);
     return res.json(result);
   } catch (error: any) {
     console.warn("Gemini shield analysis failed, activating robust fallback:", error?.message || error);
@@ -1792,6 +1813,7 @@ Expected JSON format:
     text = text.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/, '').trim();
 
     const result = JSON.parse(text);
+    result._grounding = extractGrounding(response);
     return res.json(result);
   } catch (error: any) {
     console.warn("Gemini scamcheck analysis failed, activating fallback:", error?.message || error);
@@ -1965,6 +1987,7 @@ JSON shape:
     // Cleanup potential markdown ticks if the model generates them
     text = text.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/, '').trim();
     const result = JSON.parse(text);
+    result._grounding = extractGrounding(response);
     return res.json(result);
   } catch (error: any) {
     console.warn("Gemini check-price failed, falling back gracefully:", error?.message || error);
@@ -2498,6 +2521,7 @@ WRITE ALL HUMAN-READABLE VALUES IN ${langName}. Do NOT invent fake laws, agencie
     let text = response.text || "";
     text = text.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/, '').trim();
     const result = JSON.parse(text);
+    result._grounding = extractGrounding(response);
     return res.json(result);
   } catch (error: any) {
     console.warn("Tenancy guide generation failed:", error?.message || error);
@@ -2561,6 +2585,7 @@ app.post("/api/exchange-rate", async (req, res) => {
     let text = response.text || "";
     text = text.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/, '').trim();
     const data = JSON.parse(text);
+    data._grounding = extractGrounding(response);
     if (typeof data.rate !== "number" || !isFinite(data.rate)) {
       throw new Error("invalid rate");
     }
