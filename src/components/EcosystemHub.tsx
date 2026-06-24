@@ -664,7 +664,7 @@ export default function EcosystemHub() {
       image: postItemImage
     };
     setMarketItems(prev => [newItem, ...prev]);
-    triggerNotification(`🛍️ 您的闲置宝贝发布成功！Serene 资金托管保障机制已为您全程自动锁航。`);
+    triggerNotification(`🛍️ [概念演示] 您的闲置宝贝发布成功！未来版本将接入资金托管保障机制（当前不涉及真实资金）。`);
     // reset
     setItemTitle('');
     setItemPrice('');
@@ -676,7 +676,7 @@ export default function EcosystemHub() {
   // Payment simulations
   const handleMealPay = (id: string) => {
     setMeals(prev => prev.map(m => m.id === id ? { ...m, isUnlocked: true, joinedCount: (m.joinedCount || 0) + 1 } : m));
-    triggerNotification('💳 澳洲拼饭预约金 $15 支付成功！资金锁定在 Serene 担保账目。精确门牌地址已为您安全解锁！');
+    triggerNotification('💳 [概念演示] 已模拟拼饭预约金支付，精确门牌地址已解锁（演示流程，不涉及真实资金）。');
     setCheckoutMealId(null);
     // Find the unlocked meal and auto update selected view
     const updated = meals.find(m => m.id === id);
@@ -687,7 +687,7 @@ export default function EcosystemHub() {
 
   const handleMarketItemBuyAndLock = (id: string) => {
     setMarketItems(prev => prev.map(i => i.id === id ? { ...i, secureStatus: 'locked_escrow' } : i));
-    triggerNotification('🔒 担保货款已安全划入 Serene 托管金库！请线下约定约定送达或面交，确认无误再点击放款。');
+    triggerNotification('🔒 [概念演示] 已模拟货款托管锁定，请线下约定面交，确认无误再放款（演示流程，不涉及真实资金）。');
     setCheckoutItemId(null);
     const updated = marketItems.find(i => i.id === id);
     if (updated) {
@@ -744,15 +744,20 @@ export default function EcosystemHub() {
           <Compass size={240} />
         </div>
         <div className="relative z-10">
-          <div className="inline-flex items-center space-x-1.5 bg-emerald-50 text-emerald-800 px-3 py-1 rounded-full text-xs font-black tracking-wider mb-2.5">
-            <Shield size={14} />
-            <span>SERENE TRUST ECOSYSTEM · 墨尔本留学生安全生态集市</span>
+          <div className="flex flex-wrap items-center gap-2 mb-2.5">
+            <div className="inline-flex items-center space-x-1.5 bg-emerald-50 text-emerald-800 px-3 py-1 rounded-full text-xs font-black tracking-wider">
+              <Shield size={14} />
+              <span>SERENE TRUST ECOSYSTEM · 海外新移民安全生态集市</span>
+            </div>
+            <span className="inline-flex items-center gap-1 bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide">
+              🧪 概念演示 · Roadmap
+            </span>
           </div>
           <h2 className="text-2xl md:text-3xl font-black text-[#141413] tracking-tight">
             本地向导 · 留学生拼饭 · 闲置安全流转
           </h2>
           <p className="text-xs text-gray-500 mt-1 max-w-2xl leading-relaxed">
-            告别传统微信二手群、租房群泛滥的换汇诈骗、皮包中介与虚假低价。依托实名和官方防坑基座，提供可信赖的线下带玩向导、拼饭门牌锁定与货款托管的安全街区。
+            告别传统二手群、租房群泛滥的换汇诈骗、皮包中介与虚假低价的<strong>生态愿景演示</strong>：展示「线下带玩向导 + 拼饭门牌锁定 + 货款托管」的可信赖街区设想。<strong className="text-amber-700">本模块为概念原型，不涉及真实资金流转</strong>，下方向导/商品均为示例数据。
           </p>
         </div>
       </div>
