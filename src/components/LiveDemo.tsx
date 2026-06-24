@@ -711,11 +711,21 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
     document.body.removeChild(element);
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!analysis) return;
-    const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(analysis.englishDraft.subject)}&body=${encodeURIComponent(draftBody)}`;
-    window.open(url, '_blank');
-    setAppState('sent');
+    setIsSending(true);
+    try {
+      // Real Gmail API: create a draft in the user's own Gmail (logs in on-demand).
+      await onSendEmail(recipient, analysis.englishDraft.subject, draftBody);
+      setAppState('sent');
+    } catch (e) {
+      // Login cancelled or API unavailable → fall back to a web compose link so the demo never dead-ends.
+      const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(analysis.englishDraft.subject)}&body=${encodeURIComponent(draftBody)}`;
+      window.open(url, '_blank');
+      setAppState('sent');
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const reset = () => {
@@ -1587,14 +1597,16 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                        </p>
                        
                        <div className="w-full max-w-md">
-                         <button 
-                           onClick={handleSend} 
-                           className="w-full bg-[#141413] hover:bg-[#252320] text-white py-4 rounded-xl font-bold flex items-center justify-center space-x-3 shadow-xl shadow-[#141413]/20 transition-all hover:-translate-y-0.5 active:scale-95"
+                         <button
+                           onClick={handleSend}
+                           disabled={isSending}
+                           className="w-full bg-[#141413] hover:bg-[#252320] disabled:opacity-60 text-white py-4 rounded-xl font-bold flex items-center justify-center space-x-3 shadow-xl shadow-[#141413]/20 transition-all hover:-translate-y-0.5 active:scale-95"
                          >
                             <img src="https://www.gstatic.com/images/branding/product/1x/gmail_32dp.png" alt="Gmail" className="w-5 h-5 filter brightness-0 invert" />
-                            <span>前往网页版 Gmail 发送</span>
+                            <span>{isSending ? '正在 Gmail 创建草稿…' : '一键在 Gmail 创建草稿'}</span>
                             <ExternalLink size={16} className="ml-1 opacity-70" />
                          </button>
+                         <p className="text-[10px] text-gray-400 text-center mt-2">通过 Gmail API 在你自己的邮箱生成草稿，你过目后再发送（不会自动发出）。</p>
                        </div>
                     </div>
                   </div>
@@ -1609,10 +1621,13 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                   <div className="w-24 h-24 bg-[#EBF1ED] text-[#141413] rounded-full flex items-center justify-center mb-8 shadow-inner border border-[#141413]/10">
                     <Send size={40} className="ml-2" />
                   </div>
-                  <h3 className="text-3xl font-extrabold text-gray-900 mb-4 font-serif">已跳转至网页版 Gmail！</h3>
-                  <p className="text-gray-500 text-base max-w-sm mb-10 leading-relaxed">
-                    请在弹出的窗口中确认并发送。这道难关，就快跨过去了。
+                  <h3 className="text-3xl font-extrabold text-gray-900 mb-4 font-serif">草稿已存进你的 Gmail！</h3>
+                  <p className="text-gray-500 text-base max-w-sm mb-6 leading-relaxed">
+                    打开 Gmail 的「草稿」，过目无误后一键发送。这道难关，就快跨过去了。
                   </p>
+                  <a href="https://mail.google.com/mail/u/0/#drafts" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-[#cc785c] hover:underline mb-8 inline-flex items-center gap-1">
+                    打开 Gmail 草稿箱 <ExternalLink size={14} />
+                  </a>
                   
                   <button onClick={reset} className="text-[#141413] font-bold bg-white border-2 border-[#141413] hover:bg-[#141413] hover:text-white px-10 py-4 rounded-full transition-all shadow-sm flex items-center space-x-2 active:scale-95">
                      <span>处理下一封信</span>

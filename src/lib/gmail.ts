@@ -1,4 +1,6 @@
-export const sendEmail = async (
+// Creates a real Gmail DRAFT via the Gmail API (drafts.create) — safer than sending:
+// the user reviews it in their own Gmail and hits send themselves.
+export const createGmailDraft = async (
   accessToken: string,
   to: string,
   subject: string,
@@ -14,35 +16,36 @@ export const sendEmail = async (
     return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   };
 
+  // RFC 2047 encode the subject so non-ASCII characters survive.
+  const encodedSubject = `=?UTF-8?B?${btoa(unescape(encodeURIComponent(subject)))}?=`;
+
   const message = [
     `To: ${to}`,
     'Content-Type: text/plain; charset=utf-8',
     'MIME-Version: 1.0',
-    `Subject: ${subject}`, // We can simplify or use B encoding
+    `Subject: ${encodedSubject}`,
     '',
     bodyText,
   ].join('\r\n');
 
-  const encodedMessage = encodeBase64Url(message);
+  const raw = encodeBase64Url(message);
 
   const response = await fetch(
-    'https://gmail.googleapis.com/gmail/v1/users/me/messages/send',
+    'https://gmail.googleapis.com/gmail/v1/users/me/drafts',
     {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        raw: encodedMessage,
-      }),
+      body: JSON.stringify({ message: { raw } }),
     }
   );
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
-    throw new Error(`Failed to send email: ${errorData?.error?.message || response.statusText}`);
+    throw new Error(`Failed to create draft: ${errorData?.error?.message || response.statusText}`);
   }
-  
-  return await response.json();
+
+  return await response.json(); // { id, message: { id, ... } }
 };

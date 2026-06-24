@@ -59,8 +59,8 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
 }
 
 const provider = new GoogleAuthProvider();
-// Required Gmail scope as requested
-provider.addScope('https://www.googleapis.com/auth/gmail.send');
+// Gmail "compose" scope: lets us create a draft in the user's Gmail (safer than sending).
+provider.addScope('https://www.googleapis.com/auth/gmail.compose');
 
 let isSigningIn = false;
 let cachedAccessToken: string | null = null;
