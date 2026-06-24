@@ -8,7 +8,7 @@ import LegalHubDemo from './components/LegalHubDemo';
 import { Mail, Shield, AlertTriangle, Compass, LogIn, LogOut, Clock, Scale, ListTodo } from 'lucide-react';
 
 import { initAuth, googleSignIn, logout } from './lib/firebase';
-import { sendEmail } from './lib/gmail';
+import { createGmailDraft } from './lib/gmail';
 import { User } from 'firebase/auth';
 import { useLocale, COUNTRIES, LANGUAGES, REGIONS } from './lib/locale';
 
@@ -59,9 +59,19 @@ export default function App() {
     await logout();
   };
 
-  const handleSendEmail = async (recipient: string, subject: string, body: string) => {
-    if (!accessToken) throw new Error("No token");
-    await sendEmail(accessToken, recipient, subject, body);
+  // Create a Gmail draft. Logs in on-demand (contextual) so the rest of the app stays login-free.
+  const handleCreateDraft = async (recipient: string, subject: string, body: string) => {
+    let token = accessToken;
+    if (!token) {
+      const res = await googleSignIn();
+      if (res) {
+        setUser(res.user);
+        setAccessToken(res.accessToken);
+        token = res.accessToken;
+      }
+    }
+    if (!token) throw new Error("No token");
+    await createGmailDraft(token, recipient, subject, body);
   };
 
   const tabs: { id: TabView; label: string; icon: React.ReactNode }[] = [
@@ -133,7 +143,7 @@ export default function App() {
                    accessToken={accessToken} 
                    onLogin={handleLogin} 
                    onLogout={handleLogout} 
-                   onSendEmail={handleSendEmail} 
+                   onSendEmail={handleCreateDraft}
                 />
               </div>
             )}
