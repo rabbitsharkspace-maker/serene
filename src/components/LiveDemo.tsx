@@ -339,7 +339,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
     ctx.font = '24px sans-serif';
     
     if (type === 'fine') {
-      ctx.fillStyle = '#141413';
+      ctx.fillStyle = '#1d1d1f';
       ctx.fillRect(0, 0, 600, 15); // visual bar
       ctx.fillStyle = '#000000';
       ctx.fillText('CITY COUNCIL', 50, 100);
@@ -351,7 +351,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
       ctx.fillText('OFFENCE: Parking in permit zone', 50, 320);
       ctx.fillText('Please pay within 14 days to avoid penalty.', 50, 420);
     } else if (type === 'coe') {
-      ctx.fillStyle = '#cc785c';
+      ctx.fillStyle = '#ff5a3c';
       ctx.fillRect(0, 0, 600, 15); // visual bar
       ctx.fillStyle = '#000000';
       ctx.fillText('UNIVERSITY ADMINISTRATION', 50, 100);
@@ -746,8 +746,8 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
       <div className="w-full md:p-4">
         
         <div className="mb-14 relative z-10">
-          <p className="text-[#cc785c] text-xs font-semibold tracking-[0.18em] mb-3 uppercase font-sans">Letter Officer · 信件官</p>
-          <h2 className="font-display text-4xl md:text-[3.25rem] font-medium text-[#141413] leading-[1.1] tracking-tight">
+          <p className="text-[#ff5a3c] text-xs font-semibold tracking-[0.18em] mb-3 uppercase font-sans">Letter Officer · 信件官</p>
+          <h2 className="font-display text-4xl md:text-[3.25rem] font-medium text-[#1d1d1f] leading-[1.1] tracking-tight">
             全能信件官。<br className="hidden md:block"/>三步，从慌张到搞定。
           </h2>
         </div>
@@ -792,7 +792,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                               value={profileVisaType} 
                               onChange={(e) => setProfileVisaType(e.target.value)} 
                               placeholder={`例如: ${content.defaultVisaZh}`}
-                              className="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-800 focus:outline-none focus:ring-2 ring-[#141413]/10 hover:border-gray-300 font-bold"
+                              className="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-800 focus:outline-none focus:ring-2 ring-[#1d1d1f]/10 hover:border-gray-300 font-bold"
                             />
                           </div>
                           <div className="flex flex-col gap-1.5">
@@ -802,7 +802,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                               value={profileSchool} 
                               onChange={(e) => setProfileSchool(e.target.value)} 
                               placeholder="例如: ANU, Master of Applied Data"
-                              className="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-800 focus:outline-none focus:ring-2 ring-[#141413]/10 hover:border-gray-300 font-bold"
+                              className="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-800 focus:outline-none focus:ring-2 ring-[#1d1d1f]/10 hover:border-gray-300 font-bold"
                             />
                           </div>
                           <div className="flex flex-col gap-1.5">
@@ -812,7 +812,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                               value={profileLeaseKeyTerms} 
                               onChange={(e) => setProfileLeaseKeyTerms(e.target.value)} 
                               placeholder="例如: lease ends 30 June"
-                              className="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-800 focus:outline-none focus:ring-2 ring-[#141413]/10 hover:border-gray-300 font-bold"
+                              className="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-800 focus:outline-none focus:ring-2 ring-[#1d1d1f]/10 hover:border-gray-300 font-bold"
                             />
                           </div>
                           <div className="flex flex-col gap-1.5">
@@ -822,16 +822,16 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                               value={profileAdditionalDetails} 
                               onChange={(e) => setProfileAdditionalDetails(e.target.value)} 
                               placeholder="例如: 租住在 Flinder Lane 等"
-                              className="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-800 focus:outline-none focus:ring-2 ring-[#141413]/10 hover:border-gray-300 font-bold"
+                              className="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-800 focus:outline-none focus:ring-2 ring-[#1d1d1f]/10 hover:border-gray-300 font-bold"
                             />
                           </div>
                         </div>
 
                         <div className="mt-4 flex items-center justify-between border-t border-gray-150/20 pt-4 flex-wrap gap-2">
                           <p className="text-[11px] text-gray-400 flex items-center gap-1.5">
-                            <Smile size={13} className="text-[#cc785c]" />
+                            <Smile size={13} className="text-[#ff5a3c]" />
                             {user ? (
-                              <span className="text-emerald-600 font-bold flex items-center gap-1"><UserCheck size={12}/> 已通过 Firebase 账户同步至云端数据库</span>
+                              <span className="text-ink font-bold flex items-center gap-1"><UserCheck size={12}/> 已通过 Firebase 账户同步至云端数据库</span>
                             ) : (
                               <span>您暂未登录。已保存在本地，登录后可同步至云端数据库保存</span>
                             )}
@@ -840,7 +840,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                             <button 
                               onClick={handleSaveProfile}
                               disabled={isSavingProfile}
-                              className="text-xs bg-[#cc785c] text-white hover:bg-amber-600 disabled:opacity-50 px-5 py-2.5 rounded-xl font-bold transition-all shadow-sm flex items-center gap-1 cursor-pointer"
+                              className="text-xs bg-[#ff5a3c] text-white hover:bg-amber-600 disabled:opacity-50 px-5 py-2.5 rounded-xl font-bold transition-all shadow-sm flex items-center gap-1 cursor-pointer"
                             >
                               {isSavingProfile ? "保存并同步中..." : "保存并更新记忆副驾"}
                             </button>
@@ -848,8 +848,8 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                         </div>
 
                         {profileSaveSuccess && (
-                          <div className="mt-3 text-xs bg-emerald-50 text-emerald-800 p-2.5 rounded-xl border border-emerald-150 flex items-center gap-1.5 font-bold animate-in fade-in zoom-in-95 duration-200">
-                            <CheckCircle2 size={14} className="text-emerald-600 animate-bounce" />
+                          <div className="mt-3 text-xs bg-surface-soft text-ink p-2.5 rounded-xl border border-hairline flex items-center gap-1.5 font-bold animate-in fade-in zoom-in-95 duration-200">
+                            <CheckCircle2 size={14} className="text-ink animate-bounce" />
                             记忆载入成功！后续分析将全自动引入您的个人背景进行一对一定向抗诉诊断。
                           </div>
                         )}
@@ -872,7 +872,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                         
                         <div 
                           onClick={() => { if (activeCase) return; fileInputRef.current?.click(); }}
-                          className={`w-full ${activeCase ? 'cursor-default bg-white border-2 border-dashed border-hairline' : 'cursor-pointer hover:brightness-110 bg-[#181715] border border-white/10'} rounded-2xl flex flex-col items-center justify-center overflow-hidden relative transition-all duration-300`}
+                          className={`w-full ${activeCase ? 'cursor-default bg-white border-2 border-dashed border-hairline' : 'cursor-pointer hover:brightness-110 bg-[#0a0a0a] border border-white/10'} rounded-2xl flex flex-col items-center justify-center overflow-hidden relative transition-all duration-300`}
                           style={{ minHeight: '380px' }}
                         >
                            {/* Render High definition document directly in container if a preset is selected! */}
@@ -885,7 +885,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                <img src={filePreview} alt="Preview" className="absolute inset-0 w-full h-full object-contain p-2 bg-white/5" />
                              ) : (
                                <div className="text-center p-6">
-                                 <div className="w-12 h-12 border border-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 border-dashed group-hover:border-[#cc785c]/50 transition-colors">
+                                 <div className="w-12 h-12 border border-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 border-dashed group-hover:border-[#ff5a3c]/50 transition-colors">
                                    <Camera className="text-white/50 group-hover:text-white transition-colors" size={24} />
                                  </div>
                                  <p className="text-white/60 text-xs font-bold font-sans">拍照或上传英文公文/罚单</p>
@@ -924,7 +924,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                         <button 
                           onClick={submitForAnalysis}
                           disabled={!file}
-                          className={`w-full py-3.5 rounded-2xl font-extrabold flex justify-center items-center space-x-2 transition-all duration-350 ${file ? 'bg-[#cc785c] hover:bg-[#a9583e] text-white shadow-lg active:scale-95' : 'bg-gray-150 text-gray-400 cursor-not-allowed'}`}
+                          className={`w-full py-3.5 rounded-2xl font-extrabold flex justify-center items-center space-x-2 transition-all duration-350 ${file ? 'bg-[#ff5a3c] hover:bg-[#e6492d] text-white shadow-lg active:scale-95' : 'bg-gray-150 text-gray-400 cursor-not-allowed'}`}
                         >
                           <span className="tracking-wide">AI 一键深度汉化翻译</span>
                           <ArrowRight size={18} />
@@ -941,12 +941,12 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                            <span>💡 一键载入真实高频法律/申诉案例</span>
                          </div>
                          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                            <button onClick={() => loadExample('fine')} className={`text-xs font-bold border rounded-xl p-3 transition-all flex flex-col items-center gap-1 cursor-pointer ${activeCase === 'fine' ? 'border-[#141413] bg-[#141413]/5 shadow-sm text-neutral-900 ring-1 ring-[#141413]/25' : 'border-gray-100 bg-white hover:border-[#141413]/30 hover:bg-[#141413]/5 text-gray-700'}`}>
+                            <button onClick={() => loadExample('fine')} className={`text-xs font-bold border rounded-xl p-3 transition-all flex flex-col items-center gap-1 cursor-pointer ${activeCase === 'fine' ? 'border-[#1d1d1f] bg-[#1d1d1f]/5 shadow-sm text-neutral-900 ring-1 ring-[#1d1d1f]/25' : 'border-gray-100 bg-white hover:border-[#1d1d1f]/30 hover:bg-[#1d1d1f]/5 text-gray-700'}`}>
                               <span className="text-base">🎫</span>
                               <span className="text-gray-800">停车 / 交通罚单</span>
                               <span className="text-[10px] font-normal text-muted-soft text-center leading-tight">例：超时停车被开罚单</span>
                             </button>
-                            <button onClick={() => loadExample('coe')} className={`text-xs font-bold border rounded-xl p-3 transition-all flex flex-col items-center gap-1 cursor-pointer ${activeCase === 'coe' ? 'border-[#cc785c] bg-[#cc785c]/5 shadow-sm text-neutral-900 ring-1 ring-[#cc785c]/25' : 'border-gray-100 bg-white hover:border-[#cc785c]/30 hover:bg-[#cc785c]/5 text-gray-700'}`}>
+                            <button onClick={() => loadExample('coe')} className={`text-xs font-bold border rounded-xl p-3 transition-all flex flex-col items-center gap-1 cursor-pointer ${activeCase === 'coe' ? 'border-[#ff5a3c] bg-[#ff5a3c]/5 shadow-sm text-neutral-900 ring-1 ring-[#ff5a3c]/25' : 'border-gray-100 bg-white hover:border-[#ff5a3c]/30 hover:bg-[#ff5a3c]/5 text-gray-700'}`}>
                               <span className="text-base">⚠️</span>
                               <span className="text-gray-800">学籍 / 签证警告</span>
                               <span className="text-[10px] font-normal text-muted-soft text-center leading-tight">例：挂科收到 Show Cause</span>
@@ -961,7 +961,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                               <span className="text-gray-800">学术抄袭指控</span>
                               <span className="text-[10px] font-normal text-muted-soft text-center leading-tight">例：论文查重过高被指控</span>
                             </button>
-                            <button onClick={() => loadExample('noise')} className={`text-xs font-bold border rounded-xl p-3 transition-all flex flex-col items-center gap-1 cursor-pointer ${activeCase === 'noise' ? 'border-emerald-500 bg-emerald-50 shadow-sm text-neutral-900 ring-1 ring-emerald-500/25' : 'border-gray-100 bg-white hover:border-emerald-200 hover:bg-emerald-50 text-gray-700'}`}>
+                            <button onClick={() => loadExample('noise')} className={`text-xs font-bold border rounded-xl p-3 transition-all flex flex-col items-center gap-1 cursor-pointer ${activeCase === 'noise' ? 'border-hairline bg-surface-soft shadow-sm text-neutral-900 ring-1 ring-primary/25' : 'border-gray-100 bg-white hover:border-hairline hover:bg-surface-soft text-gray-700'}`}>
                               <span className="text-base">📢</span>
                               <span className="text-gray-800">邻里噪音警告</span>
                               <span className="text-[10px] font-normal text-muted-soft text-center leading-tight">例：聚会被投诉收警告</span>
@@ -998,10 +998,10 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                    <span className="font-bold text-gray-900">🚨 涉诉金额/威胁:</span> <span className="font-extrabold text-red-650">{CASE_GUIDES[activeCase].amount}</span>
                                  </div>
                                  <div>
-                                   <span className="font-bold text-gray-900">⏰ 行政抗诉死线:</span> <span className="font-bold text-[#141413] bg-white border px-1.5 py-0.5 rounded">{CASE_GUIDES[activeCase].deadline}</span>
+                                   <span className="font-bold text-gray-900">⏰ 行政抗诉死线:</span> <span className="font-bold text-[#1d1d1f] bg-white border px-1.5 py-0.5 rounded">{CASE_GUIDES[activeCase].deadline}</span>
                                  </div>
                                  <div className="bg-white/85 p-3 rounded-2xl border border-amber-100/50 leading-relaxed text-gray-600 mt-2">
-                                   <p className="font-bold text-gray-900 border-l-2 border-[#cc785c] pl-1.5 mb-1.5 text-[10px]">事件描述 (Case Overview):</p>
+                                   <p className="font-bold text-gray-900 border-l-2 border-[#ff5a3c] pl-1.5 mb-1.5 text-[10px]">事件描述 (Case Overview):</p>
                                    {CASE_GUIDES[activeCase].summary}
                                  </div>
                                </div>
@@ -1027,12 +1027,12 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                      <ul className="space-y-2">
                                        {CASE_GUIDES[activeCase].groundingSources.map((source, index) => (
                                          <li key={index} className="leading-normal flex items-start gap-1">
-                                           <span className="text-[#141413] shrink-0 mt-0.5 text-xs">🔗</span>
+                                           <span className="text-[#1d1d1f] shrink-0 mt-0.5 text-xs">🔗</span>
                                            <a 
                                              href={source.url} 
                                              target="_blank" 
                                              rel="noopener noreferrer" 
-                                             className="text-[#141413] hover:text-[#cc785c] hover:underline font-bold transition-colors flex flex-wrap items-center gap-0.5"
+                                             className="text-[#1d1d1f] hover:text-[#ff5a3c] hover:underline font-bold transition-colors flex flex-wrap items-center gap-0.5"
                                            >
                                              <span>{source.label}</span>
                                              <span className="text-[9px] text-gray-400 font-normal">({new URL(source.url).hostname})</span>
@@ -1058,7 +1058,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                              <div className="border-t border-amber-100 pt-3 mt-5 flex flex-col sm:flex-row gap-2">
                                <button 
                                  onClick={() => setShowDocModal(true)}
-                                 className="flex-1 bg-[#141413] hover:bg-neutral-800 text-white font-extrabold py-2.5 px-4 rounded-xl text-xs flex justify-center items-center gap-1.5 active:scale-95 transition-all cursor-pointer shadow-sm"
+                                 className="flex-1 bg-[#1d1d1f] hover:bg-neutral-800 text-white font-extrabold py-2.5 px-4 rounded-xl text-xs flex justify-center items-center gap-1.5 active:scale-95 transition-all cursor-pointer shadow-sm"
                                >
                                  <Eye size={14}/>
                                  <span>📄 放大查阅高清原始公文 (HTML排版原件)</span>
@@ -1068,7 +1068,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                          ) : (
                            <div className="flex-1 flex flex-col items-center justify-center text-center py-10">
                               <Info className="text-amber-500 mb-3 animate-bounce" size={32} />
-                              <h3 className="text-base font-bold text-[#141413] mb-1">等待选择公文案例</h3>
+                              <h3 className="text-base font-bold text-[#1d1d1f] mb-1">等待选择公文案例</h3>
                               <p className="text-xs text-gray-500 max-w-sm leading-relaxed px-4">
                                 请在上方点击选择任意常见罚单、租房、抄袭、噪音案例一键导入。
                                 载入后，此区域将自动解锁专业保姆级法律指导(More Info)以及高清排版原件。
@@ -1085,8 +1085,8 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
              {appState === 'analyzing' && (
                 <div className="flex-1 flex flex-col items-center justify-center py-8 px-4 max-w-xl mx-auto animate-in fade-in duration-500">
                   <div className="relative mb-6 flex items-center justify-center">
-                    <div className="w-14 h-14 border-4 border border-emerald-100 border-t-emerald-600 rounded-full animate-spin"></div>
-                    <span className="absolute text-emerald-700 font-extrabold text-[10px] uppercase font-sans tracking-tight">R-AI</span>
+                    <div className="w-14 h-14 border-4 border border-hairline border-t-ink rounded-full animate-spin"></div>
+                    <span className="absolute text-ink font-extrabold text-[10px] uppercase font-sans tracking-tight">R-AI</span>
                   </div>
                   
                   <h3 className="text-lg font-extrabold text-gray-950 mb-1 flex items-center gap-1.5 justify-center">
@@ -1134,23 +1134,23 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                       return (
                         <div 
                           key={item.step} 
-                          className={`p-3.5 rounded-2.5xl border transition-all duration-300 ${isDone ? 'bg-emerald-50/50 border-emerald-200' : isActive ? 'bg-[#141413]/5 border-[#141413]/25 shadow-sm animate-pulse' : 'bg-gray-50/20 border-gray-100 opacity-45'}`}
+                          className={`p-3.5 rounded-2.5xl border transition-all duration-300 ${isDone ? 'bg-surface-soft/50 border-hairline' : isActive ? 'bg-[#1d1d1f]/5 border-[#1d1d1f]/25 shadow-sm animate-pulse' : 'bg-gray-50/20 border-gray-100 opacity-45'}`}
                         >
                           <div className="flex items-center space-x-3">
                             <div className="shrink-0">
                               {isDone ? (
-                                <span className="w-5.5 h-5.5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold font-sans">✓</span>
+                                <span className="w-5.5 h-5.5 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold font-sans">✓</span>
                               ) : isActive ? (
-                                <span className="w-5.5 h-5.5 rounded-full bg-emerald-700 text-white flex items-center justify-center text-xs font-bold font-sans animate-spin">⟳</span>
+                                <span className="w-5.5 h-5.5 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold font-sans animate-spin">⟳</span>
                               ) : (
                                 <span className="w-5.5 h-5.5 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center text-xs font-bold font-sans">{item.step}</span>
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className={`text-[11px] font-black tracking-wide ${isDone ? 'text-emerald-950' : isActive ? 'text-emerald-900' : 'text-gray-450'}`}>
+                              <h4 className={`text-[11px] font-black tracking-wide ${isDone ? 'text-ink' : isActive ? 'text-ink' : 'text-gray-450'}`}>
                                 {item.title}
                               </h4>
-                              <p className={`text-[10px] mt-0.5 leading-normal ${isDone ? 'text-emerald-800' : isActive ? 'text-emerald-750 font-bold' : 'text-gray-400'}`}>
+                              <p className={`text-[10px] mt-0.5 leading-normal ${isDone ? 'text-ink' : isActive ? 'text-ink font-bold' : 'text-gray-400'}`}>
                                 {isDone ? item.success : isActive ? item.pending : "排队待命..."}
                               </p>
                             </div>
@@ -1186,12 +1186,12 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                  )}
 
                  {/* Visual automatic-completion checking summary banner */}
-                 <div className="bg-emerald-50 border border-emerald-200/65 p-5 rounded-3xl flex items-start space-x-4 mb-6 animate-in slide-in-from-top-4 duration-500 shadow-sm">
-                   <div className="w-10 h-10 bg-emerald-600 text-white rounded-2xl flex items-center justify-center text-lg shrink-0 shadow-sm font-sans font-bold">
+                 <div className="bg-surface-soft border border-hairline/65 p-5 rounded-3xl flex items-start space-x-4 mb-6 animate-in slide-in-from-top-4 duration-500 shadow-sm">
+                   <div className="w-10 h-10 bg-primary text-white rounded-2xl flex items-center justify-center text-lg shrink-0 shadow-sm font-sans font-bold">
                      🎉
                    </div>
                    <div>
-                     <h4 className="text-xs font-black text-[#141413] mb-1">
+                     <h4 className="text-xs font-black text-[#1d1d1f] mb-1">
                        AI 闭环护航申诉：整套法务复议流程已全面自动为您办妥！(AI Auto-Resolution Actions Complete)
                      </h4>
                      <p className="text-[11px] text-gray-700 leading-relaxed font-sans font-medium">
@@ -1206,7 +1206,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch flex-1">
                         {/* LEFT COLUMN: Disputable items list */}
                         <div className="lg:col-span-6 flex flex-col bg-neutral-100/60 p-5 rounded-3xl border border-gray-200/50 max-h-[85vh] overflow-y-auto custom-scrollbar">
-                           <div className="text-[10px] font-black text-[#141413] tracking-wider uppercase mb-1">
+                           <div className="text-[10px] font-black text-[#1d1d1f] tracking-wider uppercase mb-1">
                              ⚖️ 交叉匹配合同条目冲突分析栏 (CROSS DISPUTE ITEMS)
                            </div>
                            <h3 className="text-sm font-extrabold text-gray-900 mb-4">
@@ -1215,7 +1215,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
 
                            <div className="space-y-4">
                              {crossAnalysis.disputableItems.map((item: any, i: number) => (
-                               <div key={i} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-3 hover:border-emerald-300 transition-colors">
+                               <div key={i} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-3 hover:border-hairline transition-colors">
                                  <div className="flex justify-between items-start border-b border-gray-50 pb-2">
                                    <span className="text-xs font-black text-gray-950 flex items-center gap-1">
                                      <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
@@ -1227,8 +1227,8 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                  </div>
                                  
                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[10px] text-gray-500 font-sans leading-relaxed">
-                                   <div className="bg-emerald-50/30 p-2.5 rounded-lg border border-emerald-100/50">
-                                     <p className="font-bold text-emerald-900 mb-1">Clause A 住宅契约条款或规范：</p>
+                                   <div className="bg-surface-soft/30 p-2.5 rounded-lg border border-hairline/50">
+                                     <p className="font-bold text-ink mb-1">Clause A 住宅契约条款或规范：</p>
                                      <p>{item.clauseA}</p>
                                    </div>
                                    <div className="bg-red-50/20 p-2.5 rounded-lg border border-red-100/30">
@@ -1255,8 +1255,8 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                         <div className="lg:col-span-6 flex flex-col gap-6 overflow-y-auto pr-1 custom-scrollbar max-h-[85vh]">
                            {/* Global strategy card */}
                            <div className="bg-[#FFF4F2] p-5 rounded-3xl border border-[#FEE6E3]">
-                             <div className="text-[10px] font-bold text-[#cc785c] tracking-widest mb-2 uppercase flex items-center space-x-2">
-                               <span className="w-2 h-2 rounded-full bg-[#cc785c]"></span>
+                             <div className="text-[10px] font-bold text-[#ff5a3c] tracking-widest mb-2 uppercase flex items-center space-x-2">
+                               <span className="w-2 h-2 rounded-full bg-[#ff5a3c]"></span>
                                <span>总体驳回对线核心策略 (Chief Negotiator Directive)</span>
                              </div>
                              <p className="text-gray-900 text-xs font-medium leading-relaxed mb-3">
@@ -1271,16 +1271,16 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                            </div>
 
                            {/* Intention and drafts */}
-                           <div className="bg-[#FAF9F5] p-5 rounded-3xl border border-gray-200 flex flex-col gap-4 font-sans">
+                           <div className="bg-[#f5f5f7] p-5 rounded-3xl border border-gray-200 flex flex-col gap-4 font-sans">
                              <div className="flex justify-between items-center border-b border-gray-100 pb-2">
                                <span className="text-xs font-black text-gray-800 flex items-center gap-1">
                                  📝 主力英文维权正式声明书 (Drafting Response Document)
                                </span>
-                               <span className="text-[9px] bg-emerald-50 text-emerald-800 border border-emerald-100 px-2 py-0.5 rounded-full font-black">对线意图高度匹配</span>
+                               <span className="text-[9px] bg-surface-soft text-ink border border-hairline px-2 py-0.5 rounded-full font-black">对线意图高度匹配</span>
                              </div>
 
-                             <div className="text-[11px]/relaxed text-gray-500 bg-emerald-50/10 p-2.5 rounded-xl border border-emerald-150/40 font-normal">
-                               <span className="font-bold text-emerald-950">对线意图：</span>
+                             <div className="text-[11px]/relaxed text-gray-500 bg-surface-soft/10 p-2.5 rounded-xl border border-hairline/40 font-normal">
+                               <span className="font-bold text-ink">对线意图：</span>
                                {crossAnalysis.englishDraft.intention}
                              </div>
 
@@ -1294,7 +1294,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                <textarea 
                                  value={draftBody}
                                  onChange={(e) => setDraftBody(e.target.value)}
-                                 className="bg-white text-xs border border-gray-200 h-[220px] rounded-xl p-3 resize-none font-sans focus:outline-none focus:ring-1 focus:ring-[#141413] focus:border-[#141413] leading-relaxed select-text" 
+                                 className="bg-white text-xs border border-gray-200 h-[220px] rounded-xl p-3 resize-none font-sans focus:outline-none focus:ring-1 focus:ring-[#1d1d1f] focus:border-[#1d1d1f] leading-relaxed select-text" 
                                />
                              </div>
 
@@ -1318,7 +1318,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                      `请注意，今日向中介 Horizon 提交了正式抗诉信件，依据 14 天法定答复时限，若对方无理回绝，请立即单方面发起 RTBA 索赔！时效届满截止日期：${dateStr}`
                                    );
                                  }}
-                                 className="flex-1 bg-white hover:bg-neutral-50 text-[#141413] border-2 border-[#141413]/35 font-extrabold text-xs py-3 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer active:scale-95"
+                                 className="flex-1 bg-white hover:bg-neutral-50 text-[#1d1d1f] border-2 border-[#1d1d1f]/35 font-extrabold text-xs py-3 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer active:scale-95"
                                >
                                  <Calendar size={14} />
                                  <span>一键载入法定抗辩日历事件 (.ics)</span>
@@ -1330,7 +1330,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                    window.open(url, '_blank');
                                    setAppState('sent');
                                  }}
-                                 className="flex-1 bg-[#141413] hover:bg-neutral-800 text-white font-extrabold text-xs py-3 px-4 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer active:scale-95"
+                                 className="flex-1 bg-[#1d1d1f] hover:bg-neutral-800 text-white font-extrabold text-xs py-3 px-4 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer active:scale-95"
                                >
                                  <Send size={14} />
                                  <span>极速一键直达 Gmail 答复抗辩</span>
@@ -1348,7 +1348,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                        {activeCase ? (
                          <span className="text-[10px] text-amber-700 bg-amber-100 px-2 py-0.5 rounded font-bold">内置经典案例</span>
                        ) : (
-                         <span className="text-[10px] text-blue-700 bg-blue-100 px-2 py-0.5 rounded font-bold">用户自选公文</span>
+                         <span className="text-[10px] text-on-dark bg-ink px-2 py-0.5 rounded font-bold">用户自选公文</span>
                        )}
                      </div>
 
@@ -1366,7 +1366,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
 
                      <button 
                        onClick={() => setShowDocModal(true)}
-                       className="mt-3.5 w-full bg-[#141413] hover:bg-neutral-800 text-white font-extrabold py-2.5 px-4 rounded-xl text-xs flex justify-center items-center gap-1.5 active:scale-95 transition-all cursor-pointer shadow-sm"
+                       className="mt-3.5 w-full bg-[#1d1d1f] hover:bg-neutral-800 text-white font-extrabold py-2.5 px-4 rounded-xl text-xs flex justify-center items-center gap-1.5 active:scale-95 transition-all cursor-pointer shadow-sm"
                      >
                        <Eye size={13}/>
                        <span>📄 放大查阅高清原始公文 (1:1 A4放大)</span>
@@ -1376,8 +1376,8 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                    {/* Right Column: AI Translation & Responses */}
                    <div className="lg:col-span-7 flex flex-col gap-6 overflow-y-auto pr-1 custom-scrollbar max-h-[85vh]">
                      <div className="bg-[#FFF4F2] p-6 rounded-2xl border border-[#FEE6E3]">
-                    <div className="text-[10px] font-bold text-[#cc785c] tracking-widest mb-3 uppercase flex items-center space-x-2">
-                       <span className="w-2 h-2 rounded-full bg-[#cc785c]"></span>
+                    <div className="text-[10px] font-bold text-[#ff5a3c] tracking-widest mb-3 uppercase flex items-center space-x-2">
+                       <span className="w-2 h-2 rounded-full bg-[#ff5a3c]"></span>
                        <span>它在说什么 & 痛感折算</span>
                     </div>
                     <div className="text-gray-900 font-medium text-sm mb-4 markdown-body">
@@ -1391,9 +1391,9 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                     </div>
                  </div>
 
-                 <div className="bg-[#F8F6F1] p-6 rounded-2xl mb-8 border border-[#EBE8E0]">
-                    <div className="text-[10px] font-bold text-[#141413] tracking-widest mb-4 uppercase flex items-center space-x-2">
-                       <span className="w-2 h-2 rounded-full bg-[#141413]"></span>
+                 <div className="bg-[#ececef] p-6 rounded-2xl mb-8 border border-[#EBE8E0]">
+                    <div className="text-[10px] font-bold text-[#1d1d1f] tracking-widest mb-4 uppercase flex items-center space-x-2">
+                       <span className="w-2 h-2 rounded-full bg-[#1d1d1f]"></span>
                        <span>🚀 抗辩执行清单 (To-Do Checklist Kanban)</span>
                      </div>
                      {analysis.deadline && (
@@ -1427,7 +1427,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                ⏰ 剩余 {analysis.deadline?.businessDaysLeft ?? 0} 天
                              </span>
                              {analysis.issuer?.isOfficial && (
-                               <span className="bg-[#141413]/10 text-[#141413] text-[8px] font-black px-1.5 py-0.5 rounded">
+                               <span className="bg-[#1d1d1f]/10 text-[#1d1d1f] text-[8px] font-black px-1.5 py-0.5 rounded">
                                  🏛️ 官方认证
                                </span>
                              )}
@@ -1447,12 +1447,12 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                        const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
                        return (
                          <div className="mb-4 font-sans">
-                           <div className="flex justify-between items-center mb-1 text-[10px] font-black text-[#141413] tracking-wider uppercase">
+                           <div className="flex justify-between items-center mb-1 text-[10px] font-black text-[#1d1d1f] tracking-wider uppercase">
                              <span>申诉执行进度</span>
                              <span>{completedCount}/{totalCount} 已完成 ({percentage}%)</span>
                            </div>
                            <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden border border-gray-100">
-                             <div className="bg-emerald-600 h-full transition-all duration-550" style={{ width: `${percentage}%` }} />
+                             <div className="bg-primary h-full transition-all duration-550" style={{ width: `${percentage}%` }} />
                            </div>
                          </div>
                        );
@@ -1464,8 +1464,8 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                             onClick={() => toggleTaskStatus(task.id)}
                             className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 mt-0.5 transition-all cursor-pointer ${
                               task.status === 'done' 
-                                ? 'bg-[#141413] border-[#141413] text-white' 
-                                : 'border-gray-300 bg-white hover:border-[#141413]'
+                                ? 'bg-[#1d1d1f] border-[#1d1d1f] text-white' 
+                                : 'border-gray-300 bg-white hover:border-[#1d1d1f]'
                             }`}
                           >
                             {task.status === 'done' && <CheckCircle2 size={11} className="stroke-[3]" />}
@@ -1477,7 +1477,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                  href={task.url} 
                                  target="_blank" 
                                  rel="noopener noreferrer" 
-                                 className="inline-flex items-center gap-1 text-[10px] font-black text-emerald-700 hover:text-red-500 mt-1.5 transition-all bg-emerald-50 px-2 py-0.5 rounded-md"
+                                 className="inline-flex items-center gap-1 text-[10px] font-black text-ink hover:text-red-500 mt-1.5 transition-all bg-surface-soft px-2 py-0.5 rounded-md"
                                >
                                  <span>🌐 去官网对线：{task.channel || "在线申诉纠纷平台"}</span>
                                  <ExternalLink size={9} className="shrink-0" />
@@ -1493,7 +1493,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                     <h3 className="text-2xl font-bold text-gray-900 mb-6 font-serif">拟定英文回信</h3>
                     
                     <div className="bg-[#FFF8E7] p-5 rounded-xl border border-[#FBEAC3] mb-6 flex items-start space-x-4 shadow-sm">
-                       <div className="w-10 h-10 rounded-full bg-[#cc785c]/20 flex items-center justify-center flex-shrink-0 mt-0.5 border border-[#cc785c]/30">
+                       <div className="w-10 h-10 rounded-full bg-[#ff5a3c]/20 flex items-center justify-center flex-shrink-0 mt-0.5 border border-[#ff5a3c]/30">
                           <AlignLeft size={18} className="text-[#B58529]" />
                        </div>
                        <div>
@@ -1507,12 +1507,12 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                     <div className="flex flex-col space-y-4 mb-6">
                      {/* Part 4: Verified Legal/Grounding Sources Display next to email strategy intent */}
                      {analysis.userRights && analysis.userRights.length > 0 && (
-                       <div className="bg-emerald-50/15 border border-emerald-200 p-5 rounded-2xl mb-6 flex flex-col gap-3 font-sans shadow-sm">
-                         <div className="text-[10px] font-black text-[#141413] tracking-wider uppercase flex items-center gap-1.5 leading-none">
-                           <Globe size={13} className="text-emerald-700 shrink-0"/>
+                       <div className="bg-surface-soft/15 border border-hairline p-5 rounded-2xl mb-6 flex flex-col gap-3 font-sans shadow-sm">
+                         <div className="text-[10px] font-black text-[#1d1d1f] tracking-wider uppercase flex items-center gap-1.5 leading-none">
+                           <Globe size={13} className="text-ink shrink-0"/>
                            <span>⚖️ 基石：申诉法定依据（真 Grounding 官方信源支撑）</span>
                          </div>
-                         <div className="divide-y divide-emerald-100/60 flex flex-col">
+                         <div className="divide-y divide-ink/60 flex flex-col">
                            {analysis.userRights.map((right, index) => (
                              <div key={index} className="py-2.5 first:pt-0 last:pb-0 flex flex-col gap-1 text-xs">
                                <p className="font-bold text-gray-900 leading-normal">
@@ -1527,7 +1527,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                      href={right.sourceUrl} 
                                      target="_blank" 
                                      rel="noopener noreferrer" 
-                                     className="inline-flex items-center gap-0.5 text-[#141413] font-black hover:text-[#cc785c] hover:underline whitespace-nowrap"
+                                     className="inline-flex items-center gap-0.5 text-[#1d1d1f] font-black hover:text-[#ff5a3c] hover:underline whitespace-nowrap"
                                    >
                                      <span>🔗 查看官方原文条款</span>
                                      <ExternalLink size={9} />
@@ -1569,7 +1569,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                        <div className="flex-1 flex flex-col">
                           <div className="flex items-center justify-between mb-2 px-1">
                              <label className="text-[11px] font-bold text-gray-500 tracking-widest uppercase">英文原稿（可自由修改）</label>
-                             <span className="text-[10px] bg-blue-50 text-blue-500 px-2 py-0.5 rounded-full font-bold">Editable</span>
+                             <span className="text-[10px] bg-ink text-on-dark px-2 py-0.5 rounded-full font-bold">Editable</span>
                           </div>
                           <textarea 
                             value={draftBody}
@@ -1600,7 +1600,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                          <button
                            onClick={handleSend}
                            disabled={isSending}
-                           className="w-full bg-[#141413] hover:bg-[#252320] disabled:opacity-60 text-white py-4 rounded-xl font-bold flex items-center justify-center space-x-3 shadow-xl shadow-[#141413]/20 transition-all hover:-translate-y-0.5 active:scale-95"
+                           className="w-full bg-[#1d1d1f] hover:bg-[#1a1a1a] disabled:opacity-60 text-white py-4 rounded-xl font-bold flex items-center justify-center space-x-3 shadow-xl shadow-[#1d1d1f]/20 transition-all hover:-translate-y-0.5 active:scale-95"
                          >
                             <img src="https://www.gstatic.com/images/branding/product/1x/gmail_32dp.png" alt="Gmail" className="w-5 h-5 filter brightness-0 invert" />
                             <span>{isSending ? '正在 Gmail 创建草稿…' : '一键在 Gmail 创建草稿'}</span>
@@ -1618,18 +1618,18 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
 
              {appState === 'sent' && (
                <div className="flex-1 flex flex-col items-center justify-center text-center animate-in zoom-in-95 duration-500 py-12">
-                  <div className="w-24 h-24 bg-[#EBF1ED] text-[#141413] rounded-full flex items-center justify-center mb-8 shadow-inner border border-[#141413]/10">
+                  <div className="w-24 h-24 bg-[#EBF1ED] text-[#1d1d1f] rounded-full flex items-center justify-center mb-8 shadow-inner border border-[#1d1d1f]/10">
                     <Send size={40} className="ml-2" />
                   </div>
                   <h3 className="text-3xl font-extrabold text-gray-900 mb-4 font-serif">草稿已存进你的 Gmail！</h3>
                   <p className="text-gray-500 text-base max-w-sm mb-6 leading-relaxed">
                     打开 Gmail 的「草稿」，过目无误后一键发送。这道难关，就快跨过去了。
                   </p>
-                  <a href="https://mail.google.com/mail/u/0/#drafts" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-[#cc785c] hover:underline mb-8 inline-flex items-center gap-1">
+                  <a href="https://mail.google.com/mail/u/0/#drafts" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-[#ff5a3c] hover:underline mb-8 inline-flex items-center gap-1">
                     打开 Gmail 草稿箱 <ExternalLink size={14} />
                   </a>
                   
-                  <button onClick={reset} className="text-[#141413] font-bold bg-white border-2 border-[#141413] hover:bg-[#141413] hover:text-white px-10 py-4 rounded-full transition-all shadow-sm flex items-center space-x-2 active:scale-95">
+                  <button onClick={reset} className="text-[#1d1d1f] font-bold bg-white border-2 border-[#1d1d1f] hover:bg-[#1d1d1f] hover:text-white px-10 py-4 rounded-full transition-all shadow-sm flex items-center space-x-2 active:scale-95">
                      <span>处理下一封信</span>
                      <ArrowRight size={18} />
                   </button>
@@ -1642,10 +1642,10 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
         {/* High-Definition Original Document Overlay Modal */}
         {showDocModal && (activeCase || filePreview) && (
           <div className="fixed inset-0 bg-neutral-900/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-300">
-            <div className="bg-[#FAF9F5] rounded-3xl w-full max-w-3xl shadow-2xl overflow-hidden border border-neutral-100 flex flex-col max-h-[90vh]">
-              <div className="bg-[#141413] text-white px-6 py-4 flex justify-between items-center">
+            <div className="bg-[#f5f5f7] rounded-3xl w-full max-w-3xl shadow-2xl overflow-hidden border border-neutral-100 flex flex-col max-h-[90vh]">
+              <div className="bg-[#1d1d1f] text-white px-6 py-4 flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                  <FileText size={18} className="text-[#cc785c]"/>
+                  <FileText size={18} className="text-[#ff5a3c]"/>
                   <span className="font-extrabold text-xs md:text-sm">
                     {activeCase ? `${CASE_GUIDES[activeCase].title} - 官方正本 A4 高清阅览` : '已上传公文 - 高清放大阅览'}
                   </span>
@@ -1674,13 +1674,13 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
               </div>
 
               {appState !== 'result' && (
-                <div className="bg-[#141413]/5 px-6 py-4 flex justify-end gap-2 border-t text-xs">
+                <div className="bg-[#1d1d1f]/5 px-6 py-4 flex justify-end gap-2 border-t text-xs">
                   <button 
                     onClick={() => {
                       setShowDocModal(false);
                       submitForAnalysis();
                     }}
-                    className="bg-[#cc785c] hover:bg-[#a9583e] text-white font-extrabold py-2.5 px-6 rounded-xl shadow active:scale-95 transition-all flex items-center gap-1 cursor-pointer"
+                    className="bg-[#ff5a3c] hover:bg-[#e6492d] text-white font-extrabold py-2.5 px-6 rounded-xl shadow active:scale-95 transition-all flex items-center gap-1 cursor-pointer"
                   >
                     <span>一键对该公文进行Ai深度解析与写信申诉</span>
                     <ArrowRight size={14}/>

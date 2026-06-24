@@ -143,12 +143,12 @@ export default function HistoryView() {
       <div className="w-full max-w-4xl mx-auto bg-white rounded-3xl p-6 md:p-12 shadow-sm border border-gray-100">
         <button 
           onClick={() => setSelectedItem(null)}
-          className="mb-6 text-sm font-bold text-gray-400 hover:text-[#141413] transition flex items-center gap-1.5 cursor-pointer"
+          className="mb-6 text-sm font-bold text-gray-400 hover:text-[#1d1d1f] transition flex items-center gap-1.5 cursor-pointer"
         >
           <ArrowRight className="rotate-180" size={16} /> 返回列表
         </button>
         <div>
-          <h2 className="text-2xl font-bold mb-2 text-[#141413]">{selectedItem.subject}</h2>
+          <h2 className="text-2xl font-bold mb-2 text-[#1d1d1f]">{selectedItem.subject}</h2>
           <p className="text-sm text-gray-400 mb-8 flex items-center gap-2 font-medium">
             <Clock size={14} /> {new Date(selectedItem.timestamp).toLocaleString()}
           </p>
@@ -164,7 +164,7 @@ export default function HistoryView() {
           <div className="mt-8 flex justify-end">
             <button 
               onClick={() => handleSendDraft(selectedItem)}
-              className="bg-[#141413] hover:bg-[#252320] text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 shadow-sm hover:shadow transition-all active:scale-95 cursor-pointer text-xs"
+              className="bg-[#1d1d1f] hover:bg-[#1a1a1a] text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 shadow-sm hover:shadow transition-all active:scale-95 cursor-pointer text-xs"
             >
               <span>前往 Gmail 发送</span>
               <ExternalLink size={14} className="opacity-70" />
@@ -180,8 +180,8 @@ export default function HistoryView() {
       {/* Title Header */}
       <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 className="text-11px font-black text-[#cc785c] tracking-widest uppercase mb-1.5">Dashboard & Action Desk</h2>
-          <h1 className="text-4xl font-extrabold text-[#141413] tracking-tight leading-none">避坑案头 & 历史记录。</h1>
+          <h2 className="text-11px font-black text-[#ff5a3c] tracking-widest uppercase mb-1.5">Dashboard & Action Desk</h2>
+          <h1 className="text-4xl font-extrabold text-[#1d1d1f] tracking-tight leading-none">避坑案头 & 历史记录。</h1>
           <p className="text-gray-400 text-xs mt-2 font-medium">汇总并跨信件追踪您所有的申诉待办任务、危机死线与保存的对线原稿。</p>
         </div>
 
@@ -189,14 +189,14 @@ export default function HistoryView() {
         <div className="flex bg-gray-100/80 p-1.5 rounded-2xl border border-gray-200/50 self-start md:self-end">
           <button 
             onClick={() => setActiveSubTab('kanban')}
-            className={`px-5 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 ${activeSubTab === 'kanban' ? 'bg-[#141413] text-white shadow' : 'text-gray-500 hover:text-gray-800'}`}
+            className={`px-5 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 ${activeSubTab === 'kanban' ? 'bg-[#1d1d1f] text-white shadow' : 'text-gray-500 hover:text-gray-800'}`}
           >
             <ListTodo size={14} />
             <span>避坑行动案头 ({tasks.length})</span>
           </button>
           <button 
             onClick={() => setActiveSubTab('drafts')}
-            className={`px-5 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 ${activeSubTab === 'drafts' ? 'bg-[#141413] text-white shadow' : 'text-gray-500 hover:text-gray-800'}`}
+            className={`px-5 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 ${activeSubTab === 'drafts' ? 'bg-[#1d1d1f] text-white shadow' : 'text-gray-500 hover:text-gray-800'}`}
           >
             <Mail size={14} />
             <span>历史申诉原稿 ({history.length})</span>
@@ -209,12 +209,12 @@ export default function HistoryView() {
           {/* Action Desk Cards Section */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div className="bg-[#FAF6EE] border border-amber-200/40 rounded-3xl p-5 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#cc785c]/10 text-[#cc785c] flex items-center justify-center font-bold">
+              <div className="w-12 h-12 rounded-2xl bg-[#ff5a3c]/10 text-[#ff5a3c] flex items-center justify-center font-bold">
                 <Calendar size={22} />
               </div>
               <div>
                 <span className="text-[10px] font-black text-gray-400 tracking-wider">进行中待办</span>
-                <h3 className="text-2xl font-black text-[#141413]">{countTodo} <span className="text-xs font-normal text-gray-500">项</span></h3>
+                <h3 className="text-2xl font-black text-[#1d1d1f]">{countTodo} <span className="text-xs font-normal text-gray-500">项</span></h3>
               </div>
             </div>
 
@@ -228,13 +228,13 @@ export default function HistoryView() {
               </div>
             </div>
 
-            <div className="bg-emerald-50/40 border border-emerald-100 rounded-3xl p-5 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
+            <div className="bg-surface-soft/40 border border-hairline rounded-3xl p-5 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-surface-soft text-ink flex items-center justify-center font-bold">
                 <CheckCircle size={22} />
               </div>
               <div>
-                <span className="text-[10px] font-black text-emerald-500 tracking-wider">已斩获搞定</span>
-                <h3 className="text-2xl font-black text-emerald-800">{countDone} <span className="text-xs font-normal text-[#141413]">项</span></h3>
+                <span className="text-[10px] font-black text-ink tracking-wider">已斩获搞定</span>
+                <h3 className="text-2xl font-black text-ink">{countDone} <span className="text-xs font-normal text-[#1d1d1f]">项</span></h3>
               </div>
             </div>
           </div>
@@ -274,8 +274,8 @@ export default function HistoryView() {
                   <div className="grid grid-cols-3 gap-2">
                     {[
                       { code: 'red', label: '红色 (高危)', bg: 'bg-red-50 text-red-800 hover:bg-red-100', activeBg: 'bg-red-650 text-white border-red-650' },
-                      { code: 'yellow', label: '黄色 (中等)', bg: 'bg-amber-50 text-amber-800 hover:bg-amber-100', activeBg: 'bg-[#cc785c] text-white border-[#cc785c]' },
-                      { code: 'green', label: '绿色 (常规)', bg: 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100', activeBg: 'bg-emerald-650 text-white border-emerald-650' }
+                      { code: 'yellow', label: '黄色 (中等)', bg: 'bg-amber-50 text-amber-800 hover:bg-amber-100', activeBg: 'bg-[#ff5a3c] text-white border-[#ff5a3c]' },
+                      { code: 'green', label: '绿色 (常规)', bg: 'bg-surface-soft text-ink hover:bg-surface-soft', activeBg: 'bg-ink text-white border-hairline' }
                     ].map(opt => (
                       <button
                         type="button"
@@ -314,7 +314,7 @@ export default function HistoryView() {
                 <button
                   type="submit"
                   disabled={isAddingTask || !newTaskTitle}
-                  className="mt-2 w-full bg-[#141413] hover:bg-neutral-800 text-white disabled:opacity-50 text-xs font-black py-3 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="mt-2 w-full bg-[#1d1d1f] hover:bg-neutral-800 text-white disabled:opacity-50 text-xs font-black py-3 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <Plus size={14} />
                   <span>{isAddingTask ? "添加中..." : "保存加入案头待办"}</span>
@@ -329,7 +329,7 @@ export default function HistoryView() {
                   <span>行动清单汇总 (支持多信件自动汇聚)</span>
                   <button 
                     onClick={handleAddAllToGoogleCalendar}
-                    className="bg-[#FAF6EE] text-[#cc785c] border border-amber-200/50 hover:bg-[#FAF1E1] px-4 py-2 rounded-xl text-[10px] cursor-pointer font-black flex items-center gap-1 transition-all"
+                    className="bg-[#FAF6EE] text-[#ff5a3c] border border-amber-200/50 hover:bg-[#FAF1E1] px-4 py-2 rounded-xl text-[10px] cursor-pointer font-black flex items-center gap-1 transition-all"
                   >
                     <Calendar size={12} />
                     <span>一键快捷同步未完成项至 Google 日历</span>
@@ -338,12 +338,12 @@ export default function HistoryView() {
 
                 {isLoadingTasks ? (
                   <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-                    <div className="w-8 h-8 border-3 border-[#141413] border-t-transparent rounded-full animate-spin mb-4" />
+                    <div className="w-8 h-8 border-3 border-[#1d1d1f] border-t-transparent rounded-full animate-spin mb-4" />
                     <p className="text-xs font-bold">努力加载云端行动计划...</p>
                   </div>
                 ) : tasks.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-20 text-center">
-                    <div className="w-16 h-16 bg-[#FAF6EE] text-[#cc785c] rounded-full flex items-center justify-center mb-4">
+                    <div className="w-16 h-16 bg-[#FAF6EE] text-[#ff5a3c] rounded-full flex items-center justify-center mb-4">
                       <ListTodo size={28} />
                     </div>
                     <h3 className="text-base font-bold text-gray-700 mb-1.5">行动清单空空如也</h3>
@@ -359,7 +359,7 @@ export default function HistoryView() {
                           ? 'border-l-4 border-l-red-500 bg-red-50/20' 
                           : task.priority === 'yellow' 
                             ? 'border-l-4 border-l-amber-400 bg-amber-50/10' 
-                            : 'border-l-4 border-l-emerald-400 bg-emerald-50/10';
+                            : 'border-l-4 border-l-ink bg-surface-soft/10';
 
                       return (
                         <div 
@@ -368,10 +368,10 @@ export default function HistoryView() {
                         >
                           <button 
                             onClick={() => handleToggleTask(task)}
-                            className="text-[#141413] hover:scale-110 active:scale-95 transition-all w-5 h-5 shrink-0 mt-0.5 cursor-pointer"
+                            className="text-[#1d1d1f] hover:scale-110 active:scale-95 transition-all w-5 h-5 shrink-0 mt-0.5 cursor-pointer"
                           >
                             {task.status === 'done' ? (
-                              <CheckSquare size={19} className="text-[#141413]" />
+                              <CheckSquare size={19} className="text-[#1d1d1f]" />
                             ) : (
                               <Square size={19} className="text-gray-300 hover:text-gray-400" />
                             )}
@@ -393,7 +393,7 @@ export default function HistoryView() {
                                   <button 
                                     onClick={() => handleAddToGoogleCalendar(task)}
                                     title="添加此死线到 Google 日历"
-                                    className="text-[#cc785c] hover:text-[#cc785c] hover:underline font-extrabold flex items-center gap-0.5 cursor-pointer bg-white px-1.5 py-0.5 rounded border border-amber-100"
+                                    className="text-[#ff5a3c] hover:text-[#ff5a3c] hover:underline font-extrabold flex items-center gap-0.5 cursor-pointer bg-white px-1.5 py-0.5 rounded border border-amber-100"
                                   >
                                     <span>+ 谷歌日历</span>
                                   </button>
@@ -417,7 +417,7 @@ export default function HistoryView() {
                                   href={task.url} 
                                   target="_blank" 
                                   rel="noopener noreferrer" 
-                                  className="text-[#141413] hover:text-[#cc785c] hover:underline font-bold inline-flex items-center gap-0.5"
+                                  className="text-[#1d1d1f] hover:text-[#ff5a3c] hover:underline font-bold inline-flex items-center gap-0.5"
                                 >
                                   <span>Portal 入口 🔗</span>
                                 </a>
@@ -457,17 +457,17 @@ export default function HistoryView() {
                 <div 
                   key={item.id} 
                   onClick={() => setSelectedItem(item)}
-                  className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm cursor-pointer hover:border-[#141413]/30 hover:shadow-md transition-all group relative overflow-hidden flex items-start justify-between"
+                  className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm cursor-pointer hover:border-[#1d1d1f]/30 hover:shadow-md transition-all group relative overflow-hidden flex items-start justify-between"
                 >
                   <div className="flex-1 pr-6 flex flex-col gap-2">
-                    <h3 className="font-bold text-lg text-gray-900 group-hover:text-[#141413] transition-colors">{item.subject}</h3>
+                    <h3 className="font-bold text-lg text-gray-900 group-hover:text-[#1d1d1f] transition-colors">{item.subject}</h3>
                     <p className="text-sm text-gray-400 font-mono line-clamp-2 md:line-clamp-1 leading-relaxed">{item.body.substring(0, 150)}...</p>
                     <div className="flex items-center gap-4 mt-2">
                       <span className="text-[11px] font-bold text-gray-400 flex items-center gap-1"><Clock size={12}/> {new Date(item.timestamp).toLocaleDateString()}</span>
                       <span className="text-[11px] font-bold text-gray-400 flex items-center gap-1"><Mail size={12}/> {item.recipientEmail || '未指定邮箱'}</span>
                     </div>
                   </div>
-                  <div className="w-10 h-10 bg-[#faf9f5] rounded-full flex items-center justify-center group-hover:bg-[#141413] group-hover:text-white text-gray-400 transition-colors">
+                  <div className="w-10 h-10 bg-[#f5f5f7] rounded-full flex items-center justify-center group-hover:bg-[#1d1d1f] group-hover:text-white text-gray-400 transition-colors">
                     <ArrowRight size={18} />
                   </div>
                 </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Mic, Phone, MapPin, AlertCircle, Volume2, ShieldAlert, BookOpen, Sparkles, Copy, Check, HeartHandshake, ExternalLink, ArrowRight, ShieldCheck, CheckSquare, Square, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useLocale, getCountryContent, getInterpreterName } from '../lib/locale';
@@ -194,6 +194,7 @@ export default function EmergencyAidDemo() {
   const interpreter = getInterpreterName(language);
   const [isListening, setIsListening] = useState(false);
   const [voiceUnavailable, setVoiceUnavailable] = useState(false);
+  const recognitionRef = useRef<any>(null);
   const [meltdownTriggered, setMeltdownTriggered] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [activeCheatsheetIdx, setActiveCheatsheetIdx] = useState(0);
@@ -356,33 +357,58 @@ export default function EmergencyAidDemo() {
     }
   };
 
+  // Toggle: press to start listening, press again to stop.
+  const toggleVoiceAssistance = () => {
+    if (isGeneratingCustom) return;
+    if (isListening) { stopVoiceAssistance(); return; }
+    startVoiceAssistance();
+  };
+
+  const stopVoiceAssistance = () => {
+    try { recognitionRef.current?.stop(); } catch {}
+    try { recognitionRef.current?.abort?.(); } catch {}
+    recognitionRef.current = null;
+    setIsListening(false);
+  };
+
   const startVoiceAssistance = () => {
+    setVoiceUnavailable(false);
+    setTranscript('');
     setIsListening(true);
     try {
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (SpeechRecognition) {
         const recognition = new SpeechRecognition();
+        recognitionRef.current = recognition;
         recognition.lang = 'zh-CN';
-        recognition.interimResults = false;
+        recognition.interimResults = true;
         recognition.maxAlternatives = 1;
-        
+
         recognition.onresult = (event: any) => {
-          const text = event.results[0][0].transcript;
-          setCustomScenario(text);
-          handleGenerateEmergencyGuide(text);
-          setIsListening(false);
+          // Live partial transcript so the user SEES the mic is working.
+          let finalText = '';
+          let interim = '';
+          for (let i = 0; i < event.results.length; i++) {
+            const r = event.results[i];
+            if (r.isFinal) finalText += r[0].transcript; else interim += r[0].transcript;
+          }
+          setTranscript(interim || finalText);
+          if (finalText) {
+            setCustomScenario(finalText);
+            setIsListening(false);
+            recognitionRef.current = null;
+            handleGenerateEmergencyGuide(finalText);
+          }
         };
-        
+
         recognition.onerror = (event: any) => {
           console.warn("Speech recognition error", event.error);
           setIsListening(false);
+          recognitionRef.current = null;
           if (event.error === 'no-speech') {
-            // No speech detected — just stop and let the user retry.
-            alert('未能检测到声音，请重试。');
+            setVoiceUnavailable(true);   // surface the example/typing path
           } else {
-            // Mic genuinely unavailable (permission denied, aborted in a preview
-            // sandbox, or unsupported). Do NOT fabricate a transcript — surface an
-            // honest, clearly-labeled example-scenario affordance instead.
+            // Mic unavailable (permission denied / preview sandbox / unsupported).
             setVoiceUnavailable(true);
           }
         };
@@ -543,11 +569,11 @@ export default function EmergencyAidDemo() {
             {/* Context Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-150 pb-6">
               <div>
-                <div className="inline-flex items-center space-x-2 bg-[#cc785c]/10 text-[#cc785c] border border-[#cc785c]/20 px-3 py-1 rounded-full text-xs font-black tracking-wider mb-2">
+                <div className="inline-flex items-center space-x-2 bg-[#ff5a3c]/10 text-[#ff5a3c] border border-[#ff5a3c]/20 px-3 py-1 rounded-full text-xs font-black tracking-wider mb-2">
                   <ShieldAlert size={14} />
                   <span>RESPONSIBLE AI · 留学生安全险境红线守则</span>
                 </div>
-                <h1 className="text-2.5xl md:text-3.5xl font-black text-[#141413] tracking-tight">
+                <h1 className="text-2.5xl md:text-3.5xl font-black text-[#1d1d1f] tracking-tight">
                   First Aid 租客应急第一求助箱
                 </h1>
                 <p className="text-xs text-gray-400 mt-1 font-medium">（专门针对海外留学租房高危纠纷提供即时心理脱敏、官方对线通联、与保姆级避坑指南）</p>
@@ -564,7 +590,7 @@ export default function EmergencyAidDemo() {
                 onClick={() => setEmergencyTab('tenancy')}
                 className={`py-3 px-5 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center space-x-2 cursor-pointer ${
                   emergencyTab === 'tenancy'
-                    ? "bg-[#141413] text-white shadow-md scale-102"
+                    ? "bg-[#1d1d1f] text-white shadow-md scale-102"
                     : "text-gray-500 hover:text-gray-900 hover:bg-gray-200/50"
                 }`}
               >
@@ -594,7 +620,7 @@ export default function EmergencyAidDemo() {
                 <div className="lg:col-span-4 space-y-2.5">
                   <div className="flex items-center justify-between px-2 mb-2">
                     <span className="text-[11px] font-black text-gray-400 uppercase tracking-wider">选择您当前不幸遭遇的惨剧：</span>
-                    <span className="text-[10px] text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded font-bold font-mono">8大顽疾覆盖</span>
+                    <span className="text-[10px] text-ink bg-surface-soft px-2 py-0.5 rounded font-bold font-mono">8大顽疾覆盖</span>
                   </div>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
@@ -605,7 +631,7 @@ export default function EmergencyAidDemo() {
                         onClick={() => setSelectedTenancyIdx(idx)}
                         className={`w-full p-3.5 rounded-2xl text-left transition-all border outline-none cursor-pointer flex items-start space-x-3 group relative ${
                           selectedTenancyIdx === idx
-                            ? "bg-[#141413] text-white border-[#141413] shadow-md scale-[1.01]"
+                            ? "bg-[#1d1d1f] text-white border-[#1d1d1f] shadow-md scale-[1.01]"
                             : "bg-white hover:bg-gray-50 text-gray-800 border-gray-150"
                         }`}
                       >
@@ -624,18 +650,18 @@ export default function EmergencyAidDemo() {
                           </div>
                         )}
                         {selectedTenancyIdx === idx && (
-                          <div className="absolute right-3.5 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#cc785c] rounded-full"></div>
+                          <div className="absolute right-3.5 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#ff5a3c] rounded-full"></div>
                         )}
                       </button>
                     ))}
                   </div>
 
-                  <div className="p-4 bg-emerald-50/50 border border-emerald-100 rounded-3xl mt-4">
-                    <h5 className="text-xs font-bold text-emerald-950 flex items-center gap-1.5 mb-1.5">
-                      <ShieldCheck size={14} className="text-emerald-700" />
+                  <div className="p-4 bg-surface-soft/50 border border-hairline rounded-3xl mt-4">
+                    <h5 className="text-xs font-bold text-ink flex items-center gap-1.5 mb-1.5">
+                      <ShieldCheck size={14} className="text-ink" />
                       <span>Serene 中外法条对账底限机制</span>
                     </h5>
-                    <p className="text-[10px] text-emerald-800/95 leading-relaxed font-medium">
+                    <p className="text-[10px] text-ink/95 leading-relaxed font-medium">
                       {country === 'AU'
                         ? '本求助箱内置维多利亚州（VIC）、新南威尔士州（NSW）最新版本的《住宅租赁法 RTA》红线判例。AI 绝不编造虚假法庭条款，确保每一句对外英文震慑警告都有据可考，底气十足！'
                         : `本求助箱由 AI 结合 Google 实时检索，按你所选的「${content.nameZh}${region ? ' · ' + region : ''}」当地《住宅租赁法》生成。AI 绝不编造虚假条款，确保每条维权依据都有据可考。`}
@@ -645,11 +671,11 @@ export default function EmergencyAidDemo() {
 
                 {/* Right Side Board: Detailed comforting guide, who to contact, details */}
                 <div className="lg:col-span-8 bg-white border border-gray-150 shadow-sm rounded-3xl p-6 md:p-8 space-y-6 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-[#cc785c]/5 rounded-bl-full pointer-events-none"></div>
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-[#ff5a3c]/5 rounded-bl-full pointer-events-none"></div>
 
                   {/* Header info */}
                   <div className="flex items-center space-x-3 pb-4 border-b border-gray-100">
-                    <div className="w-12 h-12 bg-[#141413]/5 rounded-2xl flex items-center justify-center text-2xl select-none">
+                    <div className="w-12 h-12 bg-[#1d1d1f]/5 rounded-2xl flex items-center justify-center text-2xl select-none">
                       {currentTenancy.emoji}
                     </div>
                     <div>
@@ -696,7 +722,7 @@ export default function EmergencyAidDemo() {
                         >
                           <div className="space-y-1 flex-1 min-w-0">
                             <span className="text-xs font-black text-gray-800 flex items-start gap-1.5 break-words">
-                              <span className="w-1.5 h-1.5 rounded-full bg-[#cc785c] mt-1.5 shrink-0"></span>
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#ff5a3c] mt-1.5 shrink-0"></span>
                               <span className="break-words">{contact.name}</span>
                             </span>
                             <p className="text-[11px] text-gray-500 leading-relaxed font-sans font-medium max-w-xl">
@@ -709,7 +735,7 @@ export default function EmergencyAidDemo() {
                               <button
                                 type="button"
                                 onClick={() => handleCopy(contact.phone || '')}
-                                className="px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-[#141413] hover:bg-[#141413] hover:text-white transition-all text-[11px] font-black shadow-sm flex items-center gap-1 group active:scale-95 cursor-pointer"
+                                className="px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-[#1d1d1f] hover:bg-[#1d1d1f] hover:text-white transition-all text-[11px] font-black shadow-sm flex items-center gap-1 group active:scale-95 cursor-pointer"
                               >
                                 <Phone size={11} className="group-hover:animate-bounce" />
                                 <span>拨打 / 复制 {contact.phone}</span>
@@ -720,7 +746,7 @@ export default function EmergencyAidDemo() {
                                 href={contact.url}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-800 hover:bg-emerald-600 hover:text-white transition-all text-[11px] font-black shadow-sm flex items-center gap-1 active:scale-95 cursor-pointer"
+                                className="px-3 py-1.5 rounded-lg bg-surface-soft border border-hairline text-ink hover:bg-primary hover:text-white transition-all text-[11px] font-black shadow-sm flex items-center gap-1 active:scale-95 cursor-pointer"
                               >
                                 <ExternalLink size={11} />
                                 <span>进入官方大厅</span>
@@ -751,20 +777,20 @@ export default function EmergencyAidDemo() {
                             onClick={() => toggleChecklistItem(checkKey)}
                             className={`flex items-start space-x-3.5 p-3 rounded-xl transition-all select-none cursor-pointer border ${
                               isChecked 
-                                ? "bg-emerald-50/60 border-emerald-100 text-emerald-950" 
+                                ? "bg-surface-soft/60 border-hairline text-ink" 
                                 : "bg-white hover:bg-gray-100 border-gray-100 text-gray-700"
                             }`}
                           >
-                            <div className="mt-0.5 shrink-0 text-emerald-600 transition-transform active:scale-90">
+                            <div className="mt-0.5 shrink-0 text-ink transition-transform active:scale-90">
                               {isChecked ? (
-                                <div className="w-5 h-5 bg-emerald-600 rounded-md flex items-center justify-center text-white">
+                                <div className="w-5 h-5 bg-primary rounded-md flex items-center justify-center text-white">
                                   <Check size={14} strokeWidth={3} />
                                 </div>
                               ) : (
                                 <div className="w-5 h-5 border-2 border-gray-300 rounded-md bg-white"></div>
                               )}
                             </div>
-                            <span className={`text-xs leading-relaxed font-sans font-bold flex-1 ${isChecked ? "line-through text-emerald-800/70" : ""}`}>
+                            <span className={`text-xs leading-relaxed font-sans font-bold flex-1 ${isChecked ? "line-through text-ink/70" : ""}`}>
                               {step}
                             </span>
                           </div>
@@ -774,12 +800,12 @@ export default function EmergencyAidDemo() {
                   </div>
 
                   {/* 4. SOLID LEGAL SHIELDS */}
-                  <div className="bg-[#cc785c]/5 border border-[#cc785c]/15 rounded-2.5xl p-5 relative overflow-hidden">
-                    <div className="absolute right-4 bottom-2 opacity-5 text-[#cc785c]">
+                  <div className="bg-[#ff5a3c]/5 border border-[#ff5a3c]/15 rounded-2.5xl p-5 relative overflow-hidden">
+                    <div className="absolute right-4 bottom-2 opacity-5 text-[#ff5a3c]">
                       <ShieldCheck size={64} />
                     </div>
                     <div className="flex items-start space-x-3.5">
-                      <div className="p-2.5 bg-[#cc785c]/10 text-[#cc785c] rounded-xl shrink-0 mt-0.5 select-none">
+                      <div className="p-2.5 bg-[#ff5a3c]/10 text-[#ff5a3c] rounded-xl shrink-0 mt-0.5 select-none">
                         ⚖️
                       </div>
                       <div>
@@ -807,7 +833,7 @@ export default function EmergencyAidDemo() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
                 {/* HERO: AI Voice Emergency Guide — the page's primary, largest action */}
-                <div className="lg:col-span-12 bg-[#181715] rounded-3xl p-8 md:p-12 relative overflow-hidden">
+                <div className="lg:col-span-12 bg-[#0a0a0a] rounded-3xl p-8 md:p-12 relative overflow-hidden">
                   <div className="absolute -right-6 -top-6 opacity-[0.06] pointer-events-none">
                     <Mic size={240} className="text-on-dark" />
                   </div>
@@ -823,9 +849,16 @@ export default function EmergencyAidDemo() {
                         遇到突发状况、英语卡壳不知道怎么说？<b className="text-on-dark">直接对着手机说出你的处境</b>，AI 立刻为你生成 {content.emergency} 报警口语小抄 + 现场保命指南。
                       </p>
                       {isListening && (
-                        <div className="text-sm text-red-300 font-bold flex items-center justify-center md:justify-start gap-2 mt-2">
-                          <span className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></span>
-                          正在聆听，请说明你的状况...
+                        <div className="mt-2">
+                          <div className="text-sm text-red-300 font-bold flex items-center justify-center md:justify-start gap-2">
+                            <span className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></span>
+                            正在聆听，请说明你的状况…（再次点击麦克风可停止）
+                          </div>
+                          {transcript && (
+                            <p className="mt-2 text-on-dark text-sm bg-white/10 rounded-xl px-3 py-2 text-left">
+                              “{transcript}<span className="animate-pulse">|</span>”
+                            </p>
+                          )}
                         </div>
                       )}
                       {isGeneratingCustom && (
@@ -852,21 +885,38 @@ export default function EmergencyAidDemo() {
                     </div>
                     <button
                       type="button"
-                      onClick={startVoiceAssistance}
+                      onClick={toggleVoiceAssistance}
                       disabled={isGeneratingCustom}
+                      aria-label={isListening ? '停止聆听' : '点击说话'}
                       className={`w-40 h-40 md:w-52 md:h-52 shrink-0 rounded-full flex flex-col items-center justify-center transition-all shadow-2xl active:scale-95 cursor-pointer relative ${
                         isListening
-                          ? "bg-red-600 text-white animate-pulse"
+                          ? "bg-red-600 text-white"
                           : isGeneratingCustom
-                            ? "bg-neutral-700 text-neutral-400"
+                            ? "bg-neutral-700 text-neutral-400 cursor-wait"
                             : "bg-primary hover:bg-primary-active text-on-primary"
                       }`}
                     >
+                      {/* idle: gentle invite ping */}
                       {!isListening && !isGeneratingCustom && (
                         <div className="absolute inset-0 rounded-full border-4 border-primary/30 animate-ping opacity-75"></div>
                       )}
-                      <Mic size={60} className="mb-2" />
-                      <span className="text-xs font-bold uppercase tracking-wider">{isListening ? '说话中...' : '点击说话'}</span>
+                      {/* listening: expanding red rings so the press is unmistakable */}
+                      {isListening && (
+                        <>
+                          <span className="absolute inset-0 rounded-full bg-red-600/40 animate-ping"></span>
+                          <span className="absolute -inset-3 rounded-full border-2 border-red-400/50 animate-pulse"></span>
+                        </>
+                      )}
+                      {isGeneratingCustom ? (
+                        <div className="w-12 h-12 border-4 border-neutral-500/40 border-t-neutral-300 rounded-full animate-spin mb-2"></div>
+                      ) : isListening ? (
+                        <Square size={48} className="mb-2 fill-current" />
+                      ) : (
+                        <Mic size={60} className="mb-2" />
+                      )}
+                      <span className="text-xs font-bold uppercase tracking-wider">
+                        {isGeneratingCustom ? '分析中…' : isListening ? '聆听中 · 点击停止' : '点击说话'}
+                      </span>
                     </button>
                   </div>
                 </div>
@@ -900,7 +950,7 @@ export default function EmergencyAidDemo() {
 
                   {/* 2. Permanent Location Display */}
                   <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-sm relative overflow-hidden">
-                    <div className="absolute right-4 top-4 opacity-5 bg-emerald-100 text-[#141413] p-3 rounded-full">
+                    <div className="absolute right-4 top-4 opacity-5 bg-surface-soft text-[#1d1d1f] p-3 rounded-full">
                       <MapPin size={48} />
                     </div>
                     <div className="flex items-start space-x-3.5">
@@ -910,7 +960,7 @@ export default function EmergencyAidDemo() {
                       <div className="flex-1">
                         <div className="flex items-center space-x-2">
                           <span className="text-xs font-black text-gray-400 uppercase tracking-widest">您的实时精准定位</span>
-                          <span className="text-[10px] text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded font-bold">已启用 GPS · {content.nameZh}定位</span>
+                          <span className="text-[10px] text-ink bg-surface-soft px-1.5 py-0.2 rounded font-bold">已启用 GPS · {content.nameZh}定位</span>
                         </div>
                         <h3 className="text-xl md:text-2xl font-black text-gray-900 mt-1">
                           {content.sampleAddress}
@@ -925,8 +975,8 @@ export default function EmergencyAidDemo() {
                   {/* 4. Responsive Huge Call Button Panel */}
                   <div className="bg-gradient-to-br from-[#FE5D4C]/5 to-transparent rounded-3xl p-6 border border-red-100/60 flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="text-center md:text-left flex-1">
-                      <span className="text-xs font-black text-[#cc785c] uppercase tracking-wider block mb-1">{content.nameZh}官方紧急救援热线</span>
-                      <h4 className="text-2xl font-black text-[#141413]">
+                      <span className="text-xs font-black text-[#ff5a3c] uppercase tracking-wider block mb-1">{content.nameZh}官方紧急救援热线</span>
+                      <h4 className="text-2xl font-black text-[#1d1d1f]">
                         一键快速紧急拨号
                       </h4>
                       <p className="text-xs text-gray-500 mt-1 max-w-sm border-l-2 border-red-200 pl-2.5">
@@ -949,7 +999,7 @@ export default function EmergencyAidDemo() {
                   <div id="cheatsheet-section" className="bg-white border border-gray-150 rounded-3xl p-6 shadow-sm">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-2">
-                        <BookOpen size={18} className="text-[#141413]" />
+                        <BookOpen size={18} className="text-[#1d1d1f]" />
                         <h4 className="text-sm font-black text-gray-900 uppercase tracking-wide">急救口译英文小抄（直接照读）</h4>
                       </div>
                       <span className="text-[10px] text-gray-400 font-bold">点击一键复制</span>
@@ -964,7 +1014,7 @@ export default function EmergencyAidDemo() {
                           onClick={() => setActiveCheatsheetIdx(idx)}
                           className={`py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer ${
                             activeCheatsheetIdx === idx
-                              ? "bg-[#141413] text-white shadow-sm scale-102"
+                              ? "bg-[#1d1d1f] text-white shadow-sm scale-102"
                               : "bg-gray-50 hover:bg-gray-100 text-gray-600 border border-gray-150"
                           }`}
                         >
@@ -982,11 +1032,11 @@ export default function EmergencyAidDemo() {
                         className="absolute right-3 top-3 p-2 rounded-xl bg-white border border-gray-250 text-gray-500 hover:text-gray-900 transition-all shadow-sm active:scale-95 cursor-pointer flex items-center space-x-1"
                         title="复制英文"
                       >
-                        {copied ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                        {copied ? <Check size={14} className="text-ink" /> : <Copy size={14} />}
                         <span className="text-[10px] font-bold">{copied ? '已复制' : '复制小抄'}</span>
                       </button>
                       
-                      <span className="text-[10px] font-black text-[#cc785c] block mb-2 uppercase tracking-wide">
+                      <span className="text-[10px] font-black text-[#ff5a3c] block mb-2 uppercase tracking-wide">
                         {EMERGENCY_CHEATSHEETS[activeCheatsheetIdx].emoji} 接通电话后直接对着话筒念：
                       </span>
                       <blockquote className="text-lg md:text-xl font-black text-gray-900 leading-snug tracking-tight pr-10">
@@ -1129,7 +1179,7 @@ export default function EmergencyAidDemo() {
                                   className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-all text-xs flex items-center space-x-1 cursor-pointer"
                                   title="复制英文"
                                 >
-                                  {copied ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
+                                  {copied ? <Check size={12} className="text-ink" /> : <Copy size={12} />}
                                   <span className="text-[9px] font-bold">{copied ? "已复制" : "复制台词"}</span>
                                 </button>
                               </div>
@@ -1147,7 +1197,7 @@ export default function EmergencyAidDemo() {
 
                           {/* Tactical Actions */}
                           <div className="space-y-2 bg-amber-50/50 border border-amber-100 p-4 rounded-2xl">
-                            <span className="text-[10px] font-black text-[#cc785c] uppercase tracking-wide block">⚠️ 绝对最高优先级物理自救行动：</span>
+                            <span className="text-[10px] font-black text-[#ff5a3c] uppercase tracking-wide block">⚠️ 绝对最高优先级物理自救行动：</span>
                             <ul className="text-xs text-amber-950 font-bold space-y-2 leading-relaxed">
                               {customOutputs.actions.map((act, index) => (
                                 <li key={index} className="flex items-start gap-1.5">
@@ -1159,7 +1209,7 @@ export default function EmergencyAidDemo() {
                           </div>
 
                           {/* Interpreter Support Tips */}
-                          <div className="text-xs leading-relaxed font-bold text-emerald-800 bg-emerald-50 border border-emerald-100 rounded-xl p-3.5">
+                          <div className="text-xs leading-relaxed font-bold text-ink bg-surface-soft border border-hairline rounded-xl p-3.5">
                             {customOutputs.tisTips}
                           </div>
 
@@ -1183,9 +1233,9 @@ export default function EmergencyAidDemo() {
                   </div>
 
                   {/* Voice meltdown intro box */}
-                  <div className="bg-[#141413]/5 border border-[#141413]/15 rounded-3xl p-6 relative">
-                    <div className="flex items-center space-x-2 text-[#141413] mb-3">
-                      <Sparkles size={18} className="text-[#cc785c]" />
+                  <div className="bg-[#1d1d1f]/5 border border-[#1d1d1f]/15 rounded-3xl p-6 relative">
+                    <div className="flex items-center space-x-2 text-[#1d1d1f] mb-3">
+                      <Sparkles size={18} className="text-[#ff5a3c]" />
                       <h3 className="text-sm font-black uppercase tracking-wider">评委交互演示：高危安全词汇熔断</h3>
                     </div>
                     
@@ -1193,7 +1243,7 @@ export default function EmergencyAidDemo() {
                       留学生在极度慌意卡壳时，可直接呼出特定词汇。此模拟版允许通过按钮模拟对着麦克风说出高危词汇的效果，展现系统瞬间熔断切入特大自救板的能力。
                     </p>
                     
-                    <div className="bg-white border border-[#141413]/10 rounded-2xl p-4 space-y-3 shadow-sm">
+                    <div className="bg-white border border-[#1d1d1f]/10 rounded-2xl p-4 space-y-3 shadow-sm">
                       <div className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">
                         🛠️ 触发模拟高危词汇：
                       </div>
