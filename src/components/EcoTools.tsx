@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Camera, Languages, ArrowRightLeft, Loader2, Copy, Check } from 'lucide-react';
 import { useLocale, getCountryContent } from '../lib/locale';
+import GroundingSources, { Grounding } from './GroundingSources';
 
 // Likely "home" currency by the user's chosen language (immigrant source).
 const HOME_CCY: Record<string, string> = {
@@ -69,6 +70,7 @@ export default function EcoTools() {
   const [toCcy, setToCcy] = useState(HOME_CCY[language] || 'USD');
   const [rate, setRate] = useState<number | null>(null);
   const [asOf, setAsOf] = useState<string>('');
+  const [fxGrounding, setFxGrounding] = useState<Grounding | null>(null);
   const [fxLoading, setFxLoading] = useState(false);
   const [fxError, setFxError] = useState(false);
 
@@ -86,6 +88,7 @@ export default function EcoTools() {
       const d = await res.json();
       setRate(d.rate);
       setAsOf(d.asOf || '');
+      setFxGrounding(d._grounding || null);
     } catch {
       setFxError(true);
     } finally {
@@ -222,6 +225,8 @@ export default function EcoTools() {
             {asOf && <div className="text-[10px] text-muted-soft mt-1">🔎 实时来源更新：{asOf}</div>}
           </div>
         )}
+
+        {converted != null && <GroundingSources grounding={fxGrounding} />}
       </div>
     </div>
   );
