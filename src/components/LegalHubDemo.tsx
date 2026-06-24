@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Scale, Phone, Shield, BookOpen, AlertCircle, ExternalLink, Loader2, ListChecks } from 'lucide-react';
+import { Scale, Phone, Shield, BookOpen, AlertCircle, ExternalLink, Loader2, ListChecks, ShieldCheck, Check, ArrowRight } from 'lucide-react';
 import { useLocale, getCountryContent, REGIONS } from '../lib/locale';
 import GroundingSources, { Grounding } from './GroundingSources';
 
 interface ContactInfo { name: string; phone?: string; website?: string; desc: string; }
-interface Scenario { title: string; steps: string[]; template: string; interpreterTip?: string; }
+interface Scenario { title: string; rights?: string[]; steps: string[]; template: string; interpreterTip?: string; }
 interface LegalData { contacts: ContactInfo[]; scenario: Scenario; _grounding?: Grounding | null; }
 
 type Domain = 'rent' | 'fines' | 'work' | 'academic';
@@ -26,6 +26,11 @@ const AU_FALLBACK: Record<Domain, LegalData> = {
     ],
     scenario: {
       title: '🏠 退房房东/中介恶意扣押金',
+      rights: [
+        '押金不是房东的钱：除非房东能在法定期限内证明你造成了超出「合理磨损」的损坏，否则必须全额退还（Residential Tenancies Act）。',
+        '「合理磨损 (Fair Wear and Tear)」受法律保护：地毯自然变旧、墙面细微挂痕，房东不得据此扣款。',
+        '举证责任在房东：你向 RTBA 申请全额退还后，是房东必须主动起诉证明，否则你拿回全款。',
+      ],
       steps: [
         '登入押金托管机构（VIC: RTBA）先发制人申请「全额退还押金 (Claim Entire Bond)」。',
         '退房后立即拍照摄像全屋清洁与搬空细节，并附上搬入时的 Condition Report。',
@@ -42,6 +47,11 @@ const AU_FALLBACK: Record<Domain, LegalData> = {
     ],
     scenario: {
       title: '🎫 违章/停车罚单行政申诉',
+      rights: [
+        '你有权申请「内部复议 (Internal Review)」并书面陈述理由，初犯且记录良好常可改为警告。',
+        '复议期间罚款缴纳期限自动冻结，不产生任何滞纳金。',
+        '你有权要求查看违章证据（照片/标识），证据不足可据此申诉撤销。',
+      ],
       steps: [
         '向发单机构申请「内部行政复议 (Internal Review)」，初犯且记录良好极易改为警告。',
         '收集豁免证据：标识被树枝遮挡照片、病假单、救援单等。',
@@ -57,6 +67,11 @@ const AU_FALLBACK: Record<Domain, LegalData> = {
     ],
     scenario: {
       title: '💼 黑工被克扣薪资 / 职场不公',
+      rights: [
+        '即使是现金黑工、或工时超出签证规定，你依然受法定最低时薪保护，克扣即属 Wage Theft（偷薪）。',
+        '公平工作署（FWO）受理欠薪不会因签证问题向移民局举报你。',
+        '你有权获得工资单（payslip）与法定养老金（super），雇主不给即违法。',
+      ],
       steps: [
         '记录证据链：每日工时、排班表、派单与发薪聊天记录、现金袋照片。',
         '即使现金黑工，也受法定最低时薪保护，克扣即构成 Wage Theft。',
@@ -72,6 +87,11 @@ const AU_FALLBACK: Record<Domain, LegalData> = {
     ],
     scenario: {
       title: '🎓 学术诚信 / 挂科 Show Cause 抗辩',
+      rights: [
+        '你有权在限定答辩期内陈情，并提交「同情因素 (special consideration)」证据，而非只能认错。',
+        '你有权要求免费的学生顾问 (Student Advocate) 陪同出席听证会。',
+        '指控必须基于证据，你有权查看并逐条回应。',
+      ],
       steps: [
         '在限定答辩期（通常 20 天）内最速回复，绝不能只写一句道歉。',
         '提供可追溯的「同情因素」：医嘱、家庭变故等无法抗力证明。',
@@ -87,7 +107,7 @@ function auFallbackFor(domain: Domain): LegalData {
   return AU_FALLBACK[domain];
 }
 
-export default function LegalHubDemo() {
+export default function LegalHubDemo({ onOpenLetterOfficer }: { onOpenLetterOfficer?: () => void }) {
   const { country, region, language, setRegion } = useLocale();
   const content = getCountryContent(country);
   const regionOptions = REGIONS[country] || [];
@@ -111,7 +131,10 @@ export default function LegalHubDemo() {
       .then((d: LegalData) => { if (!cancelled) setData(d); })
       .catch(() => {
         if (cancelled) return;
-        if (country === 'AU') setData(auFallbackFor(selectedDomain)); // graceful AU fallback
+        // The bundled AU fallback is VIC-specific. Only serve it for VIC (or the
+        // national default, which this product treats as Melbourne-first). Other
+        // states must NOT show Victoria's phone numbers — fall through to retry.
+        if (country === 'AU' && (region === '' || region === 'VIC')) setData(auFallbackFor(selectedDomain));
         else setError(true);
       })
       .finally(() => { if (!cancelled) setLoading(false); });
@@ -178,6 +201,33 @@ export default function LegalHubDemo() {
           暂时无法生成本地化法援信息,请稍后重试,或直接搜索「{content.nameZh} {DOMAINS.find(d => d.id === selectedDomain)?.label} legal aid」。
         </div>
       ) : (
+        <>
+        {/* 你的法律权利 — the differentiator. 信件官 reads YOUR document; 法援站 tells you the
+            rights a local takes for granted but a newcomer never learns. */}
+        <div className="max-w-6xl mx-auto mb-8">
+          <div className="dark-stage rounded-3xl p-6 md:p-8">
+            <div className="flex items-center gap-2 mb-1">
+              <ShieldCheck size={18} className="text-primary" />
+              <span className="text-xs font-black tracking-widest uppercase text-on-dark-soft">你的法律权利 · KNOW YOUR RIGHTS</span>
+            </div>
+            <p className="text-on-dark-soft text-xs mb-5">本地人默认知道、新移民却从没人告诉你的那几条——先知道你「站得住脚」，再去交涉。</p>
+            {loading ? (
+              <div className="text-on-dark-soft text-sm flex items-center gap-2 py-4">
+                <Loader2 size={16} className="animate-spin text-primary" /> AI 正在核对你在「{content.nameZh}{region ? ' · ' + region : ''}」依法享有的权利…
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5">
+                {(scenario?.rights || []).map((r, i) => (
+                  <div key={i} className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full bg-primary/25 text-primary flex items-center justify-center shrink-0 mt-0.5"><Check size={12} strokeWidth={3} /></span>
+                    <p className="text-[13.5px] text-on-dark leading-relaxed">{r}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-6xl mx-auto items-stretch">
 
           {/* Left: official contacts */}
@@ -261,9 +311,17 @@ export default function LegalHubDemo() {
                   value={loading ? '正在生成英文申诉模板…' : (scenario?.template || '')}
                   readOnly
                 />
-                <div className="mt-4 text-[10.5px] text-muted-soft flex items-center gap-1 justify-center border-t border-hairline pt-3">
-                  <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span>
-                  <span>把这份草案或你收到的信,拿到【信件官】里可一键生成更完整的抗辩报告。</span>
+                <div className="mt-4 border-t border-hairline pt-4 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+                  <p className="text-[11px] text-muted-soft leading-normal max-w-sm">
+                    这是<strong className="text-muted">通用起草模板</strong>。要针对<strong className="text-muted">你手里那张具体的信/罚单</strong>生成个性化抗辩，请交给信件官——它会拍照读懂原件再逐条回。
+                  </p>
+                  <button
+                    onClick={() => onOpenLetterOfficer?.()}
+                    disabled={!onOpenLetterOfficer}
+                    className="cta-3d inline-flex items-center gap-1.5 px-5 py-2.5 text-sm font-semibold shrink-0 disabled:opacity-40 disabled:shadow-none"
+                  >
+                    用信件官个性化这封信 <ArrowRight size={16} />
+                  </button>
                 </div>
               </div>
             </div>
@@ -271,6 +329,7 @@ export default function LegalHubDemo() {
             {data?._grounding && <GroundingSources grounding={data._grounding} />}
           </div>
         </div>
+        </>
       )}
     </div>
   );
