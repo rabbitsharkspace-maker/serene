@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useLocale } from '../lib/locale';
 import EcoTools from './EcoTools';
 import MeetupPlanner from './MeetupPlanner';
+import DaigouBoard from './DaigouBoard';
 
 // Interfaces
 interface Guide {
@@ -174,7 +175,7 @@ const DEFAULT_ITEMS: MarketplaceItem[] = [
 
 export default function EcosystemHub() {
   const { country, language, region } = useLocale();
-  const [activeTab, setActiveTab] = useState<'guides' | 'private_chef' | 'marketplace' | 'tools'>('guides');
+  const [activeTab, setActiveTab] = useState<'guides' | 'private_chef' | 'marketplace' | 'daigou' | 'tools'>('guides');
 
   // Multi-tab role toggling
   const [guideRole, setGuideRole] = useState<'student' | 'guide'>('student');
@@ -791,6 +792,14 @@ export default function EcosystemHub() {
           <span className="ml-0.5 text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full">概念</span>
         </button>
         <button
+          onClick={() => { setActiveTab('daigou'); setSelectedGuide(null); setSelectedMeal(null); setSelectedItem(null); }}
+          className={`px-5 py-3 rounded-t-2xl font-black text-sm transition-all flex items-center gap-2 shrink-0 ${activeTab === 'daigou' ? 'border-b-4 border-[#1d1d1f] text-[#1d1d1f] bg-white bg-opacity-50' : 'text-gray-400 hover:text-gray-900'}`}
+        >
+          <span>📦</span>
+          <span>代购带货 (Daigou)</span>
+          <span className="ml-0.5 text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full">概念</span>
+        </button>
+        <button
           onClick={() => { setActiveTab('tools'); setSelectedGuide(null); setSelectedMeal(null); setSelectedItem(null); }}
           className={`px-5 py-3 rounded-t-2xl font-black text-sm transition-all flex items-center gap-2 shrink-0 ${activeTab === 'tools' ? 'border-b-4 border-[#1d1d1f] text-[#1d1d1f] bg-white bg-opacity-50' : 'text-gray-400 hover:text-gray-900'}`}
         >
@@ -814,6 +823,8 @@ export default function EcosystemHub() {
           <EcoTools />
         </div>
       )}
+
+      {activeTab === 'daigou' && <DaigouBoard />}
 
       {/* Main Panel views */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -1854,7 +1865,7 @@ export default function EcosystemHub() {
         </div>
 
         {/* Right Details inspector sidebar & Dynamic simulation panels */}
-        <div className={`lg:col-span-4 space-y-6 ${activeTab === 'tools' ? 'hidden' : ''}`}>
+        <div className={`lg:col-span-4 space-y-6 ${activeTab === 'tools' || activeTab === 'daigou' ? 'hidden' : ''}`}>
 
           {/* 1. Dynamic Detail Inspector */}
           <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-xs relative">

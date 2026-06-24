@@ -2584,6 +2584,7 @@ Return ONLY raw JSON (no markdown fences):
   ],
   "scenario": {
     "title": "(in ${langName}) short title of the dispute flow for this topic in ${jurisdiction}",
+    "rights": ["(in ${langName}) a SPECIFIC legal right/protection the newcomer actually has in ${jurisdiction} for this topic — the kind a local knows but a newcomer doesn't (e.g. a deposit must be refunded unless the landlord proves damage within N days; minimum wage applies even to cash/visa-overstaying work). State it plainly and empoweringly, naming the Act/standard where possible. 3-4 items."],
     "steps": ["(in ${langName}) concrete step 1", "step 2", "step 3"],
     "template": "an English email/letter the user can copy, using [方括号] placeholders, citing the correct ${jurisdiction} body and statute",
     "interpreterTip": "(in ${langName}) how to reach a FREE phone interpreter in ${country.name} before calling these agencies, if such a service exists"
