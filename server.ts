@@ -1276,6 +1276,7 @@ function formatPresetToNewSchema(preset: any, key: string): any {
 app.post("/api/analyze-bill", upload.single("image"), async (req, res) => {
   let activeCase = "";
   let originalName = "";
+  let heroPresetFallback: any = null; // built for AU+zh; only used if the live API is rate-limited
   try {
     const file = req.file;
     if (!file) {
@@ -1375,8 +1376,10 @@ app.post("/api/analyze-bill", upload.single("image"), async (req, res) => {
     const useHeroPreset = getCountry(req.body.country) === COUNTRY_PROFILES.AU
       && getLang(req.body.language) === LANGUAGES.zh;
 
+    // INTEGRITY: build (but do NOT return) the high-fidelity AU preset here. We ALWAYS call
+    // Gemini + Search grounding below; this preset is only used by the catch block as a
+    // graceful fallback when the live API is rate-limited.
     if (useHeroPreset && matchedPresetKey && PRESET_BILL_ANALYSES[matchedPresetKey]) {
-      console.log(`[API] Serving high-fidelity cached preset for bill: ${matchedPresetKey}`);
       const enrichedResult = formatPresetToNewSchema(PRESET_BILL_ANALYSES[matchedPresetKey], matchedPresetKey);
       
       // Inject user profile into matched preset results dynamically!
@@ -1419,10 +1422,10 @@ app.post("/api/analyze-bill", upload.single("image"), async (req, res) => {
           enrichedResult.summary = enrichedResult.summaryPlain;
         }
       }
-      return res.json(enrichedResult);
+      heroPresetFallback = enrichedResult;
     }
 
-    // 2. Otherwise fall back to calling Gemini API with true Search Grounding
+    // Always call Gemini API with true Search Grounding (the preset above is fallback-only)
     const aiClient = getAI();
 
     let userContextString = "";
@@ -1619,6 +1622,11 @@ Please output a JSON response matching this schema:
     if (!isLimitExceeded) {
       console.log(`[Diagnostic] Catch internal log:`, error?.message || error);
     }
+    // Prefer the high-fidelity AU preset as the rate-limit fallback when available.
+    if (heroPresetFallback) {
+      heroPresetFallback.isQuotaFallback = true;
+      return res.json(heroPresetFallback);
+    }
     const dynamicAnalysis = generateDynamicOfflineBillAnalysis(originalName, activeCase);
     const enrichedFallback = formatPresetToNewSchema(dynamicAnalysis, activeCase || "fine");
     enrichedFallback.isQuotaFallback = true;
@@ -1645,7 +1653,7 @@ app.post("/api/analyze-shield", upload.single("image"), async (req, res) => {
 The user is either uploading a screenshot of a rental listing/chat or a second-hand item/price quote. They may also provide text input.
 Please analyze the input using your vision:
 1. For Renting: Check for common scam patterns (abnormally low price, suspicious terms like "out of country transfer").
-2. For Purchases: Estimate what the item is. Check the price of a similar new item in mainstream ${country.demonym} stores (${country.retailers}) using your pre-trained knowledge.
+2. For Purchases: Estimate what the item is. Use your Google Search tool to look up the CURRENT, real-time price of the same or a similar NEW item in mainstream ${country.demonym} stores (${country.retailers}) — do not rely on memory, the price must reflect today's listings.
 Always output the final response in ${langName}.
 
 Required Calculations for Purchases/Value:
@@ -1681,13 +1689,16 @@ Output JSON (DO NOT WRAP IN MARKDOWN BLOCK, JUST RAW JSON):
     const response = await generateWithRetry(aiClient, 'generateContent', {
       model: "gemini-2.5-flash",
       contents: [{ role: "user", parts }],
+      config: {
+        tools: [{ googleSearch: {} }]
+      }
     }) as any;
 
     let text = response.text;
     if (!text) {
       throw new Error("Empty response from AI");
     }
-    
+
     // Strip markdown code block if present
     text = text.replace(/^```json\s*/, '').replace(/```\s*$/, '').trim();
 
