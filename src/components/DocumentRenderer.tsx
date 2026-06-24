@@ -78,9 +78,9 @@ export function renderDocumentHTML(
                 <td className="p-1.5">Total Proposed Claim Deduction</td>
                 <td className="p-1.5 text-right font-black">$420.00</td>
               </tr>
-              <tr className="bg-[#FAF9F5] text-emerald-800 font-bold">
+              <tr className="bg-[#f5f5f7] text-ink font-bold">
                 <td className="p-1.5">Balance to be Released to Tenant</td>
-                <td className="p-1.5 text-right font-black text-emerald-600">$1,680.00</td>
+                <td className="p-1.5 text-right font-black text-ink">$1,680.00</td>
               </tr>
             </tbody>
           </table>
@@ -114,11 +114,11 @@ export function renderDocumentHTML(
     return (
       <div className={`bg-white w-full ${isMini ? 'max-w-full' : 'max-w-2xl shadow-md border rounded-lg'} text-gray-800 font-sans relative ${p} ${textBase} break-words overflow-x-auto`}>
         {/* Header */}
-        <div className={`flex justify-between border-[#1C362B] ${borderB}`}>
+        <div className={`flex justify-between border-[#1d1d1f] ${borderB}`}>
           <div className="flex items-center gap-2">
-            <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-[#1C362B] bg-[#1C362B]/5 flex items-center justify-center font-serif text-[#1C362B] font-bold text-[9px] sm:text-xs uppercase shadow-sm`}>B</div>
+            <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-[#1d1d1f] bg-[#1d1d1f]/5 flex items-center justify-center font-serif text-[#1d1d1f] font-bold text-[9px] sm:text-xs uppercase shadow-sm`}>B</div>
             <div>
-              <div className={`${textTitle} text-[#1C362B] tracking-tight uppercase leading-none`}>City of Brentmoor</div>
+              <div className={`${textTitle} text-[#1d1d1f] tracking-tight uppercase leading-none`}>City of Brentmoor</div>
               <div className={`${isMini ? 'text-[5.5px]' : 'text-[7.5px]'} text-gray-400 tracking-wider font-extrabold uppercase mt-0.5`}>Municipal Corporation VIC</div>
             </div>
           </div>
@@ -145,7 +145,7 @@ export function renderDocumentHTML(
         </div>
 
         {/* Notice Title */}
-        <div className={`text-center font-bold text-white bg-[#1C362B] rounded uppercase tracking-widest ${spacing} ${titleBanner}`}>
+        <div className={`text-center font-bold text-white bg-[#1d1d1f] rounded uppercase tracking-widest ${spacing} ${titleBanner}`}>
           Parking Infringement Notice
         </div>
 
@@ -157,7 +157,7 @@ export function renderDocumentHTML(
         <div className="overflow-x-auto w-full mb-3">
           <table className="w-full text-left border border-gray-150 rounded overflow-hidden">
             <thead>
-              <tr className="bg-[#1C362B] text-white text-[7.5px] sm:text-[9px]">
+              <tr className="bg-[#1d1d1f] text-white text-[7.5px] sm:text-[9px]">
                 <th className="p-1.5 font-bold uppercase overflow-hidden break-words">Offence Code & Description</th>
                 <th className="p-1.5 font-bold uppercase text-right" style={{ width: '80px' }}>Penalty</th>
               </tr>
@@ -167,7 +167,7 @@ export function renderDocumentHTML(
                 <td className="p-1.5 text-gray-600 font-normal">Offence Code 204: Stopped in a Clearway or resident permit zone during restricted hours (Flinders Lane, Melbourne VIC 3000)</td>
                 <td className="p-1.5 text-right font-semibold text-gray-800">$85.00</td>
               </tr>
-              <tr className="bg-neutral-50 font-bold text-[#1C362B]">
+              <tr className="bg-neutral-50 font-bold text-[#1d1d1f]">
                 <td className="p-1.5">Total Amount Outstanding</td>
                 <td className="p-1.5 text-right font-black">$85.00</td>
               </tr>
@@ -175,16 +175,16 @@ export function renderDocumentHTML(
           </table>
         </div>
 
-        <div className="font-bold uppercase text-[#1C362B] border-l-4 border-amber-600 pl-1.5 mb-1 leading-none text-[8.5px] sm:text-[10px]">
+        <div className="font-bold uppercase text-[#1d1d1f] border-l-4 border-amber-600 pl-1.5 mb-1 leading-none text-[8.5px] sm:text-[10px]">
           Requirement to Pay
         </div>
         <p className={`text-gray-600 ${spacing} ${textSub}`}>
           Payment of the sum of <strong className="text-gray-900">$85.00 AUD</strong> is required by no later than <strong>1 May 2026</strong>. Failure to pay will result in referral to Fines Victoria, incurring additional statutory costs and enforcement actions.
         </p>
 
-        <div className={`bg-[#FAF9F5] p-2.5 rounded-xl border border-gray-100 grid grid-cols-1 sm:grid-cols-2 gap-3 ${spacing} ${textSub}`}>
+        <div className={`bg-[#f5f5f7] p-2.5 rounded-xl border border-gray-100 grid grid-cols-1 sm:grid-cols-2 gap-3 ${spacing} ${textSub}`}>
           <div>
-            <strong className="text-[#1C362B] uppercase text-[7.5px] sm:text-[8.5px] tracking-wider block mb-1">Payment Channels:</strong>
+            <strong className="text-[#1d1d1f] uppercase text-[7.5px] sm:text-[8.5px] tracking-wider block mb-1">Payment Channels:</strong>
             <ul className="space-y-0.5 leading-tight text-gray-600 font-mono">
               <li><strong>BPay:</strong> Biller: 30129 | Ref: 98127391782</li>
               <li><strong>Online:</strong> paymentportal.brentmoor.vic.gov.au</li>
@@ -192,7 +192,7 @@ export function renderDocumentHTML(
             </ul>
           </div>
           <div>
-            <strong className="text-[#1C362B] uppercase text-[7.5px] sm:text-[8.5px] tracking-wider block mb-1">Right of Appeal / Dispute:</strong>
+            <strong className="text-[#1d1d1f] uppercase text-[7.5px] sm:text-[8.5px] tracking-wider block mb-1">Right of Appeal / Dispute:</strong>
             <p className="leading-tight text-gray-500">
               You may request an internal executive review of this notice in writing within 28 days sending to PO Box 15, Brentmoor VIC 3108 stating compassionate factors.
             </p>
@@ -370,9 +370,9 @@ export function renderDocumentHTML(
     return (
       <div className={`bg-white w-full ${isMini ? 'max-w-full' : 'max-w-2xl shadow-md border rounded-lg'} text-gray-800 font-sans relative ${p} ${textBase} break-words overflow-x-auto`}>
         {/* Header */}
-        <div className={`flex justify-between border-emerald-800 ${borderB}`}>
+        <div className={`flex justify-between border-hairline ${borderB}`}>
           <div>
-            <div className={`${textTitle} text-emerald-900 tracking-tight uppercase`}>Meridian Strata</div>
+            <div className={`${textTitle} text-ink tracking-tight uppercase`}>Meridian Strata</div>
             <div className={`${isMini ? 'text-[5.5px]' : 'text-[7.5px]'} font-bold text-neutral-500 tracking-widest uppercase mt-[-3px]`}>Strata & Owners Corporation VIC</div>
           </div>
           <div className={`text-right ${textSub} text-gray-400 font-mono leading-tight whitespace-pre-wrap max-w-[50%]`}>
@@ -418,7 +418,7 @@ export function renderDocumentHTML(
           If further noise violations occur, the Owners Corporation will apply to the <strong>Victorian Civil and Administrative Tribunal (VCAT)</strong>. Fines might reach <strong>$1,000.00 AUD</strong>.
         </div>
 
-        <div className="font-bold uppercase text-[#1C362B] border-l-4 border-emerald-600 pl-1.5 mb-1 leading-none text-[8.5px] sm:text-[10px]">
+        <div className="font-bold uppercase text-[#1d1d1f] border-l-4 border-hairline pl-1.5 mb-1 leading-none text-[8.5px] sm:text-[10px]">
           How to Respond / Dispute
         </div>
         <p className={`text-gray-600 ${spacing} ${textSub}`}>

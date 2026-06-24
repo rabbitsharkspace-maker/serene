@@ -224,12 +224,12 @@ export default function SafetyShieldDemo() {
     
     ctx.fillStyle = '#f8f9fa';
     ctx.fillRect(0, 0, 600, 800);
-    ctx.fillStyle = '#1c362b';
+    ctx.fillStyle = '#1d1d1f';
     
     if (type === 'rent') {
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(20, 20, 560, 400);
-      ctx.fillStyle = '#1c362b';
+      ctx.fillStyle = '#1d1d1f';
       ctx.font = 'bold 28px sans-serif';
       ctx.fillText('CBD Luxury Apartment $200/w', 50, 70);
       ctx.font = '24px sans-serif';
@@ -241,7 +241,7 @@ export default function SafetyShieldDemo() {
     } else {
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(20, 20, 560, 400);
-      ctx.fillStyle = '#1c362b';
+      ctx.fillStyle = '#1d1d1f';
       ctx.font = 'bold 28px sans-serif';
       ctx.fillText('Used Microwave Oven - $80', 50, 70);
       ctx.font = '24px sans-serif';
@@ -259,6 +259,14 @@ export default function SafetyShieldDemo() {
       }
     });
   };
+
+  // Derive a numeric % for the gauge: prefer a number Gemini stated, else map by level.
+  const riskPercent = (a: { scamProbability?: string; riskLevel: string }) => {
+    const m = (a.scamProbability || '').match(/(\d{1,3})\s*%/);
+    if (m) return Math.min(100, Math.max(1, parseInt(m[1], 10)));
+    return a.riskLevel === 'red' ? 90 : a.riskLevel === 'yellow' ? 55 : 12;
+  };
+  const riskColor = (level: string) => level === 'red' ? '#d33a2c' : level === 'yellow' ? '#c2820a' : '#2fa84f';
 
   const getRiskUI = (level: string) => {
     switch(level) {
@@ -282,7 +290,7 @@ export default function SafetyShieldDemo() {
         return { 
           bg: 'bg-[#F2FBF5]', 
           border: 'border-[#E0F4E8]', 
-          text: 'text-[#141413]', 
+          text: 'text-[#1d1d1f]', 
           icon: <ShieldCheck size={24} />, 
           label: '相对安全 / 正规合理' 
         };
@@ -300,14 +308,14 @@ export default function SafetyShieldDemo() {
   return (
     <div className="w-full px-2 pb-16">
       {/* Decorative background */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-[#cc785c]/20 to-transparent blur-3xl rounded-full pointer-events-none -mr-20 -mt-20"></div>
+      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-[#ff5a3c]/20 to-transparent blur-3xl rounded-full pointer-events-none -mr-20 -mt-20"></div>
 
       <div className="mb-8 relative z-10">
         <div className="flex items-center space-x-2 mb-2">
-          <ShieldCheck size={24} className="text-[#cc785c]" />
+          <ShieldCheck size={24} className="text-[#ff5a3c]" />
           <p className="text-gray-500 text-sm font-bold tracking-widest uppercase font-mono">SAFETY SHIELD</p>
         </div>
-        <h2 className="text-3xl md:text-4xl font-extrabold text-[#141413] leading-tight font-display">
+        <h2 className="text-3xl md:text-4xl font-extrabold text-[#1d1d1f] leading-tight font-display">
           防诈防坑安全盾
         </h2>
         <p className="text-[#3C4D43] text-sm mt-1">留学生海外生活全能排雷盾牌。扫房源租房套路、估算二手机物价，深度反诈安心自检。</p>
@@ -324,7 +332,7 @@ export default function SafetyShieldDemo() {
                 onClick={() => setActiveTab('valuation')}
                 className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold transition-all ${
                   activeTab === 'valuation'
-                    ? 'bg-[#141413] text-[#cc785c] shadow-sm'
+                    ? 'bg-[#1d1d1f] text-[#ff5a3c] shadow-sm'
                     : 'text-gray-500 hover:text-gray-900'
                 }`}
               >
@@ -334,7 +342,7 @@ export default function SafetyShieldDemo() {
                 onClick={() => setActiveTab('scamCheck')}
                 className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold transition-all ${
                   activeTab === 'scamCheck'
-                    ? 'bg-[#141413] text-[#cc785c] shadow-sm'
+                    ? 'bg-[#1d1d1f] text-[#ff5a3c] shadow-sm'
                     : 'text-gray-500 hover:text-gray-900'
                 }`}
               >
@@ -360,14 +368,14 @@ export default function SafetyShieldDemo() {
                   <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept="image/*" className="hidden" />
                   <div 
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex-1 border-2 border-dashed border-gray-200 bg-gray-50 rounded-[1.5rem] p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 hover:border-[#cc785c]/50 transition-colors overflow-hidden relative group min-h-[220px]"
+                    className="flex-1 border-2 border-dashed border-gray-200 bg-gray-50 rounded-[1.5rem] p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 hover:border-[#ff5a3c]/50 transition-colors overflow-hidden relative group min-h-[220px]"
                   >
                     {filePreview ? (
                       <img src={filePreview} alt="Preview" className="absolute inset-0 w-full h-full object-contain p-2" />
                     ) : (
                       <div className="text-center p-3">
                         <div className="w-14 h-14 bg-white shadow-sm border border-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-105 transition-transform animate-pulse">
-                          <Camera className="text-gray-400 group-hover:text-[#cc785c] transition-colors" size={24} />
+                          <Camera className="text-gray-400 group-hover:text-[#ff5a3c] transition-colors" size={24} />
                         </div>
                         <p className="text-gray-600 text-sm font-medium">拖入或上传聊天截图 / 租房广告 / 二手机报价单</p>
                         <p className="text-gray-400 text-xs mt-1">支持常见图片格式（如 WhatsApp，Marketplace 截图等）</p>
@@ -376,7 +384,7 @@ export default function SafetyShieldDemo() {
                   </div>
 
                   {/* Text Input Box */}
-                  <div className="flex-1 border border-gray-200 rounded-[1.5rem] bg-white p-4 focus-within:border-[#cc785c] focus-within:ring-2 ring-[#cc785c]/20 transition-all flex flex-col min-h-[220px]">
+                  <div className="flex-1 border border-gray-200 rounded-[1.5rem] bg-white p-4 focus-within:border-[#ff5a3c] focus-within:ring-2 ring-[#ff5a3c]/20 transition-all flex flex-col min-h-[220px]">
                     <div className="flex items-center justify-between text-gray-400 mb-2">
                       <div className="flex items-center space-x-2">
                         <FileText size={16} />
@@ -393,10 +401,10 @@ export default function SafetyShieldDemo() {
                     <div className="mt-4 pt-4 border-t border-gray-100">
                       <div className="text-[10px] font-bold text-gray-400 mb-2 font-mono">一键快速载入经典案例：</div>
                       <div className="flex flex-col gap-2">
-                        <button onClick={() => loadExample('rent')} className="text-xs text-left bg-gray-50 hover:bg-[#cc785c]/10 text-gray-600 hover:text-[#141413] p-2.5 rounded-xl transition-colors truncate border border-gray-100 font-medium">
+                        <button onClick={() => loadExample('rent')} className="text-xs text-left bg-gray-50 hover:bg-[#ff5a3c]/10 text-gray-600 hover:text-[#1d1d1f] p-2.5 rounded-xl transition-colors truncate border border-gray-100 font-medium">
                           🏠 “房东在英国，让西联打定金...” (租房骗局)
                         </button>
-                        <button onClick={() => loadExample('item')} className="text-xs text-left bg-gray-50 hover:bg-[#cc785c]/10 text-gray-600 hover:text-[#141413] p-2.5 rounded-xl transition-colors truncate border border-gray-100 font-medium">
+                        <button onClick={() => loadExample('item')} className="text-xs text-left bg-gray-50 hover:bg-[#ff5a3c]/10 text-gray-600 hover:text-[#1d1d1f] p-2.5 rounded-xl transition-colors truncate border border-gray-100 font-medium">
                           📺 “二手微波炉 Marketplace 喊价 $80 划算吗？”
                         </button>
                       </div>
@@ -407,7 +415,7 @@ export default function SafetyShieldDemo() {
                 <button 
                   onClick={submitForAnalysis}
                   disabled={!file && !textInfo.trim()}
-                  className={`w-full py-4 rounded-xl font-bold flex justify-center items-center space-x-2 transition-all ${file || textInfo.trim() ? 'bg-[#141413] hover:bg-[#254839] text-[#cc785c] shadow-lg active:scale-95' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
+                  className={`w-full py-4 rounded-xl font-bold flex justify-center items-center space-x-2 transition-all ${file || textInfo.trim() ? 'bg-[#1d1d1f] hover:bg-[#254839] text-[#ff5a3c] shadow-lg active:scale-95' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
                 >
                   <span>全网大数据比对与防坑诊断</span>
                   <ArrowRight size={18} />
@@ -455,7 +463,7 @@ export default function SafetyShieldDemo() {
                               key={itemIdx}
                               className={`flex items-start gap-2.5 p-2 rounded-xl cursor-pointer text-xs transition-colors select-none ${
                                 isChecked 
-                                  ? 'bg-white shadow-xs text-gray-900 border border-[#cc785c]/50' 
+                                  ? 'bg-white shadow-xs text-gray-900 border border-[#ff5a3c]/50' 
                                   : 'text-gray-600 hover:bg-white/50 border border-transparent'
                               }`}
                             >
@@ -463,7 +471,7 @@ export default function SafetyShieldDemo() {
                                 type="checkbox"
                                 checked={isChecked}
                                 onChange={() => toggleFlag(item)}
-                                className="mt-0.5 rounded border-stone-300 text-[#141413] focus:ring-[#141413] accent-[#141413]"
+                                className="mt-0.5 rounded border-stone-300 text-[#1d1d1f] focus:ring-[#1d1d1f] accent-[#1d1d1f]"
                               />
                               <span className="leading-snug">{item}</span>
                             </label>
@@ -481,13 +489,13 @@ export default function SafetyShieldDemo() {
                     <input type="file" ref={scamFileInputRef} onChange={handleScamFileSelect} accept="image/*" className="hidden" />
                     <div 
                       onClick={() => scamFileInputRef.current?.click()}
-                      className="border-2 border-dashed border-gray-200 bg-gray-50/50 rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 hover:border-[#cc785c]/50 transition-all overflow-hidden relative min-h-[140px] group"
+                      className="border-2 border-dashed border-gray-200 bg-gray-50/50 rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 hover:border-[#ff5a3c]/50 transition-all overflow-hidden relative min-h-[140px] group"
                     >
                       {scamFilePreview ? (
                         <img src={scamFilePreview} alt="Scam Preview" className="absolute inset-0 w-full h-full object-contain p-2" />
                       ) : (
                         <div className="text-center p-2">
-                          <Camera className="text-gray-400 group-hover:text-[#cc785c] transition-colors mx-auto mb-2" size={20} />
+                          <Camera className="text-gray-400 group-hover:text-[#ff5a3c] transition-colors mx-auto mb-2" size={20} />
                           <p className="text-gray-600 text-[11px] font-semibold">上传短信/微信/WhatsApp聊天截屏</p>
                           <p className="text-gray-400 text-[10px] mt-0.5">可直接识图中高危话术字眼</p>
                         </div>
@@ -496,7 +504,7 @@ export default function SafetyShieldDemo() {
                   </div>
 
                   {/* Suspicious transcript input */}
-                  <div className="flex-1 border border-gray-200 rounded-2xl bg-white p-4 focus-within:border-[#cc785c] focus-within:ring-2 ring-[#cc785c]/10 transition-all flex flex-col min-h-[140px]">
+                  <div className="flex-1 border border-gray-200 rounded-2xl bg-white p-4 focus-within:border-[#ff5a3c] focus-within:ring-2 ring-[#ff5a3c]/10 transition-all flex flex-col min-h-[140px]">
                     <div className="flex items-center space-x-1.5 text-gray-400 mb-1.5">
                       <FileText size={14} />
                       <span className="text-[10px] font-bold uppercase tracking-wider font-mono">粘贴可疑文字信息 / 电话大意</span>
@@ -515,7 +523,7 @@ export default function SafetyShieldDemo() {
                   disabled={selectedFlags.length === 0 && !scamText.trim() && !scamFile}
                   className={`w-full py-4 rounded-xl font-bold flex justify-center items-center space-x-2 transition-all ${
                     selectedFlags.length > 0 || scamText.trim() || scamFile
-                      ? 'bg-[#141413] hover:bg-[#254839] text-[#cc785c] shadow-lg active:scale-95' 
+                      ? 'bg-[#1d1d1f] hover:bg-[#254839] text-[#ff5a3c] shadow-lg active:scale-95' 
                       : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                   }`}
                 >
@@ -535,7 +543,7 @@ export default function SafetyShieldDemo() {
                 transition={{ duration: 0.4 }}
                 className="flex-1 flex flex-col items-center justify-center text-center p-8"
               >
-                <div className="w-16 h-16 border-4 border-[#cc785c]/20 border-t-[#cc785c] rounded-full animate-spin mb-6"></div>
+                <div className="w-16 h-16 border-4 border-[#ff5a3c]/20 border-t-[#ff5a3c] rounded-full animate-spin mb-6"></div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2 font-display">
                   {activeTab === 'scamCheck' ? '反诈安全官 AI 正在深度会诊' : '防诈安全盾 正在深度研判'}
                 </h3>
@@ -568,7 +576,7 @@ export default function SafetyShieldDemo() {
                   </div>
                 </div>
 
-                <h3 className="text-2xl font-bold text-[#141413] mb-4 font-display">{analysis.title}</h3>
+                <h3 className="text-2xl font-bold text-[#1d1d1f] mb-4 font-display">{analysis.title}</h3>
 
                 {/* Summary block */}
                 <div className={`p-5 rounded-2xl mb-4 border ${getRiskUI(analysis.riskLevel).bg} ${getRiskUI(analysis.riskLevel).border}`}>
@@ -584,7 +592,7 @@ export default function SafetyShieldDemo() {
                     <ul className="space-y-3">
                       {analysis.redFlags.map((flag, idx) => (
                         <li key={idx} className="flex items-start space-x-3 text-sm text-gray-700 bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                          <span className="text-[#cc785c] flex-shrink-0 mt-0.5 font-bold">•</span>
+                          <span className="text-[#ff5a3c] flex-shrink-0 mt-0.5 font-bold">•</span>
                           <div className="font-medium leading-relaxed markdown-body w-full text-xs md:text-sm">
                             <Markdown>{flag}</Markdown>
                           </div>
@@ -597,8 +605,8 @@ export default function SafetyShieldDemo() {
                 {/* Value Check / Witty Module (if present) */}
                 {analysis.valueCheck?.wittyComparison && (
                   <div className="mt-4">
-                    <div className="bg-[#141413] text-white p-6 rounded-2xl shadow-xl relative overflow-hidden">
-                      <div className="absolute top-0 right-0 bg-[#cc785c] text-[#141413] text-[10px] font-bold px-3 py-1 rounded-bl-xl tracking-wider font-mono">物价体感换算</div>
+                    <div className="bg-[#1d1d1f] text-white p-6 rounded-2xl shadow-xl relative overflow-hidden">
+                      <div className="absolute top-0 right-0 bg-[#ff5a3c] text-[#1d1d1f] text-[10px] font-bold px-3 py-1 rounded-bl-xl tracking-wider font-mono">物价体感换算</div>
                       
                       <div className="flex justify-between items-end mb-4">
                         <div>
@@ -608,13 +616,13 @@ export default function SafetyShieldDemo() {
                         {analysis.valueCheck.localPrice && (
                           <div className="text-right">
                             <div className="text-white/50 text-xs mb-1">澳洲实体零售参考价</div>
-                            <div className="text-sm font-semibold text-[#cc785c] font-mono">{analysis.valueCheck.localPrice}</div>
+                            <div className="text-sm font-semibold text-[#ff5a3c] font-mono">{analysis.valueCheck.localPrice}</div>
                           </div>
                         )}
                       </div>
                       
                       <div className="bg-white/10 p-4 rounded-xl border border-white/15">
-                        <div className="text-xs md:text-sm text-[#cc785c] font-medium leading-relaxed markdown-body">
+                        <div className="text-xs md:text-sm text-[#ff5a3c] font-medium leading-relaxed markdown-body">
                           <Markdown>{analysis.valueCheck.wittyComparison}</Markdown>
                         </div>
                       </div>
@@ -647,7 +655,7 @@ export default function SafetyShieldDemo() {
                 </div>
 
                 {/* Risk Level Highlight + Percentage */}
-                <div className={`p-6 rounded-2xl mb-6 border ${getRiskUI(scamAnalysis.riskLevel).bg} ${getRiskUI(scamAnalysis.riskLevel).border} flex flex-col md:flex-row items-start md:items-center justify-between gap-4`}>
+                <div className={`p-6 rounded-2xl mb-6 border ${getRiskUI(scamAnalysis.riskLevel).bg} ${getRiskUI(scamAnalysis.riskLevel).border} flex flex-col md:flex-row items-start md:items-center justify-between gap-5`}>
                   <div className="flex items-center space-x-4">
                     <span className="p-3 bg-white rounded-2xl shadow-xs inline-block">
                       {getRiskUI(scamAnalysis.riskLevel).icon}
@@ -661,10 +669,29 @@ export default function SafetyShieldDemo() {
                       </div>
                     </div>
                   </div>
+                  {(() => {
+                    const pct = riskPercent(scamAnalysis);
+                    const col = riskColor(scamAnalysis.riskLevel);
+                    const C = 2 * Math.PI * 38;
+                    return (
+                      <div className="relative shrink-0 w-[108px] h-[108px] self-center">
+                        <svg width="108" height="108" viewBox="0 0 108 108" className="-rotate-90">
+                          <circle cx="54" cy="54" r="38" fill="none" stroke="rgba(0,0,0,0.07)" strokeWidth="11" />
+                          <circle cx="54" cy="54" r="38" fill="none" stroke={col} strokeWidth="11" strokeLinecap="round"
+                            strokeDasharray={C} strokeDashoffset={C * (1 - pct / 100)}
+                            style={{ transition: 'stroke-dashoffset 900ms cubic-bezier(0.16,1,0.3,1)' }} />
+                        </svg>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <span className="text-[26px] font-extrabold leading-none" style={{ color: col }}>{pct}%</span>
+                          <span className="text-[10px] font-bold text-gray-400 mt-1">诈骗概率</span>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
 
-                <h3 className="text-2xl font-bold font-display text-[#141413] mb-6 flex items-center gap-2">
-                  <span className="w-2.5 h-6 bg-[#cc785c] rounded-full inline-block"></span>
+                <h3 className="text-2xl font-bold font-display text-[#1d1d1f] mb-6 flex items-center gap-2">
+                  <span className="w-2.5 h-6 bg-[#ff5a3c] rounded-full inline-block"></span>
                   {scamAnalysis.scamType}
                 </h3>
 
@@ -689,8 +716,8 @@ export default function SafetyShieldDemo() {
                     <div className="space-y-3 flex-1">
                       {scamAnalysis.whatToDo.map((action, idx) => (
                         <div key={idx} className="flex items-start space-x-3 text-xs md:text-sm text-gray-800 bg-[#FFFCE6]/40 p-4 rounded-2xl border border-[#FFF9CC]/80 leading-relaxed">
-                          <CheckCircle2 size={18} className="text-[#cc785c] flex-shrink-0 mt-0.5" />
-                          <span className="font-semibold text-[#141413]">{action}</span>
+                          <CheckCircle2 size={18} className="text-[#ff5a3c] flex-shrink-0 mt-0.5" />
+                          <span className="font-semibold text-[#1d1d1f]">{action}</span>
                         </div>
                       ))}
                     </div>
@@ -698,9 +725,9 @@ export default function SafetyShieldDemo() {
                 </div>
 
                 {/* Reassurance Banner at Bottom */}
-                <div className="bg-[#141413] text-white p-5 rounded-3xl border border-[#234335] mt-6 relative overflow-hidden shadow-md">
-                  <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-[#cc785c]/10 rounded-full blur-2xl pointer-events-none"></div>
-                  <div className="text-xs font-bold text-[#cc785c] mb-1 px-2.5 py-0.5 bg-white/15 rounded-md inline-block uppercase tracking-wider font-mono">
+                <div className="bg-[#1d1d1f] text-white p-5 rounded-3xl border border-[#234335] mt-6 relative overflow-hidden shadow-md">
+                  <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-[#ff5a3c]/10 rounded-full blur-2xl pointer-events-none"></div>
+                  <div className="text-xs font-bold text-[#ff5a3c] mb-1 px-2.5 py-0.5 bg-white/15 rounded-md inline-block uppercase tracking-wider font-mono">
                     🌟 留学生心理安抚线长
                   </div>
                   <p className="text-xs md:text-sm text-stone-100 font-normal leading-relaxed mt-2 pl-1">

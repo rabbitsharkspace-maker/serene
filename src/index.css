@@ -1,116 +1,162 @@
-/* Serene — redesigned on the Claude "warm-canvas editorial" design language (see /DESIGN.md).
-   Cream canvas + coral CTA + humanist serif display, deliberately warm where most
-   AI brands run cool blue + slate. */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Noto+Serif+SC:wght@400;500;600;700&display=swap');
+/* Serene / Landed — redesigned design system.
+   Recipe: Apple skeleton (cool fog canvas, huge tight-tracked sans, flat color-value
+   elevation, one rationed accent) + Duolingo pressable CTA (warmth) + monopo dark
+   stage (drama) + a single warm coral voltage so it reads premium-but-not-cold. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
 @import "tailwindcss";
 
 @theme {
-  /* Type */
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Newsreader", "Noto Serif SC", Georgia, serif;
+  /* ---- Type ---- */
+  --font-sans: "Inter", "Noto Sans SC", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Inter", "Noto Sans SC", ui-sans-serif, system-ui, sans-serif;
 
-  /* Claude palette — semantic design tokens (usable as bg-*, text-*, border-*) */
-  --color-canvas: #faf9f5;            /* page background — tinted cream */
-  --color-surface-soft: #f5f0e8;      /* soft cream panels */
-  --color-surface-card: #efe9de;      /* feature cards */
-  --color-surface-strong: #e8e0d2;    /* strong cream */
-  --color-ink: #141413;               /* near-black display */
-  --color-body: #3d3d3a;              /* body text */
-  --color-body-strong: #252523;
-  --color-muted: #6c6a64;             /* secondary text */
-  --color-muted-soft: #8e8b82;
-  --color-hairline: #e6dfd8;          /* warm borders */
-  --color-hairline-soft: #ebe6df;
-  --color-primary: #cc785c;           /* coral — single brand voltage */
-  --color-primary-active: #a9583e;
-  --color-primary-disabled: #e6dfd8;
-  --color-on-primary: #ffffff;
-  --color-surface-dark: #181715;      /* dark product surfaces */
-  --color-surface-dark-elevated: #252320;
-  --color-on-dark: #faf9f5;
-  --color-on-dark-soft: #a09d96;
+  /* ---- Surfaces (Apple value-elevation, but WARM: ivory canvas, warm-white cards) ---- */
+  --color-canvas: #f6f2ec;            /* page canvas — warm ivory, not cold fog */
+  --color-surface-soft: #efe8dd;      /* recessed wells inside cards — warm */
+  --color-surface-card: #fffdf9;      /* feature cards / elevated surfaces — warm white */
+  --color-surface-strong: #e7dece;    /* stronger inset / frosted control */
+  --color-snow: #fffdf9;
+
+  /* ---- Ink scale — warm near-neutrals (a touch of brown, never cold blue-grey) ---- */
+  --color-ink: #221c15;               /* display + headings — warm near-black */
+  --color-body: #4a443b;              /* body text — warm */
+  --color-body-strong: #2c261f;
+  --color-muted: #7c7468;             /* secondary text — warm grey */
+  --color-muted-soft: #9d9486;        /* captions, tertiary */
+  --color-hairline: #e7ded1;          /* borders — warm */
+  --color-hairline-soft: #f0e9de;     /* faint dividers */
+
+  /* ---- The single rationed voltage: warm coral ---- */
+  --color-primary: #f1583a;           /* sole accent — warm terracotta-coral */
+  --color-primary-active: #d8462a;
+  --color-primary-shadow: #b53a20;    /* Duolingo 3D pressable base */
+  --color-primary-soft: #fdeee7;      /* coral tint wash — warm */
+  --color-primary-disabled: #e7ded1;
+  --color-on-primary: #fffdf9;
+  --color-link: #b06a3a;              /* inline links — warm amber-brown, not cold blue */
+
+  /* ---- monopo dark stage — warm near-black (charcoal with warmth, not cold black) ---- */
+  --color-surface-dark: #1c1611;
+  --color-surface-dark-elevated: #2a2118;
+  --color-on-dark: #f6f2ec;
+  --color-on-dark-soft: #a89f93;
+
+  /* ---- Warm the whole Tailwind gray scale so every gray-* utility reads warm ---- */
+  --color-gray-50: #faf7f2;
+  --color-gray-100: #f3eee6;
+  --color-gray-150: #ece5da;
+  --color-gray-200: #e6ddd0;
+  --color-gray-300: #d7ccba;
+  --color-gray-400: #a79d8d;
+  --color-gray-450: #948a7a;
+  --color-gray-500: #837a6c;
+  --color-gray-600: #635c50;
+  --color-gray-700: #4a443b;
+  --color-gray-800: #312c24;
+  --color-gray-900: #221c15;
+  --color-gray-950: #17120d;
+  --color-neutral-800: #2a2118;
+  --color-neutral-850: #231b13;
+  --color-neutral-900: #1c1611;
+  --color-neutral-950: #140f0b;
+
+  /* ---- Semantic (muted, used sparingly) ---- */
   --color-accent-teal: #5db8a6;
   --color-accent-amber: #e8a55a;
-  --color-success: #5db872;
-  --color-warning: #d4a017;
-  --color-error: #c64545;
+  --color-success: #2fa84f;
+  --color-warning: #c2820a;
+  --color-error: #d33a2c;
+
+  /* ---- Radii (Apple signature 28px cards / 999px pills) ---- */
+  --radius-card: 28px;
+  --radius-pill: 999px;
 }
 
 @layer utilities {
-  .perspective-1000 {
-    perspective: 1000px;
+  .perspective-1000 { perspective: 1000px; }
+
+  /* Apple display lockup — huge weight, tracking tightens with size */
+  .display-xl { font-weight: 800; letter-spacing: -0.022em; line-height: 1.05; color: var(--color-ink); }
+  .display-lg { font-weight: 800; letter-spacing: -0.019em; line-height: 1.07; color: var(--color-ink); }
+  .display-md { font-weight: 700; letter-spacing: -0.015em; line-height: 1.12; color: var(--color-ink); }
+
+  /* monopo full-bleed dark stage */
+  .dark-stage { background: var(--color-surface-dark); color: var(--color-on-dark); }
+
+  /* Duolingo 3D pressable CTA — the one place tactility is allowed */
+  .cta-3d {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    border-radius: var(--radius-pill);
+    box-shadow: 0 4px 0 0 var(--color-primary-shadow);
+    transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
+  }
+  .cta-3d:hover:not(:disabled) { background: var(--color-primary-active); }
+  .cta-3d:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--color-primary-shadow); }
+
+  /* Frosted Apple pill control */
+  .frosted {
+    background: rgba(210, 210, 215, 0.55);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
 }
 
 @layer base {
   body {
     background-color: var(--color-canvas);
-    font-family: "Inter", var(--font-sans);
+    font-family: var(--font-sans);
     color: var(--color-body);
+    font-size: 17px;                 /* Apple body baseline */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
-  /* Humanist serif display for headings (Latin + 中文) */
+  /* Apple signature: feature cards land on a consistent 28px radius (was a mix of 24px) */
+  .rounded-3xl { border-radius: 28px !important; }
+  .rounded-\[2rem\] { border-radius: 28px !important; }
+
+  /* Headings: tight heavy sans (the Apple "chiseled mass" move) — replaces serif */
   h1, h2, h3, .font-display {
     font-family: var(--font-display) !important;
-    letter-spacing: -0.02em;
     color: var(--color-ink);
-    font-weight: 500;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  h1 { letter-spacing: -0.022em; }
+  h2 { letter-spacing: -0.018em; }
+  h3 { letter-spacing: -0.014em; font-weight: 700; }
+
+  p, span, li, label, a, button, input, textarea, select {
+    font-family: var(--font-sans);
   }
 
-  p, span, li, label {
-    font-family: "Inter", sans-serif;
-  }
-
-  /* Warm, soft card elevation (cream-tinted shadows) */
+  /* Apple elevation = value contrast, not shadow. Cards: hairline + whisper shadow. */
   .bg-white.rounded-3xl,
-  .bg-canvas.rounded-3xl {
+  .bg-canvas.rounded-3xl,
+  .bg-snow.rounded-3xl {
     border: 1px solid var(--color-hairline-soft) !important;
-    box-shadow: 0 1px 2px rgba(20, 20, 19, 0.03), 0 8px 24px -12px rgba(61, 61, 58, 0.10) !important;
-    transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: 0 1px 2px rgba(74, 52, 30, 0.05) !important;
+    transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 250ms cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
   .bg-white.rounded-3xl:hover,
-  .bg-canvas.rounded-3xl:hover {
+  .bg-canvas.rounded-3xl:hover,
+  .bg-snow.rounded-3xl:hover {
     transform: translateY(-2px);
-    box-shadow: 0 2px 4px rgba(20, 20, 19, 0.04), 0 18px 40px -14px rgba(61, 61, 58, 0.16) !important;
+    box-shadow: 0 12px 32px -16px rgba(74, 52, 30, 0.20) !important;
   }
 
   button, input, textarea, select {
-    transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+    transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  button:hover:not(:disabled) {
-    transform: translateY(-1px);
-    filter: brightness(1.03);
-  }
-  button:active:not(:disabled) {
-    transform: scale(0.97);
-  }
-
-  .animate-in {
-    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
-  }
+  .animate-in { animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important; }
 
   /* Markdown rendering inside results */
-  .markdown-body strong {
-    font-weight: 700;
-    color: var(--color-ink);
-  }
-  .markdown-body p {
-    margin-bottom: 0.75em;
-    line-height: 1.6;
-    color: var(--color-body);
-  }
-  .markdown-body p:last-child {
-    margin-bottom: 0;
-  }
-  .markdown-body ul {
-    list-style-type: disc;
-    padding-left: 1.5em;
-    margin-bottom: 0.5em;
-  }
-  .markdown-body ol {
-    list-style-type: decimal;
-    padding-left: 1.5em;
-    margin-bottom: 0.5em;
-  }
+  .markdown-body strong { font-weight: 700; color: var(--color-ink); }
+  .markdown-body p { margin-bottom: 0.75em; line-height: 1.6; color: var(--color-body); }
+  .markdown-body p:last-child { margin-bottom: 0; }
+  .markdown-body ul { list-style-type: disc; padding-left: 1.5em; margin-bottom: 0.5em; }
+  .markdown-body ol { list-style-type: decimal; padding-left: 1.5em; margin-bottom: 0.5em; }
 }

@@ -740,13 +740,13 @@ export default function EcosystemHub() {
       </AnimatePresence>
 
       {/* Hero Welcome banner */}
-      <div className="mb-8 bg-gradient-to-r from-[#141413]/5 to-[#cc785c]/5 border border-[#141413]/10 rounded-3xl p-6 relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="absolute right-0 bottom-0 translate-y-3 translate-x-3 text-emerald-800/5 rotate-12">
+      <div className="mb-8 bg-gradient-to-r from-[#1d1d1f]/5 to-[#ff5a3c]/5 border border-[#1d1d1f]/10 rounded-3xl p-6 relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="absolute right-0 bottom-0 translate-y-3 translate-x-3 text-ink/5 rotate-12">
           <Compass size={240} />
         </div>
         <div className="relative z-10">
           <div className="flex flex-wrap items-center gap-2 mb-2.5">
-            <div className="inline-flex items-center space-x-1.5 bg-emerald-50 text-emerald-800 px-3 py-1 rounded-full text-xs font-black tracking-wider">
+            <div className="inline-flex items-center space-x-1.5 bg-surface-soft text-ink px-3 py-1 rounded-full text-xs font-black tracking-wider">
               <Shield size={14} />
               <span>SERENE TRUST ECOSYSTEM · 海外新移民安全生态集市</span>
             </div>
@@ -754,11 +754,11 @@ export default function EcosystemHub() {
               🧪 概念演示 · Roadmap
             </span>
           </div>
-          <h2 className="text-2xl md:text-3xl font-black text-[#141413] tracking-tight">
+          <h2 className="text-2xl md:text-3xl font-black text-[#1d1d1f] tracking-tight">
             本地向导 · 留学生拼饭 · 闲置安全流转
           </h2>
           <p className="text-xs text-gray-500 mt-1 max-w-2xl leading-relaxed">
-            告别传统二手群、租房群泛滥的换汇诈骗、皮包中介与虚假低价的<strong>生态愿景演示</strong>：展示「线下带玩向导 + 拼饭门牌锁定 + 货款托管」的可信赖街区设想。<strong className="text-amber-700">「向导 / 拼饭 / 二手」三个标签为概念预览，向导与商品均为示例数据、不涉及真实资金流转</strong>；而 <strong className="text-emerald-700">「实用工具」标签内的拍照翻译与实时汇率为真实可用的 Gemini 能力</strong>。
+            告别传统二手群、租房群泛滥的换汇诈骗、皮包中介与虚假低价的<strong>生态愿景演示</strong>：展示「线下带玩向导 + 拼饭门牌锁定 + 货款托管」的可信赖街区设想。<strong className="text-amber-700">「向导 / 拼饭 / 二手」三个标签为概念预览，向导与商品均为示例数据、不涉及真实资金流转</strong>；而 <strong className="text-ink">「实用工具」标签内的拍照翻译与实时汇率为真实可用的 Gemini 能力</strong>。
           </p>
         </div>
       </div>
@@ -767,7 +767,7 @@ export default function EcosystemHub() {
       <div className="flex border-b border-gray-200 mb-8 overflow-x-auto gap-2 scrollbar-none">
         <button 
           onClick={() => { setActiveTab('guides'); setSelectedGuide(null); setSelectedMeal(null); setSelectedItem(null); }}
-          className={`px-5 py-3 rounded-t-2xl font-black text-sm transition-all flex items-center gap-2 shrink-0 ${activeTab === 'guides' ? 'border-b-4 border-[#141413] text-[#141413] bg-white bg-opacity-50' : 'text-gray-400 hover:text-gray-900'}`}
+          className={`px-5 py-3 rounded-t-2xl font-black text-sm transition-all flex items-center gap-2 shrink-0 ${activeTab === 'guides' ? 'border-b-4 border-[#1d1d1f] text-[#1d1d1f] bg-white bg-opacity-50' : 'text-gray-400 hover:text-gray-900'}`}
         >
           <Users size={18} />
           <span>向导同行 (Companion)</span>
@@ -775,7 +775,7 @@ export default function EcosystemHub() {
         </button>
         <button 
           onClick={() => { setActiveTab('private_chef'); setSelectedGuide(null); setSelectedMeal(null); setSelectedItem(null); }}
-          className={`px-5 py-3 rounded-t-2xl font-black text-sm transition-all flex items-center gap-2 shrink-0 ${activeTab === 'private_chef' ? 'border-b-4 border-[#141413] text-[#141413] bg-white bg-opacity-50' : 'text-gray-400 hover:text-gray-900'}`}
+          className={`px-5 py-3 rounded-t-2xl font-black text-sm transition-all flex items-center gap-2 shrink-0 ${activeTab === 'private_chef' ? 'border-b-4 border-[#1d1d1f] text-[#1d1d1f] bg-white bg-opacity-50' : 'text-gray-400 hover:text-gray-900'}`}
         >
           <Utensils size={18} />
           <span>留学私厨与拼饭 (Kitchen)</span>
@@ -783,7 +783,7 @@ export default function EcosystemHub() {
         </button>
         <button 
           onClick={() => { setActiveTab('marketplace'); setSelectedGuide(null); setSelectedMeal(null); setSelectedItem(null); }}
-          className={`px-5 py-3 rounded-t-2xl font-black text-sm transition-all flex items-center gap-2 shrink-0 ${activeTab === 'marketplace' ? 'border-b-4 border-[#141413] text-[#141413] bg-white bg-opacity-50' : 'text-gray-400 hover:text-gray-900'}`}
+          className={`px-5 py-3 rounded-t-2xl font-black text-sm transition-all flex items-center gap-2 shrink-0 ${activeTab === 'marketplace' ? 'border-b-4 border-[#1d1d1f] text-[#1d1d1f] bg-white bg-opacity-50' : 'text-gray-400 hover:text-gray-900'}`}
         >
           <ShoppingBag size={18} />
           <span>二手闲置防坑街 (Market)</span>
@@ -791,11 +791,11 @@ export default function EcosystemHub() {
         </button>
         <button
           onClick={() => { setActiveTab('tools'); setSelectedGuide(null); setSelectedMeal(null); setSelectedItem(null); }}
-          className={`px-5 py-3 rounded-t-2xl font-black text-sm transition-all flex items-center gap-2 shrink-0 ${activeTab === 'tools' ? 'border-b-4 border-[#141413] text-[#141413] bg-white bg-opacity-50' : 'text-gray-400 hover:text-gray-900'}`}
+          className={`px-5 py-3 rounded-t-2xl font-black text-sm transition-all flex items-center gap-2 shrink-0 ${activeTab === 'tools' ? 'border-b-4 border-[#1d1d1f] text-[#1d1d1f] bg-white bg-opacity-50' : 'text-gray-400 hover:text-gray-900'}`}
         >
           <span>🧰</span>
           <span>实用工具 (Tools)</span>
-          <span className="ml-0.5 text-[9px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-full">Live 真实</span>
+          <span className="ml-0.5 text-[9px] font-bold text-ink bg-surface-soft px-1.5 py-0.5 rounded-full">Live 真实</span>
         </button>
       </div>
 
@@ -829,13 +829,13 @@ export default function EcosystemHub() {
                 <div className="flex bg-gray-100 p-1 rounded-xl">
                   <button 
                     onClick={() => setGuideRole('student')}
-                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${guideRole === 'student' ? 'bg-[#141413] text-white shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${guideRole === 'student' ? 'bg-[#1d1d1f] text-white shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
                   >
                     我要找本地向导
                   </button>
                   <button 
                     onClick={() => setGuideRole('guide')}
-                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${guideRole === 'guide' ? 'bg-[#141413] text-white shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${guideRole === 'guide' ? 'bg-[#1d1d1f] text-white shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
                   >
                     我是本届向导 (创建Profile)
                   </button>
@@ -853,15 +853,15 @@ export default function EcosystemHub() {
                       placeholder="搜索向导姓名、学校（如UniMelb）、所在区或个人特长..."
                       value={guideQuery}
                       onChange={e => setGuideQuery(e.target.value)}
-                      className="w-full bg-white border border-gray-200 rounded-3xl py-3.5 pl-12 pr-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#141413]/50 transition-shadow shadow-xs"
+                      className="w-full bg-white border border-gray-200 rounded-3xl py-3.5 pl-12 pr-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#1d1d1f]/50 transition-shadow shadow-xs"
                     />
                   </div>
 
                   {/* AI Situation Matching Workspace */}
-                  <div className="bg-gradient-to-br from-[#141413]/5 via-white to-amber-50/10 border border-gray-200/80 rounded-3xl p-5 shadow-xs relative overflow-hidden">
+                  <div className="bg-gradient-to-br from-[#1d1d1f]/5 via-white to-amber-50/10 border border-gray-200/80 rounded-3xl p-5 shadow-xs relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-amber-100/20 rounded-full blur-2xl pointer-events-none"></div>
                     <div className="flex items-start gap-3 mb-3">
-                      <div className="p-2 bg-[#141413] text-white rounded-xl shadow-xs">
+                      <div className="p-2 bg-[#1d1d1f] text-white rounded-xl shadow-xs">
                         <Zap size={18} />
                       </div>
                       <div>
@@ -881,17 +881,17 @@ export default function EcosystemHub() {
                         value={situationQuery}
                         onChange={e => setSituationQuery(e.target.value)}
                         placeholder="例如：刚入座Clayton看房极其担心碰见黑二手房东、或收到Show Cause信手足无措面临听证会..."
-                        className="w-full bg-white border border-gray-200 rounded-2xl p-3 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-[#141413]/55 focus:border-[#141413]/60 placeholder-gray-400 leading-relaxed shadow-xs"
+                        className="w-full bg-white border border-gray-200 rounded-2xl p-3 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-[#1d1d1f]/55 focus:border-[#1d1d1f]/60 placeholder-gray-400 leading-relaxed shadow-xs"
                       />
                       <div className="flex items-center justify-between">
                         <span className="text-[9px] text-gray-400 font-bold flex items-center gap-1">
-                          <Shield size={11} className="text-emerald-700" />
+                          <Shield size={11} className="text-ink" />
                           <span>学长向导非中介，均为真实留学生防雷经验志愿传递者</span>
                         </span>
                         <button
                           type="submit"
                           disabled={companionMatchLoading}
-                          className="px-4 py-2 bg-[#141413] hover:bg-neutral-800 text-white rounded-xl text-xs font-black tracking-wide transition-all shadow-md flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
+                          className="px-4 py-2 bg-[#1d1d1f] hover:bg-neutral-800 text-white rounded-xl text-xs font-black tracking-wide transition-all shadow-md flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
                         >
                           {companionMatchLoading ? (
                             <span className="inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
@@ -914,7 +914,7 @@ export default function EcosystemHub() {
                         <div 
                           key={g.id} 
                           onClick={() => setSelectedGuide(g)}
-                          className={`bg-white border rounded-3xl p-5 hover:border-[#141413]/30 hover:scale-101 shadow-xs transition-all cursor-pointer flex flex-col justify-between ${selectedGuide?.id === g.id ? 'ring-2 ring-[#141413] border-transparent' : 'border-gray-150'} ${matchedGuideIds.includes(g.id) ? 'ring-2 ring-amber-400 shadow-[0_0_15px_rgba(234,178,82,0.22)] border-transparent' : ''}`}
+                          className={`bg-white border rounded-3xl p-5 hover:border-[#1d1d1f]/30 hover:scale-101 shadow-xs transition-all cursor-pointer flex flex-col justify-between ${selectedGuide?.id === g.id ? 'ring-2 ring-[#1d1d1f] border-transparent' : 'border-gray-150'} ${matchedGuideIds.includes(g.id) ? 'ring-2 ring-amber-400 shadow-[0_0_15px_rgba(234,178,82,0.22)] border-transparent' : ''}`}
                         >
                           <div>
                             <div className="flex items-start justify-between">
@@ -928,7 +928,7 @@ export default function EcosystemHub() {
                                         ✨ AI 精选经验源
                                       </span>
                                     )}
-                                    {g.isCustom && <span className="bg-emerald-100 text-emerald-800 text-[9px] font-black px-1 py-0.2 rounded shrink-0">我</span>}
+                                    {g.isCustom && <span className="bg-surface-soft text-ink text-[9px] font-black px-1 py-0.2 rounded shrink-0">我</span>}
                                   </h4>
                                   <p className="text-[10px] text-gray-400 font-bold tracking-tight">{g.university} · {g.major}</p>
                                 </div>
@@ -945,13 +945,13 @@ export default function EcosystemHub() {
 
                             <div className="mt-4 space-y-2">
                               {g.projects.map((p, pIdx) => (
-                                <div key={pIdx} className="bg-emerald-50/30 border border-emerald-50/50 rounded-xl p-2.5 flex justify-between items-center text-xs">
+                                <div key={pIdx} className="bg-surface-soft/30 border border-hairline/50 rounded-xl p-2.5 flex justify-between items-center text-xs">
                                   <div className="truncate pr-2">
                                     <span className="font-bold text-gray-800 block text-xs truncate">{p.name}</span>
                                     <span className="text-[10px] text-gray-500 truncate block">{p.desc}</span>
                                   </div>
                                   <div className="flex items-center space-x-2 shrink-0">
-                                    <span className="font-black text-emerald-800 text-right font-mono">${p.price}</span>
+                                    <span className="font-black text-ink text-right font-mono">${p.price}</span>
                                     <button
                                       type="button"
                                       onClick={(e) => {
@@ -967,7 +967,7 @@ export default function EcosystemHub() {
                                           suburb: g.suburb
                                         });
                                       }}
-                                      className="bg-[#141413] text-white hover:bg-neutral-800 p-1.5 rounded-lg transition-all cursor-pointer"
+                                      className="bg-[#1d1d1f] text-white hover:bg-neutral-800 p-1.5 rounded-lg transition-all cursor-pointer"
                                       title="加入购物车"
                                     >
                                       <ShoppingCart size={11} />
@@ -983,7 +983,7 @@ export default function EcosystemHub() {
                               <MapPin size={11} />
                               {g.suburb} (活跃地)
                             </span>
-                            <div className="inline-flex items-center text-xs font-bold text-[#141413] group">
+                            <div className="inline-flex items-center text-xs font-bold text-[#1d1d1f] group">
                               <span>查看详细规划</span>
                               <ChevronRight size={14} className="ml-0.5 transition-transform group-hover:translate-x-0.5" />
                             </div>
@@ -1012,7 +1012,7 @@ export default function EcosystemHub() {
                         required
                         value={createGuideName}
                         onChange={e => setCreateGuideName(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#141413]" 
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#1d1d1f]" 
                       />
                     </div>
                     <div>
@@ -1020,7 +1020,7 @@ export default function EcosystemHub() {
                       <select 
                         value={createGuideUniv}
                         onChange={e => setCreateGuideUniv(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#141413]"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#1d1d1f]"
                       >
                         <option>墨尔本大学 (UniMelb)</option>
                         <option>莫纳什大学 (Monash)</option>
@@ -1039,7 +1039,7 @@ export default function EcosystemHub() {
                         required
                         value={createGuideMajor}
                         onChange={e => setCreateGuideMajor(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#141413]" 
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#1d1d1f]" 
                       />
                     </div>
                     <div>
@@ -1047,7 +1047,7 @@ export default function EcosystemHub() {
                       <select 
                         value={createGuideYear}
                         onChange={e => setCreateGuideYear(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#141413]"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#1d1d1f]"
                       >
                         <option>大一/大二</option>
                         <option>大三/大四</option>
@@ -1067,7 +1067,7 @@ export default function EcosystemHub() {
                         required
                         value={createGuideSuburb}
                         onChange={e => setCreateGuideSuburb(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#141413]" 
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#1d1d1f]" 
                       />
                     </div>
                     <div>
@@ -1077,7 +1077,7 @@ export default function EcosystemHub() {
                         placeholder="例如：老夫墨尔本老手，可以完美接机和带新！" 
                         value={createGuideBio}
                         onChange={e => setCreateGuideBio(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#141413]" 
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#1d1d1f]" 
                       />
                     </div>
                   </div>
@@ -1122,7 +1122,7 @@ export default function EcosystemHub() {
 
                   <button 
                     type="submit"
-                    className="w-full bg-[#141413] hover:bg-neutral-800 text-white rounded-xl py-3.5 text-xs font-black tracking-wide transition-all shadow-sm active:scale-98 cursor-pointer"
+                    className="w-full bg-[#1d1d1f] hover:bg-neutral-800 text-white rounded-xl py-3.5 text-xs font-black tracking-wide transition-all shadow-sm active:scale-98 cursor-pointer"
                   >
                     🚀 发布上架并创建向导卡
                   </button>
@@ -1140,13 +1140,13 @@ export default function EcosystemHub() {
                 <div className="flex bg-gray-100 p-1 rounded-xl">
                   <button 
                     onClick={() => setChefRole('buy')}
-                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${chefRole === 'buy' ? 'bg-[#141413] text-white shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${chefRole === 'buy' ? 'bg-[#1d1d1f] text-white shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
                   >
                     我要搭伙拼饭/吃私厨
                   </button>
                   <button 
                     onClick={() => setChefRole('sell')}
-                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${chefRole === 'sell' ? 'bg-[#141413] text-white shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${chefRole === 'sell' ? 'bg-[#1d1d1f] text-white shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
                   >
                     我要做饭展示菜单
                   </button>
@@ -1164,21 +1164,21 @@ export default function EcosystemHub() {
                       placeholder="搜索特色菜、菜系（川菜、西北菜等）或所在地区周边..."
                       value={chefQuery}
                       onChange={e => setChefQuery(e.target.value)}
-                      className="w-full bg-white border border-gray-200 rounded-3xl py-3.5 pl-12 pr-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#141413]/50 transition-shadow shadow-xs"
+                      className="w-full bg-white border border-gray-200 rounded-3xl py-3.5 pl-12 pr-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#1d1d1f]/50 transition-shadow shadow-xs"
                     />
                   </div>
 
                   {/* AI Budget Meal Assistant Block */}
-                  <div className="bg-gradient-to-br from-[#141413]/5 via-white to-[#cc785c]/5 border border-gray-200/85 rounded-3xl p-5 shadow-xs relative overflow-hidden space-y-4">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-100/10 rounded-full blur-2xl pointer-events-none"></div>
+                  <div className="bg-gradient-to-br from-[#1d1d1f]/5 via-white to-[#ff5a3c]/5 border border-gray-200/85 rounded-3xl p-5 shadow-xs relative overflow-hidden space-y-4">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-surface-soft/10 rounded-full blur-2xl pointer-events-none"></div>
                     <div className="flex items-start gap-3">
-                      <div className="p-2 bg-[#141413] text-white rounded-xl shadow-xs">
+                      <div className="p-2 bg-[#1d1d1f] text-white rounded-xl shadow-xs">
                         <Utensils size={18} />
                       </div>
                       <div>
                         <h3 className="text-sm font-black text-gray-900 flex items-center gap-1.5 leading-none">
                           <span>🥦 AI 冰箱临期食材 & 超市小票省钱自救菜谱</span>
-                          <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-1.5 py-0.2 rounded animate-pulse">外卖终结者</span>
+                          <span className="text-[10px] bg-surface-soft text-ink font-extrabold px-1.5 py-0.2 rounded animate-pulse">外卖终结者</span>
                         </h3>
                         <p className="text-[10px] text-gray-500 mt-1.5 leading-relaxed">
                           叫一顿 $30+ AUD 的送餐外卖是不是掏空了每周的生活开销？上传冰箱杂乱随拍，或 Woolworths / Coles 实拍买菜小票小图。Serene 将比照全澳平价库，瞬时为你定制最低成本极简营养快手食谱，并展开防坑账单痛感换算！
@@ -1189,7 +1189,7 @@ export default function EcosystemHub() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Image Upload Area */}
                       <div className="space-y-3">
-                        <div className="border border-dashed border-gray-250 rounded-2xl p-4 text-center bg-gray-50/50 hover:bg-white transition-all hover:border-[#141413]/30 flex flex-col justify-center items-center h-32 relative">
+                        <div className="border border-dashed border-gray-250 rounded-2xl p-4 text-center bg-gray-50/50 hover:bg-white transition-all hover:border-[#1d1d1f]/30 flex flex-col justify-center items-center h-32 relative">
                           <input
                             type="file"
                             accept="image/*"
@@ -1199,7 +1199,7 @@ export default function EcosystemHub() {
                             }}
                             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                           />
-                          <Upload className="mx-auto text-[#141413] mb-2" size={24} />
+                          <Upload className="mx-auto text-[#1d1d1f] mb-2" size={24} />
                           <span className="text-[11px] font-bold text-gray-800 block">点击或拖拽上传冰箱一角 / 买菜小票</span>
                           <span className="text-[9px] text-gray-400 mt-1 block">支持图像上传进行真实的 AI 大屏扫描</span>
                         </div>
@@ -1210,7 +1210,7 @@ export default function EcosystemHub() {
                           <button
                             type="button"
                             onClick={() => handleRecipeImgPreset('fridge')}
-                            className="px-2.5 py-1 text-[10px] font-black bg-emerald-50 hover:bg-emerald-100 active:scale-95 text-emerald-800 border border-emerald-200 rounded-lg transition-all cursor-pointer flex items-center gap-0.5"
+                            className="px-2.5 py-1 text-[10px] font-black bg-surface-soft hover:bg-surface-soft active:scale-95 text-ink border border-hairline rounded-lg transition-all cursor-pointer flex items-center gap-0.5"
                           >
                             🥦 预置临期食材
                           </button>
@@ -1228,7 +1228,7 @@ export default function EcosystemHub() {
                       <div className="bg-white/90 border border-gray-150 rounded-2xl p-3.5 flex flex-col justify-center min-h-[140px] relative font-sans">
                         {recipeLoading ? (
                           <div className="space-y-3 text-center my-auto animate-pulse">
-                            <div className="inline-block w-8 h-8 border-4 border-[#141413] border-t-transparent rounded-full animate-spin"></div>
+                            <div className="inline-block w-8 h-8 border-4 border-[#1d1d1f] border-t-transparent rounded-full animate-spin"></div>
                             <div className="space-y-1">
                               <span className="text-xs font-black text-gray-900 block">Serene AI 正在扫描冰箱及比照全澳物价...</span>
                               <span className="text-[9px] text-gray-450 block">Woolworths & Coles 最新低价策略比对计算中</span>
@@ -1240,7 +1240,7 @@ export default function EcosystemHub() {
                               <span className="text-[9px] text-gray-400 font-extrabold uppercase block">🥗 智能雷达扫描识别食材 (Ingredients):</span>
                               <div className="flex flex-wrap gap-1 mt-1">
                                 {recipeResult.ingredients.map((ing, iIdx) => (
-                                  <span key={iIdx} className="bg-emerald-100 text-emerald-800 border border-emerald-200 text-[10px] font-black px-1.5 py-0.5 rounded-lg leading-none">
+                                  <span key={iIdx} className="bg-surface-soft text-ink border border-hairline text-[10px] font-black px-1.5 py-0.5 rounded-lg leading-none">
                                     {ing}
                                   </span>
                                 ))}
@@ -1253,7 +1253,7 @@ export default function EcosystemHub() {
                                 <div key={rIdx} className="bg-gray-50 p-2.5 rounded-xl border border-gray-150 space-y-1">
                                   <div className="flex justify-between items-center text-[11px] font-black">
                                     <span className="text-gray-950 font-black">{rIdx + 1}. {rep.name}</span>
-                                    <span className="text-emerald-800 bg-emerald-100 font-mono px-1 py-0.2 rounded shrink-0">预估成本 {rep.cost}</span>
+                                    <span className="text-ink bg-surface-soft font-mono px-1 py-0.2 rounded shrink-0">预估成本 {rep.cost}</span>
                                   </div>
                                   <ul className="list-decimal pl-3.5 text-[10px] font-bold text-gray-600 space-y-0.5">
                                     {rep.steps.map((st, sIdx) => <li key={sIdx}>{st}</li>)}
@@ -1262,11 +1262,11 @@ export default function EcosystemHub() {
                               ))}
                             </div>
 
-                            <div className="border-t border-dashed border-gray-150 pt-2 bg-[#cc785c]/10 p-2.5 rounded-xl border border-[#cc785c]/20">
-                              <span className="text-[9.5px] text-[#cc785c] font-black uppercase flex items-center gap-0.5 leading-none">
+                            <div className="border-t border-dashed border-gray-150 pt-2 bg-[#ff5a3c]/10 p-2.5 rounded-xl border border-[#ff5a3c]/20">
+                              <span className="text-[9.5px] text-[#ff5a3c] font-black uppercase flex items-center gap-0.5 leading-none">
                                 🛡️ 留学生自救平价防坑账单 (Woolies / Coles 比照):
                               </span>
-                              <p className="text-[10px] text-[#141413] font-bold leading-relaxed mt-1.5">
+                              <p className="text-[10px] text-[#1d1d1f] font-bold leading-relaxed mt-1.5">
                                 {recipeResult.savingComparison}
                               </p>
                             </div>
@@ -1289,20 +1289,20 @@ export default function EcosystemHub() {
                   </div>
 
                   {/* HIGH QUALITY STYLISH CSS INTERACTIVE LOCAL MAP SIMULATOR */}
-                  <div className="bg-gradient-to-br from-[#cc785c]/10 via-[#faf9f5] to-emerald-50/10 border border-gray-200 rounded-3xl p-5 shadow-inner">
+                  <div className="bg-gradient-to-br from-[#ff5a3c]/10 via-[#f5f5f7] to-surface-soft/10 border border-gray-200 rounded-3xl p-5 shadow-inner">
                     <div className="flex items-center justify-between mb-3 text-xs leading-none">
                       <span className="font-black text-gray-800 uppercase tracking-wider flex items-center gap-1.5">
-                        <Map size={16} className="text-[#cc785c]" />
+                        <Map size={16} className="text-[#ff5a3c]" />
                         <span>墨尔本 Lygon & CBD 实时在线拼餐拼桌地图卫星定位</span>
                       </span>
-                      <span className="text-[10px] text-green-700 font-extrabold bg-green-100 px-1.5 py-0.5 rounded animate-pulse">● 2 位大显身手正在开伙</span>
+                      <span className="text-[10px] text-ink font-extrabold bg-surface-soft px-1.5 py-0.5 rounded animate-pulse">● 2 位大显身手正在开伙</span>
                     </div>
 
                     <div className="w-full h-44 bg-[#F2EDE4] rounded-2xl border border-gray-200 relative overflow-hidden shadow-inner flex items-center justify-center">
                       {/* Grid overlay for map vibe */}
                       <div className="absolute inset-0 grid grid-cols-6 grid-rows-4 opacity-15 pointer-events-none">
                         {Array.from({ length: 24 }).map((_, i) => (
-                          <div key={i} className="border border-[#141413] border-dashed"></div>
+                          <div key={i} className="border border-[#1d1d1f] border-dashed"></div>
                         ))}
                       </div>
 
@@ -1314,10 +1314,10 @@ export default function EcosystemHub() {
 
                       {/* Your Location Pin */}
                       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10">
-                        <div className="bg-[#141413] text-white px-2 py-0.5 rounded-md text-[10px] font-black shadow-md border border-white">
+                        <div className="bg-[#1d1d1f] text-white px-2 py-0.5 rounded-md text-[10px] font-black shadow-md border border-white">
                           您的位置
                         </div>
-                        <div className="w-3 h-3 bg-[#141413] rounded-full border-2 border-white animate-pulse mt-0.5"></div>
+                        <div className="w-3 h-3 bg-[#1d1d1f] rounded-full border-2 border-white animate-pulse mt-0.5"></div>
                       </div>
 
                       {/* Pin A: Dapanji */}
@@ -1356,7 +1356,7 @@ export default function EcosystemHub() {
                         <div 
                           key={m.id}
                           onClick={() => setSelectedMeal(m)}
-                          className={`bg-white border rounded-3xl overflow-hidden hover:shadow-md hover:border-[#141413]/30 hover:scale-101 shadow-xs transition-all cursor-pointer flex flex-col justify-between ${selectedMeal?.id === m.id ? 'ring-2 ring-[#141413] border-transparent' : 'border-gray-150'}`}
+                          className={`bg-white border rounded-3xl overflow-hidden hover:shadow-md hover:border-[#1d1d1f]/30 hover:scale-101 shadow-xs transition-all cursor-pointer flex flex-col justify-between ${selectedMeal?.id === m.id ? 'ring-2 ring-[#1d1d1f] border-transparent' : 'border-gray-150'}`}
                         >
                           <div>
                             {/* Dish Product Image */}
@@ -1370,7 +1370,7 @@ export default function EcosystemHub() {
                               <span className="absolute top-3 left-3 text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase bg-black/60 text-white backdrop-blur-xs">
                                 {m.type === 'cooking' ? '🔥 留校私厨列餐' : '👥 拼饭桌聚'}
                               </span>
-                              <span className="absolute top-3 right-3 text-xs font-black font-mono text-emerald-100 bg-[#141413]/85 px-2 py-0.5 rounded-lg shrink-0">
+                              <span className="absolute top-3 right-3 text-xs font-black font-mono text-on-dark bg-[#1d1d1f]/85 px-2 py-0.5 rounded-lg shrink-0">
                                 ${m.price}
                               </span>
                             </div>
@@ -1411,13 +1411,13 @@ export default function EcosystemHub() {
                                     suburb: m.suburb
                                   });
                                 }}
-                                className="bg-[#141413]/10 hover:bg-[#141413] group hover:text-white text-[#141413] px-2 py-1 rounded-xl transition-all cursor-pointer flex items-center gap-1 text-[10px] font-black"
+                                className="bg-[#1d1d1f]/10 hover:bg-[#1d1d1f] group hover:text-white text-[#1d1d1f] px-2 py-1 rounded-xl transition-all cursor-pointer flex items-center gap-1 text-[10px] font-black"
                                 title="加入防坑购物车"
                               >
                                 <ShoppingCart size={11} />
                                 <span>+购物车</span>
                               </button>
-                              <div className="text-[10px] font-extrabold text-neutral-500 hover:text-[#141413] flex items-center">
+                              <div className="text-[10px] font-extrabold text-neutral-500 hover:text-[#1d1d1f] flex items-center">
                                 <span>详情 ➜</span>
                               </div>
                             </div>
@@ -1446,7 +1446,7 @@ export default function EcosystemHub() {
                         required
                         value={postDishName}
                         onChange={e => setPostDishName(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#141413]" 
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#1d1d1f]" 
                       />
                     </div>
                     <div>
@@ -1457,7 +1457,7 @@ export default function EcosystemHub() {
                         required
                         value={postDishPrice}
                         onChange={e => setPostDishPrice(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#141413]" 
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#1d1d1f]" 
                       />
                     </div>
                   </div>
@@ -1468,7 +1468,7 @@ export default function EcosystemHub() {
                       <select 
                         value={postDishType}
                         onChange={e => setPostDishType(e.target.value as any)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#141413]"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#1d1d1f]"
                       >
                         <option value="cooking">做饭列菜单出售</option>
                         <option value="sharing">大桌聚餐分摊 (拼饭)</option>
@@ -1482,7 +1482,7 @@ export default function EcosystemHub() {
                         required
                         value={postCuisine}
                         onChange={e => setPostCuisine(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#141413]" 
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#1d1d1f]" 
                       />
                     </div>
                     <div>
@@ -1493,7 +1493,7 @@ export default function EcosystemHub() {
                         required
                         value={postSuburb}
                         onChange={e => setPostSuburb(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#141413]" 
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#1d1d1f]" 
                       />
                     </div>
                   </div>
@@ -1517,7 +1517,7 @@ export default function EcosystemHub() {
                       placeholder="例如：精心选用放养大腿鸡，慢炖三个小时。希望结交志同道合的同学搭伙一同聚食！"
                       value={postDescription}
                       onChange={e => setPostDescription(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-[#141413] resize-none" 
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-[#1d1d1f] resize-none" 
                     />
                   </div>
 
@@ -1536,7 +1536,7 @@ export default function EcosystemHub() {
                           key={p.url}
                           type="button"
                           onClick={() => setPostDishImage(p.url)}
-                          className={`relative h-12 rounded-lg overflow-hidden border-2 transition-all ${postDishImage === p.url ? 'border-[#141413] scale-102 ring-1 ring-[#141413]' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                          className={`relative h-12 rounded-lg overflow-hidden border-2 transition-all ${postDishImage === p.url ? 'border-[#1d1d1f] scale-102 ring-1 ring-[#1d1d1f]' : 'border-transparent opacity-60 hover:opacity-100'}`}
                           title={p.name}
                         >
                           <img src={p.url} alt={p.name} className="w-full h-full object-cover" />
@@ -1547,7 +1547,7 @@ export default function EcosystemHub() {
 
                   <button 
                     type="submit"
-                    className="w-full bg-[#141413] hover:bg-neutral-800 text-white rounded-xl py-3.5 text-xs font-black tracking-wide transition-all shadow-sm active:scale-98 cursor-pointer"
+                    className="w-full bg-[#1d1d1f] hover:bg-neutral-800 text-white rounded-xl py-3.5 text-xs font-black tracking-wide transition-all shadow-sm active:scale-98 cursor-pointer"
                   >
                     🍲 上架小厨菜单并锁住隐私地址
                   </button>
@@ -1566,14 +1566,14 @@ export default function EcosystemHub() {
                   <button 
                     type="button"
                     onClick={() => setMarketRole('buy')}
-                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${marketRole === 'buy' ? 'bg-[#141413] text-white shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${marketRole === 'buy' ? 'bg-[#1d1d1f] text-white shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
                   >
                     我要找靠谱闲置
                   </button>
                   <button 
                     type="button"
                     onClick={() => setMarketRole('sell')}
-                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${marketRole === 'sell' ? 'bg-[#141413] text-white shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${marketRole === 'sell' ? 'bg-[#1d1d1f] text-white shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
                   >
                     我要转卖闲置数码
                   </button>
@@ -1593,7 +1593,7 @@ export default function EcosystemHub() {
                         placeholder="搜索Kmart微波炉、课本资料或闲置书桌等..."
                         value={marketQuery}
                         onChange={e => setMarketQuery(e.target.value)}
-                        className="w-full bg-white border border-gray-200 rounded-3xl py-3.5 pl-12 pr-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#141413]/50 transition-shadow shadow-xs"
+                        className="w-full bg-white border border-gray-200 rounded-3xl py-3.5 pl-12 pr-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#1d1d1f]/50 transition-shadow shadow-xs"
                       />
                     </div>
 
@@ -1609,7 +1609,7 @@ export default function EcosystemHub() {
                           key={cat.id}
                           type="button"
                           onClick={() => setMarketCategory(cat.id)}
-                          className={`px-4 py-1.5 rounded-full text-xs font-black shrink-0 transition-all cursor-pointer ${marketCategory === cat.id ? 'bg-[#141413] text-white shadow-xs' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                          className={`px-4 py-1.5 rounded-full text-xs font-black shrink-0 transition-all cursor-pointer ${marketCategory === cat.id ? 'bg-[#1d1d1f] text-white shadow-xs' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'}`}
                         >
                           {cat.label}
                         </button>
@@ -1618,8 +1618,8 @@ export default function EcosystemHub() {
                   </div>
 
                   {/* Trust warning block */}
-                  <div className="bg-emerald-50 border border-emerald-150 p-4 rounded-2xl text-xs leading-relaxed text-[#141413] flex items-start gap-2.5">
-                    <Shield size={18} className="shrink-0 mt-0.5 text-emerald-800" />
+                  <div className="bg-surface-soft border border-hairline p-4 rounded-2xl text-xs leading-relaxed text-[#1d1d1f] flex items-start gap-2.5">
+                    <Shield size={18} className="shrink-0 mt-0.5 text-ink" />
                     <div>
                       <strong>Serene 独属二手双向货款托管交易机制：</strong>
                       买家付款后，钱款将由平台金库安全托管。双方当面验货并确认交付或拿到包裹，买家由平台释放放款，彻底避免了微信群“先钱后货或假回单”的无解死局！
@@ -1637,7 +1637,7 @@ export default function EcosystemHub() {
                         <div 
                           key={item.id}
                           onClick={() => setSelectedItem(item)}
-                          className={`bg-white border rounded-3xl overflow-hidden hover:shadow-md hover:border-[#141413]/30 hover:scale-101 shadow-xs transition-all cursor-pointer flex flex-col justify-between ${selectedItem?.id === item.id ? 'ring-2 ring-[#141413] border-transparent' : 'border-gray-150'}`}
+                          className={`bg-white border rounded-3xl overflow-hidden hover:shadow-md hover:border-[#1d1d1f]/30 hover:scale-101 shadow-xs transition-all cursor-pointer flex flex-col justify-between ${selectedItem?.id === item.id ? 'ring-2 ring-[#1d1d1f] border-transparent' : 'border-gray-150'}`}
                         >
                           <div>
                             {/* Product Image */}
@@ -1648,10 +1648,10 @@ export default function EcosystemHub() {
                                 className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                                 referrerPolicy="no-referrer"
                               />
-                              <span className="absolute top-3 left-3 text-[10px] font-extrabold px-2 py-0.5 rounded uppercase bg-[#141413] text-white">
+                              <span className="absolute top-3 left-3 text-[10px] font-extrabold px-2 py-0.5 rounded uppercase bg-[#1d1d1f] text-white">
                                 {item.condition}
                               </span>
-                              <span className="absolute top-3 right-3 text-xs font-black font-mono text-emerald-100 bg-[#141413]/85 px-2 py-0.5 rounded-lg shrink-0">
+                              <span className="absolute top-3 right-3 text-xs font-black font-mono text-on-dark bg-[#1d1d1f]/85 px-2 py-0.5 rounded-lg shrink-0">
                                 ${item.price}
                               </span>
                             </div>
@@ -1690,7 +1690,7 @@ export default function EcosystemHub() {
                                 className={`px-2 py-1 rounded-xl text-[10px] font-black cursor-pointer flex items-center gap-0.5 transition-all ${
                                   priceCheckResults[item.id]
                                     ? priceCheckResults[item.id].verdict === '划算'
-                                      ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                      ? 'bg-surface-soft text-ink border border-hairline'
                                       : priceCheckResults[item.id].verdict === '偏贵'
                                       ? 'bg-red-100 text-red-800 border border-red-300'
                                       : 'bg-amber-100 text-amber-800 border border-amber-300 animate-pulse'
@@ -1725,7 +1725,7 @@ export default function EcosystemHub() {
                                       suburb: item.suburb
                                     });
                                   }}
-                                  className="bg-[#141413]/10 hover:bg-[#141413] group hover:text-white text-[#141413] px-2 py-1 rounded-xl transition-all cursor-pointer flex items-center gap-1 text-[10px] font-black"
+                                  className="bg-[#1d1d1f]/10 hover:bg-[#1d1d1f] group hover:text-white text-[#1d1d1f] px-2 py-1 rounded-xl transition-all cursor-pointer flex items-center gap-1 text-[10px] font-black"
                                 >
                                   <ShoppingCart size={11} />
                                   <span>+购物车</span>
@@ -1739,7 +1739,7 @@ export default function EcosystemHub() {
                                   已安全交付
                                 </span>
                               )}
-                              <div className="text-[10px] font-extrabold text-neutral-500 hover:text-[#141413] flex items-center">
+                              <div className="text-[10px] font-extrabold text-neutral-500 hover:text-[#1d1d1f] flex items-center">
                                 <span>详情 ➜</span>
                               </div>
                             </div>
@@ -1769,7 +1769,7 @@ export default function EcosystemHub() {
                         required
                         value={itemTitle}
                         onChange={e => setItemTitle(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#141413]" 
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#1d1d1f]" 
                       />
                     </div>
                     <div>
@@ -1780,7 +1780,7 @@ export default function EcosystemHub() {
                         required
                         value={itemPrice}
                         onChange={e => setItemPrice(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#141413]" 
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#1d1d1f]" 
                       />
                     </div>
                   </div>
@@ -1791,7 +1791,7 @@ export default function EcosystemHub() {
                       <select 
                         value={itemCondition}
                         onChange={e => setItemCondition(e.target.value as any)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#141413]"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#1d1d1f]"
                       >
                         <option value="全新">全套未拆封 (全新)</option>
                         <option value="99新">近乎无暇 (99新)</option>
@@ -1804,7 +1804,7 @@ export default function EcosystemHub() {
                       <select 
                         value={itemCategory}
                         onChange={e => setItemCategory(e.target.value as any)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#141413]"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#1d1d1f]"
                       >
                         <option value="生活用品">生活用品</option>
                         <option value="数码">数码电子</option>
@@ -1820,7 +1820,7 @@ export default function EcosystemHub() {
                         required
                         value={itemSuburb}
                         onChange={e => setItemSuburb(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#141413]" 
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#1d1d1f]" 
                       />
                     </div>
                   </div>
@@ -1832,13 +1832,13 @@ export default function EcosystemHub() {
                       placeholder="请详细描述尺寸、原售价、成色等细节。例如：墨大附近支持面交验货，手艺全方位打包良好..."
                       value={itemDesc}
                       onChange={e => setItemDesc(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-[#141413] resize-none" 
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-[#1d1d1f] resize-none" 
                     />
                   </div>
 
                   <button 
                     type="submit"
-                    className="w-full bg-[#141413] hover:bg-neutral-800 text-white rounded-xl py-3.5 text-xs font-black tracking-wide transition-all shadow-sm active:scale-98 cursor-pointer"
+                    className="w-full bg-[#1d1d1f] hover:bg-neutral-800 text-white rounded-xl py-3.5 text-xs font-black tracking-wide transition-all shadow-sm active:scale-98 cursor-pointer"
                   >
                     🛍️ 安全发布，锁定货款担保流转
                   </button>
@@ -1855,7 +1855,7 @@ export default function EcosystemHub() {
           {/* 1. Dynamic Detail Inspector */}
           <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-xs relative">
             <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-1.5">
-              <Compass size={14} className="text-[#141413]" />
+              <Compass size={14} className="text-[#1d1d1f]" />
               <span>动态细节审查与担保板 (Detail Inspector)</span>
             </h3>
 
@@ -1875,7 +1875,7 @@ export default function EcosystemHub() {
                   <div>
                     <h4 className="font-extrabold text-gray-950 text-base">{selectedGuide.name}</h4>
                     <span className="text-[10px] text-gray-450 block font-bold text-gray-400">{selectedGuide.university}</span>
-                    <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded font-black">{selectedGuide.major}</span>
+                    <span className="text-[10px] bg-surface-soft text-ink px-1.5 py-0.2 rounded font-black">{selectedGuide.major}</span>
                   </div>
                 </div>
 
@@ -1896,7 +1896,7 @@ export default function EcosystemHub() {
                       <ul className="space-y-1.5">
                         {matchChecklist.map((item, idx) => (
                           <li key={idx} className="flex items-start gap-1.5 text-[10px] text-gray-700 font-bold leading-relaxed">
-                            <span className="text-[#141413] shrink-0 select-none mt-0.5">✔</span>
+                            <span className="text-[#1d1d1f] shrink-0 select-none mt-0.5">✔</span>
                             <span>{item}</span>
                           </li>
                         ))}
@@ -1921,7 +1921,7 @@ export default function EcosystemHub() {
                     <div key={pIdx} className="bg-neutral-50 border rounded-2xl p-3.5 space-y-1">
                       <div className="flex justify-between items-center text-xs font-black">
                         <span className="text-gray-900">{proj.name}</span>
-                        <span className="text-emerald-800 bg-emerald-100/70 px-1.5 py-0.2 rounded">${proj.price} AUD</span>
+                        <span className="text-ink bg-surface-soft/70 px-1.5 py-0.2 rounded">${proj.price} AUD</span>
                       </div>
                       <p className="text-[11px] text-gray-500 leading-relaxed">{proj.desc}</p>
                     </div>
@@ -1931,14 +1931,14 @@ export default function EcosystemHub() {
                 <div className="pt-3 flex flex-col gap-2">
                   <button 
                     onClick={() => openChatWithUser(selectedGuide.name, selectedGuide.avatar, `你好！我是本地向导 ${selectedGuide.name}，很高兴在 Serene 平台为你提供落地协助，有什么可以帮到你？`)}
-                    className="w-full bg-[#141413] hover:bg-neutral-800 text-white font-black text-xs rounded-xl py-3 shadow-xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                    className="w-full bg-[#1d1d1f] hover:bg-neutral-800 text-white font-black text-xs rounded-xl py-3 shadow-xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     <MessageSquare size={14} />
                     <span>立即对话沟通 (在线聊天)</span>
                   </button>
                   <button 
                     onClick={() => { triggerNotification(`📅 已向向导 ${selectedGuide.name} 发送带逛需求简报！对方确认接单后，在 Serene 进行安全托管付款即可。`); }}
-                    className="w-full bg-white hover:bg-gray-50 border border-[#141413] text-[#141413] font-bold text-xs rounded-xl py-3 transition-colors"
+                    className="w-full bg-white hover:bg-gray-50 border border-[#1d1d1f] text-[#1d1d1f] font-bold text-xs rounded-xl py-3 transition-colors"
                   >
                     确定预约带逛
                   </button>
@@ -1954,7 +1954,7 @@ export default function EcosystemHub() {
                     <h4 className="font-extrabold text-gray-950 text-base">{selectedMeal.dishName}</h4>
                     <span className="text-[10px] text-gray-400 font-bold block mt-0.5">大厨：{selectedMeal.chefName} ({selectedMeal.cuisine})</span>
                   </div>
-                  <span className="text-lg font-black font-mono text-emerald-800 shrink-0">${selectedMeal.price}</span>
+                  <span className="text-lg font-black font-mono text-ink shrink-0">${selectedMeal.price}</span>
                 </div>
 
                 <div className="bg-neutral-50 rounded-2xl p-3 text-xs leading-relaxed text-gray-600 font-semibold">
@@ -1964,16 +1964,16 @@ export default function EcosystemHub() {
                 <div className="space-y-2">
                   <span className="text-[10px] font-black text-gray-400 uppercase block">🔒 拼饭精准公寓地址物理门牌：</span>
                   {selectedMeal.isUnlocked ? (
-                    <div className="bg-emerald-50 text-emerald-800 border border-emerald-250 p-3.5 rounded-2xl text-xs font-bold space-y-1">
+                    <div className="bg-surface-soft text-ink border border-hairline p-3.5 rounded-2xl text-xs font-bold space-y-1">
                       <div className="flex items-center gap-1">
-                        <MapPin size={14} className="text-green-600 animate-bounce" />
+                        <MapPin size={14} className="text-ink animate-bounce" />
                         <span>已安全解锁地址 ➜</span>
                       </div>
                       <p className="font-mono text-xs">{selectedMeal.preciseAddress}</p>
                     </div>
                   ) : (
                     <div className="bg-neutral-100 border border-gray-200 p-3.5 rounded-2xl text-xs text-gray-500 font-black flex flex-col items-center justify-center text-center space-y-1.5">
-                      <Lock size={16} className="text-rose-500" />
+                      <Lock size={16} className="text-primary" />
                       <span>地址已被加密隐藏保护</span>
                       <p className="text-[10px] font-medium text-gray-400">为了防止线下直接蹲守恐吓或骚扰，支付预定金额解锁高精门房！</p>
                     </div>
@@ -1984,13 +1984,13 @@ export default function EcosystemHub() {
                   {!selectedMeal.isUnlocked ? (
                     <button 
                       onClick={() => setCheckoutMealId(selectedMeal.id)}
-                      className="w-full bg-[#141413] hover:bg-neutral-800 text-white font-black text-xs rounded-xl py-3 shadow-md active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                      className="w-full bg-[#1d1d1f] hover:bg-neutral-800 text-white font-black text-xs rounded-xl py-3 shadow-md active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-1.5"
                     >
                       <ShoppingCart size={14} />
                       <span>立即搭伙拼饭解锁定位 (${selectedMeal.price})</span>
                     </button>
                   ) : (
-                    <div className="bg-green-100 text-green-800 p-2.5 rounded-2xl text-xs font-black text-center">
+                    <div className="bg-surface-soft text-ink p-2.5 rounded-2xl text-xs font-black text-center">
                       ✓ 已解锁！由于您成功订餐，上方公寓精确信息已显形。
                     </div>
                   )}
@@ -2013,7 +2013,7 @@ export default function EcosystemHub() {
                     <h4 className="font-extrabold text-gray-950 text-base">{selectedItem.title}</h4>
                     <span className="text-[10px] text-gray-400 font-bold block mt-0.5">卖家：{selectedItem.sellerName} (成色：{selectedItem.condition})</span>
                   </div>
-                  <span className="text-lg font-black font-mono text-emerald-800 text-right shrink-0">${selectedItem.price}</span>
+                  <span className="text-lg font-black font-mono text-ink text-right shrink-0">${selectedItem.price}</span>
                 </div>
 
                 <div className="bg-gray-50 p-3.5 rounded-2xl text-xs leading-relaxed text-gray-600 font-semibold">
@@ -2024,7 +2024,7 @@ export default function EcosystemHub() {
                 {priceCheckResults[selectedItem.id] && (
                   <div className={`border rounded-3xl p-4 space-y-3 shadow-sm animate-in slide-in-from-top-3 duration-300 ${
                     priceCheckResults[selectedItem.id].verdict === '划算'
-                      ? 'bg-emerald-50/70 border-emerald-300 text-emerald-955'
+                      ? 'bg-surface-soft/70 border-hairline text-ink'
                       : priceCheckResults[selectedItem.id].verdict === '偏贵'
                       ? 'bg-red-50/70 border-red-300 text-red-955'
                       : 'bg-amber-50/70 border-amber-300 text-amber-955'
@@ -2036,7 +2036,7 @@ export default function EcosystemHub() {
                       </div>
                       <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${
                         priceCheckResults[selectedItem.id].verdict === '划算'
-                          ? 'bg-emerald-200 text-emerald-850'
+                          ? 'bg-surface-soft text-ink'
                           : priceCheckResults[selectedItem.id].verdict === '偏贵'
                           ? 'bg-red-200 text-red-850'
                           : 'bg-amber-200 text-amber-850'
@@ -2053,7 +2053,7 @@ export default function EcosystemHub() {
                         </div>
                         <div>
                           <span className="text-[9px] text-gray-400 font-extrabold uppercase block">🇦🇺 澳洲二手合理评估价</span>
-                          <span className="font-extrabold text-emerald-800 text-xs font-mono">{priceCheckResults[selectedItem.id].fairUsedPrice}</span>
+                          <span className="font-extrabold text-ink text-xs font-mono">{priceCheckResults[selectedItem.id].fairUsedPrice}</span>
                         </div>
                       </div>
 
@@ -2075,11 +2075,11 @@ export default function EcosystemHub() {
                 )}
 
                 {/* Secure mechanism status display */}
-                <div className="bg-emerald-50/50 border border-emerald-150 p-4 rounded-2xl text-xs space-y-2">
-                  <span className="text-[10px] font-black text-emerald-800 uppercase tracking-widest block">平台货款托管保险状态：</span>
+                <div className="bg-surface-soft/50 border border-hairline p-4 rounded-2xl text-xs space-y-2">
+                  <span className="text-[10px] font-black text-ink uppercase tracking-widest block">平台货款托管保险状态：</span>
                   {selectedItem.secureStatus === 'available' && (
                     <div className="text-gray-600 flex items-start gap-1.5">
-                      <Shield size={16} className="text-emerald-700 shrink-0 mt-0.5" />
+                      <Shield size={16} className="text-ink shrink-0 mt-0.5" />
                       <span><strong>平台保驾护航：</strong> 随时可以点击锁定货款。面交并检查没有任何猫腻之后再行释放放款。</span>
                     </div>
                   )}
@@ -2094,7 +2094,7 @@ export default function EcosystemHub() {
                       </p>
                       <button 
                         onClick={() => handleMarketItemReleaseFunds(selectedItem.id)}
-                        className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs py-2 rounded-xl transition-all"
+                        className="w-full bg-primary hover:bg-primary text-white font-black text-xs py-2 rounded-xl transition-all"
                       >
                         ✓ 确认面交无误 · 释放放款
                       </button>
@@ -2102,7 +2102,7 @@ export default function EcosystemHub() {
                   )}
                   {selectedItem.secureStatus === 'completed' && (
                     <div className="text-gray-500 flex items-center gap-1 text-xs font-bold text-center justify-center p-2 bg-gray-150 rounded-xl">
-                      <Check size={14} className="text-green-600" />
+                      <Check size={14} className="text-ink" />
                       <span>交易已安全划定并完成划拨结算。</span>
                     </div>
                   )}
@@ -2112,7 +2112,7 @@ export default function EcosystemHub() {
                   {selectedItem.secureStatus === 'available' && (
                     <button 
                       onClick={() => setCheckoutItemId(selectedItem.id)}
-                      className="w-full bg-[#141413] hover:bg-neutral-800 text-white font-black text-xs rounded-xl py-3 shadow-md active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                      className="w-full bg-[#1d1d1f] hover:bg-neutral-800 text-white font-black text-xs rounded-xl py-3 shadow-md active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-1.5"
                     >
                       <Lock size={14} />
                       <span>一键锁定货款担保 (${selectedItem.price})</span>
@@ -2156,7 +2156,7 @@ export default function EcosystemHub() {
                     <div>
                       <h4 className="font-extrabold text-sm text-white flex items-center gap-1">
                         <span>{activeChatUser}</span>
-                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping"></span>
+                        <span className="w-1.5 h-1.5 bg-primary rounded-full animate-ping"></span>
                       </h4>
                       <span className="text-[9px] text-gray-400 block font-bold leading-none uppercase tracking-wide">Serene 在线微聊天</span>
                     </div>
@@ -2173,7 +2173,7 @@ export default function EcosystemHub() {
                 <div className="h-44 overflow-y-auto space-y-3 pr-1 text-xs">
                   {chatMessages.map((msg, i) => (
                     <div key={i} className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
-                      <div className={`p-2.5 rounded-2xl max-w-[85%] leading-relaxed ${msg.sender === 'user' ? 'bg-[#cc785c] text-neutral-950 font-bold rounded-tr-none' : 'bg-white/10 text-white rounded-tl-none font-medium'}`}>
+                      <div className={`p-2.5 rounded-2xl max-w-[85%] leading-relaxed ${msg.sender === 'user' ? 'bg-[#ff5a3c] text-neutral-950 font-bold rounded-tr-none' : 'bg-white/10 text-white rounded-tl-none font-medium'}`}>
                         {msg.text}
                       </div>
                       <span className="text-[8px] text-gray-500 mt-0.5">{msg.time}</span>
@@ -2193,7 +2193,7 @@ export default function EcosystemHub() {
                   />
                   <button 
                     onClick={handleSendChat}
-                    className="bg-[#cc785c] hover:bg-yellow-500 text-neutral-950 px-3 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer"
+                    className="bg-[#ff5a3c] hover:bg-yellow-500 text-neutral-950 px-3 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer"
                   >
                     发送
                   </button>
@@ -2222,7 +2222,7 @@ export default function EcosystemHub() {
               className="bg-white rounded-3xl p-6 max-w-sm w-full border shadow-2xl relative space-y-5"
             >
               <div className="text-center">
-                <div className="w-12 h-12 bg-[#cc785c]/10 text-[#cc785c] rounded-full flex items-center justify-center mx-auto mb-3">
+                <div className="w-12 h-12 bg-[#ff5a3c]/10 text-[#ff5a3c] rounded-full flex items-center justify-center mx-auto mb-3">
                   <Utensils size={24} />
                 </div>
                 <h3 className="text-lg font-black text-gray-900">Serene 拼餐安全支付中介</h3>
@@ -2245,7 +2245,7 @@ export default function EcosystemHub() {
                 <hr />
                 <div className="flex justify-between items-center text-sm font-black">
                   <span>实付定金</span>
-                  <span className="text-emerald-800 font-mono">
+                  <span className="text-ink font-mono">
                     ${meals.find(m => m.id === checkoutMealId)?.price} AUD
                   </span>
                 </div>
@@ -2286,7 +2286,7 @@ export default function EcosystemHub() {
               className="bg-white rounded-3xl p-6 max-w-sm w-full border shadow-2xl relative space-y-5"
             >
               <div className="text-center">
-                <div className="w-12 h-12 bg-emerald-50 text-emerald-800 rounded-full flex items-center justify-center mx-auto mb-3">
+                <div className="w-12 h-12 bg-surface-soft text-ink rounded-full flex items-center justify-center mx-auto mb-3">
                   <Shield size={24} />
                 </div>
                 <h3 className="text-lg font-black text-gray-900">Serene 二手货款托管保险</h3>
@@ -2302,14 +2302,14 @@ export default function EcosystemHub() {
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-gray-400">折旧状态</span>
-                  <span className="font-bold text-emerald-800">
+                  <span className="font-bold text-ink">
                     {marketItems.find(i => i.id === checkoutItemId)?.condition}
                   </span>
                 </div>
                 <hr />
                 <div className="flex justify-between items-center text-sm font-black">
                   <span>担保金</span>
-                  <span className="text-emerald-800 font-mono">
+                  <span className="text-ink font-mono">
                     ${marketItems.find(i => i.id === checkoutItemId)?.price} AUD
                   </span>
                 </div>
@@ -2339,11 +2339,11 @@ export default function EcosystemHub() {
       <div className="fixed bottom-6 right-6 z-40">
         <button
           onClick={() => setIsCartOpen(true)}
-          className="bg-[#141413] hover:bg-neutral-800 text-white p-4 rounded-full shadow-2xl hover:scale-105 transition-all flex items-center justify-center relative border-2 border-white cursor-pointer"
+          className="bg-[#1d1d1f] hover:bg-neutral-800 text-white p-4 rounded-full shadow-2xl hover:scale-105 transition-all flex items-center justify-center relative border-2 border-white cursor-pointer"
         >
           <ShoppingCart size={24} />
           {cart.length > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 bg-red-600 text-white font-mono font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center animate-bounce border-2 border-[#141413]">
+            <span className="absolute -top-1.5 -right-1.5 bg-red-600 text-white font-mono font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center animate-bounce border-2 border-[#1d1d1f]">
               {cart.length}
             </span>
           )}
@@ -2373,9 +2373,9 @@ export default function EcosystemHub() {
                 className="w-full bg-[#FAF8F5] shadow-2xl flex flex-col h-full border-l border-gray-200"
               >
                 {/* Drawer Header */}
-                <div className="px-6 py-5 bg-[#141413] text-white flex items-center justify-between shadow-sm">
+                <div className="px-6 py-5 bg-[#1d1d1f] text-white flex items-center justify-between shadow-sm">
                   <div className="flex items-center space-x-2">
-                    <ShoppingCart size={18} className="text-emerald-300" />
+                    <ShoppingCart size={18} className="text-on-dark" />
                     <h3 className="text-base font-black tracking-tight flex items-center gap-1.5">
                       <span>Serene 安全防坑购物车</span>
                       <span className="text-[10px] bg-red-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
@@ -2392,8 +2392,8 @@ export default function EcosystemHub() {
                 </div>
 
                 {/* Info message */}
-                <div className="bg-emerald-50 px-6 py-3 border-b text-emerald-800 text-[11px] leading-relaxed flex items-center gap-2">
-                  <Shield size={13} className="shrink-0 text-emerald-700" />
+                <div className="bg-surface-soft px-6 py-3 border-b text-ink text-[11px] leading-relaxed flex items-center gap-2">
+                  <Shield size={13} className="shrink-0 text-ink" />
                   <span>您添加的任何项目均享有 Serene 双向资金托管托管政策保护。</span>
                 </div>
 
@@ -2429,7 +2429,7 @@ export default function EcosystemHub() {
                           </div>
 
                           <div className="flex flex-col justify-center min-w-0">
-                            <span className="text-[9px] font-black uppercase text-[#141413] bg-[#141413]/10 px-1.5 py-0.5 rounded self-start leading-none mb-1">
+                            <span className="text-[9px] font-black uppercase text-[#1d1d1f] bg-[#1d1d1f]/10 px-1.5 py-0.5 rounded self-start leading-none mb-1">
                               {c.type === 'guide_project' ? '向导陪同' : c.type === 'meal' ? '大厨拼盘' : '二手闲置'}
                             </span>
                             <h4 className="text-xs font-black text-gray-900 truncate leading-tight pr-4">
@@ -2442,7 +2442,7 @@ export default function EcosystemHub() {
                         </div>
 
                         <div className="flex flex-col items-end justify-between shrink-0">
-                          <span className="font-mono text-xs font-black text-[#141413]">
+                          <span className="font-mono text-xs font-black text-[#1d1d1f]">
                             ${c.price} AUD
                           </span>
                           <button
@@ -2468,12 +2468,12 @@ export default function EcosystemHub() {
                       </div>
                       <div className="flex justify-between text-gray-400">
                         <span>Serene 专属交易保险金</span>
-                        <span className="text-green-600 font-bold">免手续费 $0.00</span>
+                        <span className="text-ink font-bold">免手续费 $0.00</span>
                       </div>
                       <hr className="border-gray-100" />
                       <div className="flex justify-between text-sm font-black text-gray-950">
                         <span>托管结算总计</span>
-                        <span className="text-emerald-800 font-mono text-base">
+                        <span className="text-ink font-mono text-base">
                           ${cart.reduce((sum, item) => sum + item.price, 0).toFixed(2)} AUD
                         </span>
                       </div>
@@ -2488,7 +2488,7 @@ export default function EcosystemHub() {
                           }, 1600);
                         }}
                         disabled={isCartCheckingOut}
-                        className="w-full bg-[#141413] hover:bg-neutral-850 disabled:bg-neutral-300 text-white rounded-xl py-3.5 text-xs font-black tracking-wide shadow-md hover:scale-101 active:scale-99 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                        className="w-full bg-[#1d1d1f] hover:bg-neutral-850 disabled:bg-neutral-300 text-white rounded-xl py-3.5 text-xs font-black tracking-wide shadow-md hover:scale-101 active:scale-99 transition-all cursor-pointer flex items-center justify-center gap-1.5"
                       >
                         {isCartCheckingOut ? (
                           <span className="flex items-center gap-1.5">

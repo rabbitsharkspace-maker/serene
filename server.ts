@@ -2554,6 +2554,59 @@ app.post("/api/exchange-rate", async (req, res) => {
   }
 });
 
+// Legal-aid hub: real official bodies + a step-by-step dispute flow + an English letter
+// template, generated live per selected country/state and display language (Search-grounded).
+const LEGAL_DOMAIN_LABELS: Record<string, string> = {
+  rent: "tenancy / rental bond / eviction & deposit disputes",
+  fines: "traffic, parking & public-infringement fine appeals",
+  work: "wage theft & workplace rights for international students / migrants (incl. cash-in-hand)",
+  academic: "university academic-integrity, plagiarism, show-cause & expulsion appeals",
+};
+
+app.post("/api/legal-hub", async (req, res) => {
+  try {
+    const country = getCountry(req.body.country);
+    const langName = getLang(req.body.language);
+    const region = (req.body.region || "").trim();
+    const jurisdiction = region ? `${region}, ${country.name}` : country.name;
+    const domain = String(req.body.domain || "rent");
+    const topic = LEGAL_DOMAIN_LABELS[domain] || LEGAL_DOMAIN_LABELS.rent;
+
+    const aiClient = getAI();
+    const prompt = `You are a free legal-aid concierge for newly-arrived international students and migrants in ${jurisdiction}.
+Topic: ${topic}.
+Use your Google Search tool to find the REAL, current official bodies and FREE legal-aid services for this topic IN ${jurisdiction} (e.g. the government consumer/tenancy/fair-work authority, the relevant tribunal, free tenant/worker advice NGOs, university student advocacy). Tenancy/fines/work rules differ by state/province — use the ones correct for ${jurisdiction}. Cite ${country.authorities}.
+Do NOT invent agencies, URLs or phone numbers — if you are unsure of a phone number, return an empty string for it. WRITE ALL HUMAN-READABLE VALUES IN ${langName}, EXCEPT the email "template" which MUST be in English (official letters are English in ${country.name}).
+Return ONLY raw JSON (no markdown fences):
+{
+  "contacts": [
+    { "name": "real official body / NGO name (keep the local-language proper name)", "phone": "real phone or empty string", "website": "official URL", "desc": "(in ${langName}) what they do and why it helps a newcomer" }
+  ],
+  "scenario": {
+    "title": "(in ${langName}) short title of the dispute flow for this topic in ${jurisdiction}",
+    "steps": ["(in ${langName}) concrete step 1", "step 2", "step 3"],
+    "template": "an English email/letter the user can copy, using [方括号] placeholders, citing the correct ${jurisdiction} body and statute",
+    "interpreterTip": "(in ${langName}) how to reach a FREE phone interpreter in ${country.name} before calling these agencies, if such a service exists"
+  }
+}`;
+
+    const response = await generateWithRetry(aiClient, 'generateContent', {
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: { tools: [{ googleSearch: {} }] },
+    }) as any;
+
+    let text = response.text || "";
+    text = text.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/, '').trim();
+    const result = JSON.parse(text);
+    result._grounding = extractGrounding(response);
+    return res.json(result);
+  } catch (error: any) {
+    console.warn("legal-hub failed:", error?.message || error);
+    return res.status(502).json({ error: "legal_hub_failed" });
+  }
+});
+
 async function startServer() {
   // API Catch-all: Ensure API requests never fall through to Vite's HTML fallback
   app.all("/api/*", (req, res) => {
