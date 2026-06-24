@@ -2655,7 +2655,28 @@ WRITE ALL HUMAN-READABLE VALUES IN ${langName}. Return ONLY raw JSON (no markdow
     return res.json(result);
   } catch (error: any) {
     console.warn("meetup-spot failed:", error?.message || error);
-    return res.status(502).json({ error: "meetup_spot_failed" });
+    // Graceful, clearly-labeled sample so a rate-limit never blanks the marquee demo.
+    const c = getCountry(req.body.country);
+    const isAU = String(req.body.country || 'AU').toUpperCase() === 'AU';
+    const fallback = isAU ? {
+      midpointArea: "墨尔本 CBD（Swanston St 一带）",
+      reasoning: "CBD 在电车/步行可达范围内对大家最公平，餐厅密度也最高。",
+      candidates: [
+        { name: "蜀大侠火锅 Shu Da Xia", cuisine: "川式麻辣火锅", address: "Bourke St, Melbourne CBD", priceLevel: "$$", why: "麻辣鸳鸯锅满足火锅党，也照顾不吃辣的人", mapQuery: "Shu Da Xia Hot Pot Melbourne CBD" },
+        { name: "Don Don", cuisine: "日式定食", address: "Swanston St, Melbourne CBD", priceLevel: "$", why: "学生价日式便当，照顾日料党与预算", mapQuery: "Don Don Swanston Street Melbourne" },
+        { name: "Hochi Mama", cuisine: "现代亚洲 / 居酒屋", address: "Tattersalls Ln, Melbourne CBD", priceLevel: "$$", why: "氛围热闹、菜系折中，适合一群人分享", mapQuery: "Hochi Mama Melbourne" },
+        { name: "Shimbashi Soba", cuisine: "日式荞麦面", address: "Heffernan Ln, Melbourne CBD", priceLevel: "$$", why: "清爽荞麦面，与火锅形成对比", mapQuery: "Shimbashi Soba Melbourne" },
+      ],
+    } : {
+      midpointArea: `${c.name} 市中心`,
+      reasoning: "市中心交通枢纽对大家最公平，餐厅选择也多。",
+      candidates: [
+        { name: "市中心火锅店", cuisine: "火锅", address: `City Centre, ${c.name}`, priceLevel: "$$", why: "满足火锅党", mapQuery: `hot pot city centre ${c.name}` },
+        { name: "市中心日料店", cuisine: "日料", address: `City Centre, ${c.name}`, priceLevel: "$$", why: "照顾日料党", mapQuery: `sushi city centre ${c.name}` },
+        { name: "市中心亚洲餐厅", cuisine: "亚洲菜", address: `City Centre, ${c.name}`, priceLevel: "$", why: "口味折中、预算友好", mapQuery: `asian restaurant city centre ${c.name}` },
+      ],
+    };
+    return res.json({ ...fallback, isQuotaFallback: true });
   }
 });
 

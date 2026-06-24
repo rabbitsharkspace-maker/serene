@@ -5,7 +5,7 @@ import GroundingSources, { Grounding } from './GroundingSources';
 
 type Participant = { id: number; name: string; address: string; taste: string };
 type Candidate = { name: string; cuisine: string; address: string; priceLevel: string; why: string; mapQuery: string };
-type Result = { midpointArea: string; reasoning: string; candidates: Candidate[]; _grounding?: Grounding | null };
+type Result = { midpointArea: string; reasoning: string; candidates: Candidate[]; isQuotaFallback?: boolean; _grounding?: Grounding | null };
 
 const TASTE_CHIPS = ['火锅', '川菜', '日料', '韩餐', '越南粉', '西餐', '清真', '清淡', '奶茶'];
 
@@ -193,6 +193,11 @@ export default function MeetupPlanner() {
       {/* Result */}
       {result && (
         <div className="mt-6 pt-6 border-t border-hairline animate-in fade-in slide-in-from-bottom-3 duration-400">
+          {result.isQuotaFallback && (
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 mb-5 text-[11px] text-amber-800 leading-relaxed">
+              ⚠️ Google 接口当前繁忙（限流），以下为<strong>预置示例局</strong>（餐厅/中点为示例）。稍后点「AI 算中点」可获取基于你们真实地址的实时推荐。地图仍为真实 Google 地图。
+            </div>
+          )}
           <div className="bg-primary-soft border border-primary/20 rounded-2xl p-4 mb-5">
             <div className="text-xs font-bold text-ink flex items-center gap-1.5"><MapPin size={14} className="text-primary" /> 公平中点：{result.midpointArea}</div>
             <p className="text-xs text-body mt-1 leading-relaxed">{result.reasoning}</p>
