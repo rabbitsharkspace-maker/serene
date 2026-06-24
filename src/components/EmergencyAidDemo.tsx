@@ -193,6 +193,7 @@ export default function EmergencyAidDemo() {
   const content = getCountryContent(country);
   const interpreter = getInterpreterName(language);
   const [isListening, setIsListening] = useState(false);
+  const [voiceUnavailable, setVoiceUnavailable] = useState(false);
   const [meltdownTriggered, setMeltdownTriggered] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [activeCheatsheetIdx, setActiveCheatsheetIdx] = useState(0);
@@ -375,41 +376,39 @@ export default function EmergencyAidDemo() {
         recognition.onerror = (event: any) => {
           console.warn("Speech recognition error", event.error);
           setIsListening(false);
-          if (event.error === 'not-allowed') {
-            alert('获取麦克风权限失败，请确保浏览器已允许访问麦克风。正在使用模拟数据进行演示...');
-            simulateMockVoice();
-          } else if (event.error === 'aborted') {
-            alert('语音识别被浏览器中止 (预览环境受限)。正在使用模拟数据演示...');
-            simulateMockVoice();
-          } else if (event.error === 'no-speech') {
-            // Do not simulate mock voice on just no-speech, just stop.
+          if (event.error === 'no-speech') {
+            // No speech detected — just stop and let the user retry.
             alert('未能检测到声音，请重试。');
           } else {
-            simulateMockVoice();
+            // Mic genuinely unavailable (permission denied, aborted in a preview
+            // sandbox, or unsupported). Do NOT fabricate a transcript — surface an
+            // honest, clearly-labeled example-scenario affordance instead.
+            setVoiceUnavailable(true);
           }
         };
-        
+
         recognition.onend = () => {
           setIsListening(false);
         };
-        
+
         recognition.start();
       } else {
-        simulateMockVoice();
+        setIsListening(false);
+        setVoiceUnavailable(true);
       }
     } catch (e) {
-       simulateMockVoice();
+       setIsListening(false);
+       setVoiceUnavailable(true);
     }
   };
 
-  const simulateMockVoice = () => {
-     setIsListening(true);
+  // Explicit, user-initiated demo. Clearly surfaced as a sample scenario (never
+  // presented as if it were the user's real spoken input).
+  const runVoiceExample = () => {
      const text = "刚刚有人在街上袭击了我！";
+     setVoiceUnavailable(false);
      setCustomScenario(text);
-     setTimeout(() => {
-       handleGenerateEmergencyGuide(text);
-       setIsListening(false);
-     }, 1000);
+     handleGenerateEmergencyGuide(text);
   };
 
   const toggleChecklistItem = (key: string) => {
@@ -833,6 +832,21 @@ export default function EmergencyAidDemo() {
                         <div className="text-sm text-amber-300 font-bold flex items-center justify-center md:justify-start gap-2 mt-2">
                           <div className="w-3.5 h-3.5 border-2 border-amber-300/30 border-t-amber-300 rounded-full animate-spin"></div>
                           AI 正在紧急分析最优对策...
+                        </div>
+                      )}
+                      {voiceUnavailable && (
+                        <div className="mt-4 bg-on-dark/5 border border-on-dark/15 rounded-2xl p-4 text-left">
+                          <p className="text-xs text-on-dark-soft leading-relaxed mb-3">
+                            🎤 当前环境（如预览沙盒或未授权麦克风）无法调用实时语音识别。你可以<b className="text-on-dark">在下方直接输入你的处境</b>，或点此体验一个示例场景：
+                          </p>
+                          <button
+                            type="button"
+                            onClick={runVoiceExample}
+                            disabled={isGeneratingCustom}
+                            className="inline-flex items-center gap-2 text-xs font-bold bg-primary text-on-primary rounded-full px-4 py-2 hover:bg-primary-active transition-colors disabled:opacity-50"
+                          >
+                            🎬 体验示例场景：「有人在街上袭击我」
+                          </button>
                         </div>
                       )}
                     </div>

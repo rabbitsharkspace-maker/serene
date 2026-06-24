@@ -758,7 +758,7 @@ export default function EcosystemHub() {
             本地向导 · 留学生拼饭 · 闲置安全流转
           </h2>
           <p className="text-xs text-gray-500 mt-1 max-w-2xl leading-relaxed">
-            告别传统二手群、租房群泛滥的换汇诈骗、皮包中介与虚假低价的<strong>生态愿景演示</strong>：展示「线下带玩向导 + 拼饭门牌锁定 + 货款托管」的可信赖街区设想。<strong className="text-amber-700">本模块为概念原型，不涉及真实资金流转</strong>，下方向导/商品均为示例数据。
+            告别传统二手群、租房群泛滥的换汇诈骗、皮包中介与虚假低价的<strong>生态愿景演示</strong>：展示「线下带玩向导 + 拼饭门牌锁定 + 货款托管」的可信赖街区设想。<strong className="text-amber-700">「向导 / 拼饭 / 二手」三个标签为概念预览，向导与商品均为示例数据、不涉及真实资金流转</strong>；而 <strong className="text-emerald-700">「实用工具」标签内的拍照翻译与实时汇率为真实可用的 Gemini 能力</strong>。
           </p>
         </div>
       </div>
@@ -771,6 +771,7 @@ export default function EcosystemHub() {
         >
           <Users size={18} />
           <span>向导同行 (Companion)</span>
+          <span className="ml-0.5 text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full">概念</span>
         </button>
         <button 
           onClick={() => { setActiveTab('private_chef'); setSelectedGuide(null); setSelectedMeal(null); setSelectedItem(null); }}
@@ -778,6 +779,7 @@ export default function EcosystemHub() {
         >
           <Utensils size={18} />
           <span>留学私厨与拼饭 (Kitchen)</span>
+          <span className="ml-0.5 text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full">概念</span>
         </button>
         <button 
           onClick={() => { setActiveTab('marketplace'); setSelectedGuide(null); setSelectedMeal(null); setSelectedItem(null); }}
@@ -785,6 +787,7 @@ export default function EcosystemHub() {
         >
           <ShoppingBag size={18} />
           <span>二手闲置防坑街 (Market)</span>
+          <span className="ml-0.5 text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full">概念</span>
         </button>
         <button
           onClick={() => { setActiveTab('tools'); setSelectedGuide(null); setSelectedMeal(null); setSelectedItem(null); }}
@@ -792,8 +795,18 @@ export default function EcosystemHub() {
         >
           <span>🧰</span>
           <span>实用工具 (Tools)</span>
+          <span className="ml-0.5 text-[9px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-full">Live 真实</span>
         </button>
       </div>
+
+      {activeTab !== 'tools' && (
+        <div className="mb-6 flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3">
+          <span className="text-base leading-none mt-0.5">🧪</span>
+          <p className="text-[11px] text-amber-800 leading-relaxed font-medium">
+            <strong>概念预览 (Concept Preview)</strong> — 本标签展示 Serene 的「可信赖街区」愿景蓝图，向导、拼饭与商品均为示例数据，<strong>不涉及任何真实资金流转或真实交易</strong>。想体验真实可用的 Gemini 能力，请切换到「实用工具 (Tools)」标签。
+          </p>
+        </div>
+      )}
 
       {activeTab === 'tools' && (
         <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
