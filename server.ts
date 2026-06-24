@@ -1138,8 +1138,17 @@ async function generateWithRetry(aiClient: any, method: 'generateContent' | 'gen
         err?.code === 429;
 
       if (isQuotaError) {
-        // Fail-fast on rate-limits to protect system load and instantly wake robust failsafe routines
-        throw new Error("LIMIT_EXCEEDED: Gemini API quota exceeded (Error 429). Switch to local high-fidelity intelligence fallback.");
+        // Under load (e.g. many people hitting the live demo at once) a 429 is
+        // usually transient. Retry with backoff so the REAL Gemini + Search
+        // grounded path stays live as much as possible; only after exhausting
+        // retries do we surface LIMIT_EXCEEDED and fall back to the clearly
+        // labeled preset sample.
+        if (i === retries) {
+          throw new Error("LIMIT_EXCEEDED: Gemini API quota exceeded (Error 429). Switch to local high-fidelity intelligence fallback.");
+        }
+        console.log(`[Gemini API Info] Rate-limited (429), retrying ${i + 1}/${retries} after backoff...`);
+        await new Promise((resolve) => setTimeout(resolve, 1200 * (i + 1)));
+        continue;
       }
 
       if (i === retries) throw err;
@@ -1161,7 +1170,7 @@ function formatPresetToNewSchema(preset: any, key: string): any {
   let documentType = "custom_document";
   let name = "Issuing Body";
   let isOfficial = false;
-  let deadlineDate = "2026-07-01";
+  let deadlineOffsetDays = 10;
   let amountVal = 0;
   let requiredActions = [
     { step: "查阅来信并按照建议开展书面回应", officialChannel: "发函官方机构", url: "https://www.vic.gov.au" }
@@ -1175,7 +1184,7 @@ function formatPresetToNewSchema(preset: any, key: string): any {
     documentType = "parking_fine";
     name = "City of Brentmoor";
     isOfficial = true;
-    deadlineDate = "2026-05-01";
+    deadlineOffsetDays = 12;
     amountVal = 85;
     requiredActions = [
       { step: "准备书面申诉，在 2026 年 5 月 1 日前在线递交申请", officialChannel: "City of Brentmoor Portal", url: "https://www.melbourne.vic.gov.au/parking-infringements" },
@@ -1189,7 +1198,7 @@ function formatPresetToNewSchema(preset: any, key: string): any {
     documentType = "coe_termination";
     name = "Westhaven University, Melbourne";
     isOfficial = true;
-    deadlineDate = "2026-07-20";
+    deadlineOffsetDays = 18;
     amountVal = 0;
     requiredActions = [
       { step: "在收到信起 20 个工作日内向学籍申诉部门提交学术抗辩信", officialChannel: "Westhaven Progress Appeals Office", url: "https://www.education.gov.au/esos-framework" },
@@ -1203,7 +1212,7 @@ function formatPresetToNewSchema(preset: any, key: string): any {
     documentType = "tenancy_bond_claim";
     name = "Horizon Residential VIC";
     isOfficial = false;
-    deadlineDate = "2026-07-14";
+    deadlineOffsetDays = 14;
     amountVal = 420;
     requiredActions = [
       { step: "不要等待，立刻主动登录维州 RTBA 押金管理机构申请全额退回押金 (Claim Entire Bond)", officialChannel: "RTBA Official Portal", url: "https://rentalbonds.vic.gov.au/" },
@@ -1217,7 +1226,7 @@ function formatPresetToNewSchema(preset: any, key: string): any {
     documentType = "academic_integrity";
     name = "Westhaven University Progress Committee";
     isOfficial = true;
-    deadlineDate = "2026-06-28";
+    deadlineOffsetDays = 6;
     amountVal = 0;
     requiredActions = [
       { step: "于 6月28日 截止日期前进行确认出席 7月3日 学术诚信听证会回执登记", officialChannel: "Academic Board Secretary Office", url: "https://www.teqsa.gov.au/guides-resources/resources/academic-integrity/academic-integrity-toolkit" },
@@ -1231,7 +1240,7 @@ function formatPresetToNewSchema(preset: any, key: string): any {
     documentType = "noise_complaint";
     name = "Meridian Strata Management";
     isOfficial = false;
-    deadlineDate = "2026-07-06";
+    deadlineOffsetDays = 10;
     amountVal = 0;
     requiredActions = [
       { step: "在 7月6日 截止前，书面回复物业管理公司，做出深夜安静承诺", officialChannel: "Owners Corporation Admin", url: "https://www.consumer.vic.gov.au/housing/renting" }
@@ -1244,7 +1253,7 @@ function formatPresetToNewSchema(preset: any, key: string): any {
     documentType = "utility_arrears";
     name = "Coastal Energy & Water";
     isOfficial = false;
-    deadlineDate = "2026-07-01";
+    deadlineOffsetDays = 7;
     amountVal = 258.30;
     requiredActions = [
       { step: "在 7月1日 断电死线前，书面写信或致电 Coastal 售后部门，提出进入 Hardship 计划", officialChannel: "Coastal Helpdesk", url: "https://www.ewov.com.au/" },
@@ -1256,12 +1265,13 @@ function formatPresetToNewSchema(preset: any, key: string): any {
     riskLevel = "high";
   }
   
-  // Calculate business days left dynamically based on current time (2026-06-22)
-  const today = new Date("2026-06-22T18:34:42-07:00");
-  const deadlineDateObj = new Date(deadlineDate);
-  const diffTime = deadlineDateObj.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  const businessDaysLeft = Math.max(0, diffDays);
+  // Deadline is computed relative to the REAL current date so the countdown never
+  // goes stale or shows a past-due date during later judging rounds (initial screen
+  // mid-July, on-site demo in August).
+  const today = new Date();
+  const deadlineDateObj = new Date(today.getTime() + deadlineOffsetDays * 24 * 60 * 60 * 1000);
+  const deadlineDate = deadlineDateObj.toISOString().slice(0, 10);
+  const businessDaysLeft = deadlineOffsetDays;
 
   return {
     documentType,
@@ -1460,6 +1470,7 @@ IMPORTANT RULE: You MUST ensure that your entire analysis fields (especially sum
 `;
     }
     
+    const todayStr = new Date().toISOString().slice(0, 10);
     const prompt = `You are a ${country.demonym} tenancy, bureaucracy, and legal advisor for newly-arrived international students and migrants in ${country.name}.
 The user has uploaded an official bill, a fine, or an academic/housing warning notice (Show Cause, breach, rent bond claim, etc.).
 ${userContextString}
@@ -1483,7 +1494,7 @@ Please output a JSON response matching this schema:
   "deadline": {
     "date": "string (YYYY-MM-DD format of the deadline/due date, or estimate if missing)",
     "time": "string (HH:mm format of deadline)",
-    "businessDaysLeft": "number (number of days left from today 2026-06-22)"
+    "businessDaysLeft": "number (number of days left from today ${todayStr})"
   },
   "amount": {
     "value": "number (the total outstanding fine or due amount, or 0 if none)",
@@ -2074,97 +2085,40 @@ Return JSON (never wrap in markdown):
 app.post("/api/cross-reference", upload.array("images", 2), async (req, res) => {
   let activeCrossPreset = req.body.activeCrossPreset || "";
   try {
-    // If the mock preset is active, or we detect robust keywords
-    if (activeCrossPreset === "bond_cross" || activeCrossPreset === "cross") {
-      console.log(`[API] Serving high-fidelity mock cross-document analysis`);
-      return res.json({
-        isContradictionFound: true,
-        disputableItems: [
-          {
-            name: "地毯蒸汽清洗费 (Steam Cleaning of Carpet)",
-            amount: 180,
-            clauseA: "租房合同第 12 条：‘租客需保持房屋及地毯合理干净（Fair Wear and Tear），除非有严重的顽固污渍，否则不需要或不得变相强迫进行专业蒸汽清洗。’",
-            clauseB: "中介扣款声明第 1 条：‘由于租期结束退房，租客必须自费提供专业商业蒸汽清洁账单，否则扣除 $180 押金。’",
-            negotiableReason: "根据维州《住宅租赁法 RTA》，将专业蒸汽清洁列为绝对性强制退房条件是无效的。租客只需将房屋保持在‘合理整洁’的状态即可。中介以‘退房必须提供发票’为由扣款，公然抵触了合同第 12 条对‘合理磨损（Fair Wear and Tear）’的界定，在法律上可无条件驳回。",
-            advicePlain: "回复中介：‘依照租房协议第 12 条及维州 RTA 标准，房屋退房时已吸尘处于合理干净状态，不存在任何严重污渍，不适用任何强制专业清洗费用。请全额释放 Bond。’"
-          },
-          {
-            name: "厨房瓷砖去油污费 (Kitchen Tile Oil Cleaning)",
-            amount: 90,
-            clauseA: "租房合同第 8 条：‘交付时租客需保证厨房烹饪区域的无害清洁。’",
-            clauseB: "中介扣款声明第 2 条：‘厨房抽油烟机及瓷砖表面有轻微日常烹调痕迹，收取局部深度去油污费 $90。’",
-            negotiableReason: "抽油烟机下方及瓷砖表面的轻微油烟属于正常烹饪、日常居住所必然产生的合理消耗磨损（Fair Wear and Tear）。多起 VCAT 历史判决均判定：中介不能强制要求‘无尘无垢’的样板房标准，轻微油污且已做基础抹地清洁后，不应被强扣 $90。",
-            advicePlain: "回复中介：‘厨房区域退房前已进行基础擦拭与清洁。轻微瓷砖折旧属于标准日常生活磨损，在 VCAT 裁决中不支持转嫁深度清洗费。’"
-          },
-          {
-            name: "墙面挂痕与修补费 (Wall Scuff Marks Repairs)",
-            amount: 150,
-            clauseA: "租房合同第 15 条：‘租客不得故意损坏墙体；但因搬家或挂画造成的轻微合理划痕及摩擦痕迹属于 Fair wear and tear 范畴。’",
-            clauseB: "中介扣款声明第 3 条：‘客厅靠近电视背景墙处存在若干磨擦细痕与轻度掉漆，收取墙面抹灰及局部油漆修补款 $150。’",
-            negotiableReason: "由于日常家具搬动、挂件摆设导致的轻微墙体磨擦伤痕，是住宅使用中公认的合理磨损（Fair Wear & Tear）。房东不能通过索赔来使其获得‘全新墙壁’的资产增值。VCAT 对轻度墙体擦痕一律拒绝判赔，此项扣款极为不合理。",
-            advicePlain: "回复中介：‘电视墙附近痕迹仅为家具放置的正常折旧折耗。依据维多利亚州 Consumer Affairs 准则，常态磨损不构成故意或过失损毁，拒绝支付此项墙面翻新费。’"
-          }
-        ],
-        recommendation: "整体来看，中介 Horizon 提出的三项扣款项目均严重伤害了您作为维州承租人依法享有的合法‘合理折旧与磨损（Fair Wear and Tear）’权！其操作手段带有典型的‘欺负留学生经验不足’的强加性质。建议采取强硬且专业的法律话术回击，并辅以单方面向 RTBA 提交全额退押金申请（RTBA Claim），直接掌握博弈主动权。",
-        englishDraft: {
-          intention: "引用合同第 12 条、标准住宅租赁法 RTA 关于‘合理磨损’条款，严词拒绝中介的所有单方面押金扣除主张，声明地毯和油漆刮痕完全属于 Fair wear and tear，抗辩对线意图明确，迫使中介退让。",
-          recipientEmail: "claims@horizonresidential.com.au",
-          subject: "Dispute of Bond Claim Notice - 4/85 Bourke Street - Alex Thompson",
-          body: `Dear Horizons Property Management Team,
-
-I am writing to formally dispute the proposed bond deduction of $420.00 regarding my former tenancy at 4/85 Bourke Street, which recently ended.
-
-According to our Tenancy Agreement and the Victorian Residential Tenancies Act (RTA), the tenant is only required to return the property in a reasonably clean condition, allowing for "fair wear and tear".
-
-1. **Carpet Steam Cleaning ($180)**: Referring to Clause 12 of our agreement, professional steam cleaning is only required where specific persistent staining exists beyond ordinary usage. Our exit photos confirm the carpet was left thoroughly vacuumed and clean. There are no severe stains. Mandatory end-of-lease steam cleaning clauses that do not meet this threshold are void under Victorian law.
-2. **Kitchen Tiles Cleaning ($90)**: The kitchen was thoroughly wiped down. Minor cooking residues on extraction surfaces constitute normal wear and tear from everyday life.
-3. **Wall Scuff Marks ($150)**: The minor rub marks in the living room are minor cosmetic wear from normal domestic furniture placement, fitting perfectly under standard fair wear and tear.
-
-I have already submitted a unilateral Bond Claim for a FULL refund directly to the Residential Tenancies Bond Authority (RTBA). If you do not agree to release the bond in full within 14 days, you are welcome to apply to VCAT, where I will present my exit condition reports and photographs.
-
-I request that you confirm the full release of my bond to avoid further escalating this matter.
-
-Yours sincerely,
-
-Alex Thompson
-Tenant`,
-          chineseTranslation: `尊敬的 Horizons 物业管理团队：
-
-我写信旨在正式驳回针对我刚结束的 4/85 Bourke Street 租约所提出的 $420.00 押金扣除主张。
-
-根据我们签署的租赁合同及维州《住宅租赁法》(RTA)，租客仅需以“合理干净”的状态返还房屋，并允许发生“合理磨损与折旧（Fair Wear and Tear）”。
-
-1. **地毯蒸汽清洁费 ($180)**：参照我们合同的第 12 条，只有在普通使用范围之外存在特定顽固污渍时，才需要进行蒸汽清洁。我们的退房照片证实地毯已彻底吸尘并保持干净，不存在任何严重污渍。在维多利亚州法律下，不满足该前提的强制地毯蒸汽清洁条款是无效的。
-2. **厨房瓷砖去油污费 ($90)**：整个厨房已做了精细的表面抹拭。日常活动抽油烟机风口表面留下的轻微烹饪残留完全属于日常生活过程中的常规损耗。
-3. **墙面挂痕与修补费 ($150)**：客厅微弱的墙壁刮痕仅是家具摆放常态摩擦产生的局部轻度掉漆，属于无可争议的合理折损范围。
-
-作为主张，我已完成了单方面向 RTBA（住宅租赁押金管理局）发起退还全额押金（Full Refund Claim）的申请。如果贵方在法定 14 天内不同意如数退还，贵方需要向 VCAT（民事仲裁庭）发起自证申诉。我将十分乐意向 VCAT 仲裁官呈递我方完备的退房交割报告与高清细化照片。
-
-请尽快向我确认押金的全额释放，以免我们将此事态升级。
-
-您诚挚的，
-
-Alex Thompson
-租客`
-        }
-      });
-    }
+    const country = getCountry(req.body.country);
+    const langName = getLang(req.body.language);
+    const region = (req.body.region || "").trim();
+    const jurisdiction = region ? `${region}, ${country.name}` : country.name;
 
     const files = req.files as Express.Multer.File[];
-    if (!files || files.length === 0) {
+    const hasFiles = !!files && files.length > 0;
+
+    // INTEGRITY: we NEVER short-circuit to a hardcoded answer. For the no-upload demo preset
+    // we feed a fixed SAMPLE pair of documents (as text) to the REAL model, so the cross-doc
+    // analysis is genuinely AI-generated, jurisdiction-aware and Search-grounded.
+    const SAMPLE_CROSS_DOCS = `DOCUMENT A — Tenancy/lease agreement (excerpts):
+- Clause 12: tenant must keep the property and carpets reasonably clean (allowing for fair wear and tear); professional steam cleaning is NOT mandatory unless there is severe staining beyond ordinary use.
+- Clause 8: the kitchen must be handed back in a harmless, basically-clean condition.
+- Clause 15: minor scuff/rub marks from furniture or hanging pictures count as fair wear and tear.
+DOCUMENT B — Agent's bond/deposit-deduction claim:
+1) Carpet steam cleaning: $180 — tenant must pay for professional steam cleaning or lose the deposit.
+2) Kitchen tile de-greasing: $90 — light cooking residue on tiles/rangehood.
+3) Wall scuff repair: $150 — minor scuff marks near the living-room TV wall.`;
+
+    if (!hasFiles && !activeCrossPreset) {
       return res.status(400).json({ error: "Please upload at least one file or select a preset" });
     }
 
     const aiClient = getAI();
-    let prompt = `You are an expert Australian tenancy and consumer dispute analyst.
-You are given up to TWO files/images: (A) a tenancy/lease agreement or a reference invoice/bill rules, (B) a bond deduction claim, fine invoice, or a demand notice.
-Your primary task is to review and cross-reference them. Compare Document B's specific items/deductions against Document A's clauses, terms, or specifications.
-Check for any direct contradictions, disputes, or grounds where Document A makes the claims in Document B disputable (e.g. landlord has responsibility for that expense, it falls under local Australian regulations for 'fair wear and tear', or is outright prohibited).
+    let prompt = `You are an expert tenancy and consumer-dispute analyst for newly-arrived international students and migrants in ${jurisdiction}.
+You are given (A) a tenancy/lease agreement or reference rules, and (B) a deposit/bond deduction claim, fine invoice, or demand notice.
+Your task: cross-reference them. Compare Document B's specific items/deductions against Document A's clauses, and find contradictions or grounds where A makes B's claims disputable (e.g. it is the landlord's responsibility, it falls under "fair wear and tear", or it is outright prohibited) UNDER THE LAW OF ${jurisdiction}.
+${hasFiles ? "The two documents are attached as images." : `The user is running the sample demo. Analyze these two sample documents provided as text:\n${SAMPLE_CROSS_DOCS}`}
 
-Examine this thoroughly and generate a response in Chinese.
+Write all human-readable values in ${langName}.
 
 RULES FOR GROUNDING:
-- Cite real legal acts like Victorian Residential Tenancies Act (RTA), standard CAV/VCAT rulings where applicable.
+- Use your Google Search tool to cite the correct, real ${country.demonym} statute / tribunal / consumer body for ${jurisdiction} (do not assume Victoria/Australia unless that is the jurisdiction). Cite ${country.authorities}.
 - Set isContradictionFound to true if there is any disputable item.
 
 Required JSON Output schema:
@@ -2176,33 +2130,36 @@ Required JSON Output schema:
       "amount": 180,
       "clauseA": "What document A says (Clause references or quotes)",
       "clauseB": "What document B lists or charges",
-      "negotiableReason": "Detailed legal reasoning in Chinese explaining why they contradict and how to defeat it",
-      "advicePlain": "Chinese short advice on what to reply or say to reject this specific item"
+      "negotiableReason": "Detailed legal reasoning in ${langName} explaining why they contradict and how to defeat it under ${jurisdiction} law",
+      "advicePlain": "short advice in ${langName} on what to reply to reject this specific item"
     }
   ],
-  "recommendation": "Overall recommendation on negotiation strategy in Chinese",
+  "recommendation": "Overall negotiation-strategy recommendation in ${langName}",
   "englishDraft": {
-    "intention": "Intention in Chinese of this dispute letter",
+    "intention": "Intention in ${langName} of this dispute letter",
     "recipientEmail": "Who to send this to if detected, or blank",
-    "subject": "Professional Dispute Email Subject",
+    "subject": "Professional Dispute Email Subject (English)",
     "body": "Formal, professional English dispute letter using [Your Name] as placeholder",
-    "chineseTranslation": "Chinese translation of the English draft body for tenant understandability"
+    "chineseTranslation": "Translation of the English draft body into ${langName} for the tenant"
   }
 }`;
 
     const contentsParts: any[] = [{ text: prompt }];
-    for (const f of files) {
-      contentsParts.push({
-        inlineData: {
-          data: f.buffer.toString("base64"),
-          mimeType: f.mimetype
-        }
-      });
+    if (hasFiles) {
+      for (const f of files) {
+        contentsParts.push({
+          inlineData: {
+            data: f.buffer.toString("base64"),
+            mimeType: f.mimetype
+          }
+        });
+      }
     }
 
     const response = await generateWithRetry(aiClient, 'generateContent', {
       model: "gemini-2.5-flash",
       contents: [{ role: "user", parts: contentsParts }],
+      config: { tools: [{ googleSearch: {} }] },
     }) as any;
 
     let text = response.text;
@@ -2212,6 +2169,7 @@ Required JSON Output schema:
 
     text = text.replace(/^```json\s*/, '').replace(/```\s*$/, '').trim();
     const result = JSON.parse(text);
+    result._grounding = extractGrounding(response);
     return res.json(result);
   } catch (error: any) {
     const isLimitExceeded = error?.message?.includes("LIMIT_EXCEEDED");

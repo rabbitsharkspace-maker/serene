@@ -537,6 +537,9 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
         formData.append('school', profileSchool);
         formData.append('leaseKeyTerms', profileLeaseKeyTerms);
         formData.append('additionalDetails', profileAdditionalDetails);
+        formData.append('country', country);
+        formData.append('language', language);
+        formData.append('region', region);
 
         const res = await fetch('/api/cross-reference', {
           method: 'POST',
@@ -1163,10 +1166,10 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                      </div>
                      <div>
                        <h4 className="text-xs font-black text-amber-900 mb-1">
-                         系统启用「本地高保真法务抗辩规则库」(Locally Powered Legal Compliance Mode Activated)
+                         预置示例分析（非对您文件的实时识别）· Preset Sample — Not Live Analysis
                        </h4>
                        <p className="text-[11px] text-amber-850 leading-relaxed font-sans font-medium">
-                         由于当前 Google 接口云端请求队列繁忙，系统已自动平滑加载本机 **高保真申诉引擎** 进行账单分析与邮件生成（支持完整维州 RTA/CAV 法条匹配、时效核算与英文自证答辩信）。抗辩效力依旧饱满，请您放心操作！
+                         当前 Google Gemini 接口繁忙（限流），暂时无法对您刚上传的文件做实时视觉识别。以下展示的是<strong>同类案件的预置示例</strong>，用于演示分析与维权信生成能力，<strong>并非针对您这张文件的真实结果</strong>，其中的金额、机构、日期均为示例。请稍后点击「重新分析」以获取基于您文件的真实 Gemini + Google 实时检索结果。
                        </p>
                      </div>
                    </div>
