@@ -2607,6 +2607,57 @@ Return ONLY raw JSON (no markdown fences):
   }
 });
 
+// "拼饭" meetup planner: given each friend's rough location + food taste, find a fair central
+// area and recommend REAL restaurants near it that balance everyone (Search-grounded).
+app.post("/api/meetup-spot", async (req, res) => {
+  try {
+    const country = getCountry(req.body.country);
+    const langName = getLang(req.body.language);
+    const region = (req.body.region || "").trim();
+    const jurisdiction = region ? `${region}, ${country.name}` : country.name;
+    const participants = Array.isArray(req.body.participants) ? req.body.participants : [];
+    if (participants.length < 2) {
+      return res.status(400).json({ error: "need at least 2 participants" });
+    }
+    const roster = participants
+      .map((p: any, i: number) => `- ${p.name || ("朋友" + (i + 1))}: near ${p.address || "unknown"}; likes ${p.taste || "anything"}`)
+      .join("\n");
+
+    const aiClient = getAI();
+    const prompt = `You are a meetup planner helping a group of friends (often international students/new migrants) in ${jurisdiction} pick ONE place to eat together ("拼饭").
+Participants and their rough locations + food tastes:
+${roster}
+
+Use your Google Search tool to: (1) reason about a FAIR central area roughly equidistant between everyone, then (2) recommend 4 REAL, currently-operating restaurants near that central area in ${jurisdiction} that balance everyone's tastes and suit a student budget. Use real venues — do not invent names.
+WRITE ALL HUMAN-READABLE VALUES IN ${langName}. Return ONLY raw JSON (no markdown fences):
+{
+  "midpointArea": "(in ${langName}) the fair central neighbourhood/area name everyone can reach",
+  "reasoning": "(in ${langName}) one short sentence on why this area is fair to everyone",
+  "candidates": [
+    { "name": "real restaurant name", "cuisine": "(in ${langName}) cuisine type", "address": "street/area in ${jurisdiction}", "priceLevel": "$ or $$ or $$$", "why": "(in ${langName}) why it balances the group's tastes and is central", "mapQuery": "restaurant name + address (for Google Maps search)" }
+  ]
+}`;
+
+    const response = await generateWithRetry(aiClient, 'generateContent', {
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: { tools: [{ googleSearch: {} }] },
+    }) as any;
+
+    let text = response.text || "";
+    // Robust: pull the JSON object out even if the model wraps it in fences or prose.
+    const s = text.indexOf('{');
+    const e = text.lastIndexOf('}');
+    if (s !== -1 && e !== -1 && e > s) text = text.slice(s, e + 1);
+    const result = JSON.parse(text);
+    result._grounding = extractGrounding(response);
+    return res.json(result);
+  } catch (error: any) {
+    console.warn("meetup-spot failed:", error?.message || error);
+    return res.status(502).json({ error: "meetup_spot_failed" });
+  }
+});
+
 async function startServer() {
   // API Catch-all: Ensure API requests never fall through to Vite's HTML fallback
   app.all("/api/*", (req, res) => {

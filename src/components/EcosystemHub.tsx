@@ -7,6 +7,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { useLocale } from '../lib/locale';
 import EcoTools from './EcoTools';
+import MeetupPlanner from './MeetupPlanner';
 
 // Interfaces
 interface Guide {
@@ -1134,6 +1135,9 @@ export default function EcosystemHub() {
           {/* TAB 2: PRIVATE CHEF */}
           {activeTab === 'private_chef' && (
             <div className="space-y-6">
+              {/* 拼饭 Kahoot 局 — the centerpiece group-meal planner */}
+              <MeetupPlanner />
+
               {/* Perspective Role switcher */}
               <div className="flex justify-between items-center bg-white border border-gray-150 p-4 rounded-2xl shadow-xs">
                 <span className="text-xs font-black text-gray-500 uppercase tracking-widest">Kitchen Tab Segment</span>
