@@ -7,7 +7,7 @@ import HistoryView from './components/HistoryView';
 import LegalHubDemo from './components/LegalHubDemo';
 import { Mail, Shield, AlertTriangle, Compass, LogIn, LogOut, Clock, Scale, ListTodo } from 'lucide-react';
 
-import { initAuth, googleSignIn, logout } from './lib/firebase';
+import { initAuth, googleSignIn, consumeRedirectResult, logout } from './lib/firebase';
 import { createGmailDraft } from './lib/gmail';
 import { User } from 'firebase/auth';
 import { useLocale, COUNTRIES, LANGUAGES, REGIONS } from './lib/locale';
@@ -37,6 +37,27 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
+  // If we just returned from a full-page redirect sign-in (popup-blocked fallback),
+  // capture the token and finish creating the Gmail draft the user had queued.
+  useEffect(() => {
+    consumeRedirectResult().then(async (res) => {
+      if (!res) return;
+      setUser(res.user);
+      setAccessToken(res.accessToken);
+      const pending = sessionStorage.getItem('serene_pending_draft');
+      if (pending) {
+        sessionStorage.removeItem('serene_pending_draft');
+        try {
+          const d = JSON.parse(pending);
+          await createGmailDraft(res.accessToken, d.recipient, d.subject, d.body);
+          alert('✅ 草稿已存进你的 Gmail！打开 Gmail 的「草稿」即可查看并发送。');
+        } catch (e: any) {
+          alert('草稿创建失败：' + (e?.message || e));
+        }
+      }
+    });
+  }, []);
+
   const handleLogin = async () => {
     try {
       setAuthError(null);
@@ -63,12 +84,14 @@ export default function App() {
   const handleCreateDraft = async (recipient: string, subject: string, body: string) => {
     let token = accessToken;
     if (!token) {
+      // Stash so we can finish the draft after a full-page redirect sign-in (popup-blocked fallback).
+      sessionStorage.setItem('serene_pending_draft', JSON.stringify({ recipient, subject, body }));
       const res = await googleSignIn();
-      if (res) {
-        setUser(res.user);
-        setAccessToken(res.accessToken);
-        token = res.accessToken;
-      }
+      if (!res) return; // redirecting away; the draft completes on return (see effect above)
+      setUser(res.user);
+      setAccessToken(res.accessToken);
+      token = res.accessToken;
+      sessionStorage.removeItem('serene_pending_draft'); // popup path succeeded
     }
     if (!token) throw new Error("No token");
     await createGmailDraft(token, recipient, subject, body);

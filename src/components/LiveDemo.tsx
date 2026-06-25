@@ -718,10 +718,13 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
       // Real Gmail API: create a draft in the user's own Gmail (logs in on-demand).
       await onSendEmail(recipient, analysis.englishDraft.subject, draftBody);
       setAppState('sent');
-    } catch (e) {
-      // Login cancelled or API unavailable → fall back to a web compose link so the demo never dead-ends.
+    } catch (e: any) {
+      // Genuine failure (e.g. Gmail scope not granted). Tell the user why, then fall back to a
+      // web-compose link in the SAME tab (a normal navigation that popup-blockers cannot stop).
+      const reason = e?.message || String(e);
       const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(analysis.englishDraft.subject)}&body=${encodeURIComponent(draftBody)}`;
-      window.open(url, '_blank');
+      const go = window.confirm(`Gmail 草稿创建未完成（${reason}）。\n是否改为打开 Gmail 网页版手动粘贴发送？`);
+      if (go) window.open(url, '_blank') || (window.location.href = url);
       setAppState('sent');
     } finally {
       setIsSending(false);
