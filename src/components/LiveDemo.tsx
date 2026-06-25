@@ -714,21 +714,12 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
 
   const handleSend = async () => {
     if (!analysis) return;
-    setIsSending(true);
-    setSendError(null);
-    try {
-      // Real Gmail API: create a draft in the user's own Gmail (logs in on-demand).
-      await onSendEmail(recipient, analysis.englishDraft.subject, draftBody);
-      // Only reached on GENUINE success (draft created) — or when a redirect sign-in is
-      // navigating away (page unloads, so this is harmless).
-      setAppState('sent');
-    } catch (e: any) {
-      // Real failure (popup closed, Gmail scope not granted, network, etc.). Be honest:
-      // stay on the draft page and surface the exact reason in a persistent banner.
-      setSendError(e?.message || String(e));
-    } finally {
-      setIsSending(false);
-    }
+    // Open Gmail's web composer with the whole appeal pre-filled. This is a direct, synchronous
+    // window.open inside the click handler, so popup blockers allow it — and it needs no login
+    // or Firebase config (the Gmail API draft path requires a Firebase project we don't control).
+    const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(analysis.englishDraft.subject)}&body=${encodeURIComponent(draftBody)}`;
+    window.open(url, '_blank', 'noopener');
+    setAppState('sent');
   };
 
   const reset = () => {
@@ -1602,25 +1593,13 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                        <div className="w-full max-w-md">
                          <button
                            onClick={handleSend}
-                           disabled={isSending}
-                           className="w-full bg-[#1d1d1f] hover:bg-[#1a1a1a] disabled:opacity-60 text-white py-4 rounded-xl font-bold flex items-center justify-center space-x-3 shadow-xl shadow-[#1d1d1f]/20 transition-all hover:-translate-y-0.5 active:scale-95"
+                           className="w-full bg-[#1d1d1f] hover:bg-[#1a1a1a] text-white py-4 rounded-xl font-bold flex items-center justify-center space-x-3 shadow-xl shadow-[#1d1d1f]/20 transition-all hover:-translate-y-0.5 active:scale-95"
                          >
                             <img src="https://www.gstatic.com/images/branding/product/1x/gmail_32dp.png" alt="Gmail" className="w-5 h-5 filter brightness-0 invert" />
-                            <span>{isSending ? '正在 Gmail 创建草稿…' : '一键在 Gmail 创建草稿'}</span>
+                            <span>一键在 Gmail 打开（整封信已预填）</span>
                             <ExternalLink size={16} className="ml-1 opacity-70" />
                          </button>
-                         <p className="text-[10px] text-gray-400 text-center mt-2">通过 Gmail API 在你自己的邮箱生成草稿，你过目后再发送（不会自动发出）。</p>
-                         {sendError && (
-                           <div className="mt-3 text-xs bg-red-50 border border-red-200 text-red-800 rounded-xl p-3 leading-relaxed">
-                             <div className="font-bold mb-1">⚠️ Gmail 草稿没有创建成功</div>
-                             <div className="font-mono text-[10px] break-all text-red-700">{sendError}</div>
-                             <a
-                               href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(analysis.englishDraft.subject)}&body=${encodeURIComponent(draftBody)}`}
-                               target="_blank" rel="noopener noreferrer"
-                               className="inline-flex items-center gap-1 mt-2 font-bold text-[#1d1d1f] underline"
-                             >改用 Gmail 网页版打开草稿 <ExternalLink size={12} /></a>
-                           </div>
-                         )}
+                         <p className="text-[10px] text-gray-400 text-center mt-2">自动打开 Gmail 网页版，收件人、主题、正文已替你填好；你过目无误后点发送（不会自动发出）。</p>
                        </div>
                     </div>
                   </div>
@@ -1635,13 +1614,10 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                   <div className="w-24 h-24 bg-[#EBF1ED] text-[#1d1d1f] rounded-full flex items-center justify-center mb-8 shadow-inner border border-[#1d1d1f]/10">
                     <Send size={40} className="ml-2" />
                   </div>
-                  <h3 className="text-3xl font-extrabold text-gray-900 mb-4 font-serif">草稿已存进你的 Gmail！</h3>
-                  <p className="text-gray-500 text-base max-w-sm mb-6 leading-relaxed">
-                    打开 Gmail 的「草稿」，过目无误后一键发送。这道难关，就快跨过去了。
+                  <h3 className="text-3xl font-extrabold text-gray-900 mb-4 font-serif">已在 Gmail 打开，整封信替你填好了！</h3>
+                  <p className="text-gray-500 text-base max-w-sm mb-8 leading-relaxed">
+                    切到 Gmail 标签页，收件人、主题、正文都已预填；过目无误后点发送。这道难关，就快跨过去了。
                   </p>
-                  <a href="https://mail.google.com/mail/u/0/#drafts" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-[#ff5a3c] hover:underline mb-8 inline-flex items-center gap-1">
-                    打开 Gmail 草稿箱 <ExternalLink size={14} />
-                  </a>
                   
                   <button onClick={reset} className="text-[#1d1d1f] font-bold bg-white border-2 border-[#1d1d1f] hover:bg-[#1d1d1f] hover:text-white px-10 py-4 rounded-full transition-all shadow-sm flex items-center space-x-2 active:scale-95">
                      <span>处理下一封信</span>
