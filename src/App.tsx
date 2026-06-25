@@ -19,7 +19,7 @@ export default function App() {
   const regionOptions = REGIONS[country] || [];
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<TabView>('emergency');
+  const [activeTab, setActiveTab] = useState<TabView>('letter');
   const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -110,7 +110,7 @@ export default function App() {
     <div className="min-h-[100dvh] flex flex-col bg-canvas font-sans text-body overflow-hidden pb-16 md:pb-0 md:pl-20 relative">
 
       {/* Top App Bar */}
-      <header className="bg-canvas/85 backdrop-blur-md border-b border-hairline flex items-center justify-between px-5 md:px-6 py-3.5 z-20 sticky top-0 w-full">
+      <header className="bg-canvas/85 backdrop-blur-md border-b border-hairline flex flex-wrap items-center justify-between gap-y-2 px-4 md:px-6 py-3 md:py-3.5 z-20 sticky top-0 w-full">
         <h1 className="flex items-center gap-2.5 text-lg md:text-xl">
           <span className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center text-on-primary font-display text-lg shadow-sm">S</span>
           <span className="flex flex-col leading-none">
@@ -118,13 +118,13 @@ export default function App() {
             <span className="hidden sm:block text-[11px] font-sans font-medium text-muted mt-0.5 tracking-wide">海外落地安心副驾 · Landing Copilot</span>
           </span>
         </h1>
-        <div className="flex items-center gap-2 md:gap-2.5">
+        <div className="flex items-center gap-2 md:gap-2.5 w-full sm:w-auto">
           {/* Destination country + display language selectors — the "无界" controls */}
           <select
             value={country}
             onChange={(e) => setCountry(e.target.value)}
             title="目的国 Destination country"
-            className="text-xs md:text-sm font-medium text-body bg-surface-soft border border-hairline rounded-lg px-2.5 py-2 cursor-pointer hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+            className="flex-1 sm:flex-none min-w-0 truncate text-xs md:text-sm font-medium text-body bg-surface-soft border border-hairline rounded-lg px-2.5 py-2 cursor-pointer hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
           >
             {COUNTRIES.map((c) => (
               <option key={c.code} value={c.code}>{c.flag} {c.label}</option>
@@ -135,7 +135,7 @@ export default function App() {
               value={region}
               onChange={(e) => setRegion(e.target.value)}
               title="州/省 State or province"
-              className="hidden sm:block text-xs md:text-sm font-medium text-body bg-surface-soft border border-hairline rounded-lg px-2.5 py-2 cursor-pointer hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary max-w-[9rem]"
+              className="flex-1 sm:flex-none min-w-0 truncate text-xs md:text-sm font-medium text-body bg-surface-soft border border-hairline rounded-lg px-2.5 py-2 cursor-pointer hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary sm:max-w-[9rem]"
             >
               <option value="">州/省 (可选)</option>
               {regionOptions.map((r) => (
@@ -147,7 +147,7 @@ export default function App() {
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
             title="显示语言 Display language"
-            className="text-xs md:text-sm font-medium text-body bg-surface-soft border border-hairline rounded-lg px-2.5 py-2 cursor-pointer hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+            className="flex-1 sm:flex-none min-w-0 truncate text-xs md:text-sm font-medium text-body bg-surface-soft border border-hairline rounded-lg px-2.5 py-2 cursor-pointer hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
           >
             {LANGUAGES.map((l) => (
               <option key={l.code} value={l.code}>{l.flag} {l.label}</option>

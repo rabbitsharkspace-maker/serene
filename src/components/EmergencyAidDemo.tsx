@@ -571,12 +571,12 @@ export default function EmergencyAidDemo() {
               <div>
                 <div className="inline-flex items-center space-x-2 bg-[#ff5a3c]/10 text-[#ff5a3c] border border-[#ff5a3c]/20 px-3 py-1 rounded-full text-xs font-black tracking-wider mb-2">
                   <ShieldAlert size={14} />
-                  <span>RESPONSIBLE AI · 留学生安全险境红线守则</span>
+                  <span>RESPONSIBLE AI · 海外新移民安全险境红线守则</span>
                 </div>
                 <h1 className="text-2.5xl md:text-3.5xl font-black text-[#1d1d1f] tracking-tight">
                   First Aid 租客应急第一求助箱
                 </h1>
-                <p className="text-xs text-gray-400 mt-1 font-medium">（专门针对海外留学租房高危纠纷提供即时心理脱敏、官方对线通联、与保姆级避坑指南）</p>
+                <p className="text-xs text-gray-400 mt-1 font-medium">（专门针对海外新移民租房高危纠纷提供即时心理脱敏、官方对线通联、与保姆级避坑指南）</p>
               </div>
               <div className="bg-amber-50/70 border border-amber-200/50 rounded-2xl p-3.5 max-w-sm text-[11px] leading-relaxed text-amber-900 shadow-sm shrink-0">
                 ⚠️ <strong>安全提示：</strong>如果您的生命财产正受到恶意暴力或物理入侵威胁，请立即切换至<strong>「{content.emergency} 特服口译卡」</strong>直接拨打 {content.nameZh} 官方紧急救援专线 {content.emergency}。

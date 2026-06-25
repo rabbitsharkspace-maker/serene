@@ -318,7 +318,7 @@ export default function SafetyShieldDemo() {
         <h2 className="text-3xl md:text-4xl font-extrabold text-[#1d1d1f] leading-tight font-display">
           防诈防坑安全盾
         </h2>
-        <p className="text-[#3C4D43] text-sm mt-1">留学生海外生活全能排雷盾牌。扫房源租房套路、估算二手机物价，深度反诈安心自检。</p>
+        <p className="text-[#3C4D43] text-sm mt-1">海外新移民的全能排雷盾牌。扫房源租房套路、估算二手物价，深度反诈安心自检。</p>
       </div>
 
       <div className="flex flex-col relative z-10 w-full">
