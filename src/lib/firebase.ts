@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, User, signOut as firebaseSignOut } from 'firebase/auth';
+import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, User, signOut as firebaseSignOut } from 'firebase/auth';
 import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json'; // adjust path to project root
 
@@ -96,10 +96,37 @@ export const googleSignIn = async (): Promise<{ user: User; accessToken: string 
     cachedAccessToken = credential.accessToken;
     return { user: result.user, accessToken: cachedAccessToken };
   } catch (error: any) {
+    const code = error?.code || '';
+    // When the popup is blocked (common in iframes / embedded previews / strict browsers),
+    // fall back to a full-page redirect, which works everywhere. The page navigates away and
+    // returns; consumeRedirectResult() picks up the token on reload.
+    if (
+      code === 'auth/popup-blocked' ||
+      code === 'auth/cancelled-popup-request' ||
+      code === 'auth/operation-not-supported-in-this-environment'
+    ) {
+      await signInWithRedirect(auth, provider);
+      return null; // navigating away
+    }
     console.error('Sign in error:', error);
     throw error;
   } finally {
     isSigningIn = false;
+  }
+};
+
+// Call once on app load: if we just came back from a redirect sign-in, capture the token.
+export const consumeRedirectResult = async (): Promise<{ user: User; accessToken: string } | null> => {
+  try {
+    const result = await getRedirectResult(auth);
+    if (!result) return null;
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    if (!credential?.accessToken) return null;
+    cachedAccessToken = credential.accessToken;
+    return { user: result.user, accessToken: credential.accessToken };
+  } catch (error) {
+    console.error('Redirect result error:', error);
+    return null;
   }
 };
 
