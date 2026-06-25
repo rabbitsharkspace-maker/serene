@@ -191,6 +191,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
   const [isTranslating, setIsTranslating] = useState(false);
   const [recipient, setRecipient] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
   const [showTranslation, setShowTranslation] = useState(false);
   
   // User Profile States for Personalized Memory
@@ -714,18 +715,17 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
   const handleSend = async () => {
     if (!analysis) return;
     setIsSending(true);
+    setSendError(null);
     try {
       // Real Gmail API: create a draft in the user's own Gmail (logs in on-demand).
       await onSendEmail(recipient, analysis.englishDraft.subject, draftBody);
+      // Only reached on GENUINE success (draft created) — or when a redirect sign-in is
+      // navigating away (page unloads, so this is harmless).
       setAppState('sent');
     } catch (e: any) {
-      // Genuine failure (e.g. Gmail scope not granted). Tell the user why, then fall back to a
-      // web-compose link in the SAME tab (a normal navigation that popup-blockers cannot stop).
-      const reason = e?.message || String(e);
-      const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(analysis.englishDraft.subject)}&body=${encodeURIComponent(draftBody)}`;
-      const go = window.confirm(`Gmail 草稿创建未完成（${reason}）。\n是否改为打开 Gmail 网页版手动粘贴发送？`);
-      if (go) window.open(url, '_blank') || (window.location.href = url);
-      setAppState('sent');
+      // Real failure (popup closed, Gmail scope not granted, network, etc.). Be honest:
+      // stay on the draft page and surface the exact reason in a persistent banner.
+      setSendError(e?.message || String(e));
     } finally {
       setIsSending(false);
     }
@@ -1610,6 +1610,17 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                             <ExternalLink size={16} className="ml-1 opacity-70" />
                          </button>
                          <p className="text-[10px] text-gray-400 text-center mt-2">通过 Gmail API 在你自己的邮箱生成草稿，你过目后再发送（不会自动发出）。</p>
+                         {sendError && (
+                           <div className="mt-3 text-xs bg-red-50 border border-red-200 text-red-800 rounded-xl p-3 leading-relaxed">
+                             <div className="font-bold mb-1">⚠️ Gmail 草稿没有创建成功</div>
+                             <div className="font-mono text-[10px] break-all text-red-700">{sendError}</div>
+                             <a
+                               href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(analysis.englishDraft.subject)}&body=${encodeURIComponent(draftBody)}`}
+                               target="_blank" rel="noopener noreferrer"
+                               className="inline-flex items-center gap-1 mt-2 font-bold text-[#1d1d1f] underline"
+                             >改用 Gmail 网页版打开草稿 <ExternalLink size={12} /></a>
+                           </div>
+                         )}
                        </div>
                     </div>
                   </div>
