@@ -686,6 +686,8 @@ const STRINGS = {
   mp_subtitle: { zh: '各填位置+口味 → Gemini 算公平中点、推荐真实餐厅 → 转盘一锤定音。', es: 'Cada quien pone su ubicación y gusto → Gemini calcula el punto medio justo y sugiere restaurantes reales → la ruleta decide.', hi: 'सब अपनी जगह + पसंद भरें → Gemini निष्पक्ष मध्य-बिंदु निकालकर असली रेस्तरां सुझाता है → पहिया फैसला करता है।', vi: 'Mỗi người điền vị trí + khẩu vị → Gemini tính điểm giữa công bằng, gợi ý nhà hàng thật → vòng quay chốt.', ar: 'يُدخل كل شخص موقعه وذوقه → يحسب Gemini نقطة المنتصف العادلة ويقترح مطاعم حقيقية → وتحسم العجلة الأمر.' },
   mp_join_code: { zh: '加入码', es: 'Código', hi: 'जॉइन कोड', vi: 'Mã tham gia', ar: 'رمز الانضمام' },
   mp_join_hint: { zh: '发给朋友，在 Serene 输入即可加入', es: 'Compártelo; tus amigos se unen escribiéndolo en Serene', hi: 'दोस्तों को भेजें; Serene में डालकर वे जुड़ सकते हैं', vi: 'Gửi cho bạn bè, nhập vào Serene là tham gia', ar: 'أرسله لأصدقائك؛ يدخلونه في Serene للانضمام' },
+  mp_scan_join: { zh: '扫码直接加入', es: 'Escanea para unirte', hi: 'जुड़ने के लिए स्कैन करें', vi: 'Quét để tham gia', ar: 'امسح للانضمام' },
+  mp_live: { zh: '实时同步', es: 'En vivo', hi: 'लाइव', vi: 'Trực tiếp', ar: 'مباشر' },
   mp_host: { zh: '👑 房主', es: '👑 Anfitrión', hi: '👑 होस्ट', vi: '👑 Chủ phòng', ar: '👑 المضيف' },
   mp_joined: { zh: '已加入', es: 'Unido', hi: 'जुड़ गया', vi: 'Đã tham gia', ar: 'انضم' },
   mp_addr_placeholder: { zh: '你大概在哪(区/街道)', es: '¿Dónde estás más o menos? (zona/calle)', hi: 'आप लगभग कहाँ हैं (क्षेत्र/गली)', vi: 'Bạn ở khoảng đâu (khu/đường)', ar: 'أين أنت تقريبًا (الحي/الشارع)' },
