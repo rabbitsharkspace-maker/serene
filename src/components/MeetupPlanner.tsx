@@ -1,10 +1,15 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Users, MapPin, Sparkles, Loader2, Plus, X, Copy, Check, Dices, Utensils } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { useLocale, getCountryContent } from '../lib/locale';
 import { useT } from '../lib/i18n';
+import {
+  getClientId, ensureRoom, participantExists, putParticipant, patchParticipant,
+  dropParticipant, putResult, putChosen, watchParticipants, watchRoom,
+} from '../lib/meetupService';
 import GroundingSources, { Grounding } from './GroundingSources';
 
-type Participant = { id: number; name: string; address: string; taste: string };
+type Participant = { id: string; name: string; address: string; taste: string };
 type Candidate = { name: string; cuisine: string; address: string; priceLevel: string; why: string; mapQuery: string };
 type Result = { midpointArea: string; reasoning: string; candidates: Candidate[]; isQuotaFallback?: boolean; _grounding?: Grounding | null };
 
@@ -32,12 +37,30 @@ export default function MeetupPlanner() {
     t('mp_taste_pho'), t('mp_taste_western'), t('mp_taste_halal'), t('mp_taste_light'), t('mp_taste_milktea'),
   ];
 
-  const [joinCode] = useState(randomCode);
+  // Room identity: a ?meetup=CODE in the URL joins that room; otherwise we host a new one.
+  const urlCode = useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    const c = new URLSearchParams(window.location.search).get('meetup');
+    return c ? c.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6) : null;
+  }, []);
+  const joinedViaUrl = !!urlCode;
+  const clientId = useMemo(() => getClientId(), []);
+  const [joinCode] = useState(() => urlCode || randomCode());
+
+  // Scannable join link — the QR mirrors the host's real origin (LAN IP / deployed domain),
+  // so once you're not on localhost a friend can scan it and land in this same live room.
+  const joinUrl = `${typeof window !== 'undefined' ? window.location.origin : 'https://serene.app'}/?meetup=${joinCode}`;
   const [codeCopied, setCodeCopied] = useState(false);
-  const [participants, setParticipants] = useState<Participant[]>(() => [
-    { id: 1, name: t('mp_you'), address: spots[0], taste: t('mp_taste_hotpot') },
-    { id: 2, name: t('mp_classmate'), address: spots[1], taste: t('mp_taste_japanese') },
-  ]);
+  const [synced, setSynced] = useState(false); // true once the Firestore room is live
+
+  const [participants, setParticipants] = useState<Participant[]>(() =>
+    joinedViaUrl
+      ? [{ id: clientId, name: t('mp_you'), address: '', taste: '' }]
+      : [
+          { id: clientId, name: t('mp_you'), address: spots[0], taste: t('mp_taste_hotpot') },
+          { id: 'sample-friend', name: t('mp_classmate'), address: spots[1], taste: t('mp_taste_japanese') },
+        ],
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
@@ -47,12 +70,85 @@ export default function MeetupPlanner() {
   const [spinning, setSpinning] = useState(false);
   const [chosen, setChosen] = useState<number | null>(null);
 
-  const update = (id: number, key: keyof Participant, val: string) =>
+  // --- realtime plumbing ---
+  const editingIdRef = useRef<string | null>(null);                          // who the local user is typing into
+  const editTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const spinningRef = useRef(false);
+  useEffect(() => { spinningRef.current = spinning; }, [spinning]);
+
+  // Join/create the room, seed myself, then subscribe to live participants + result/pick.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      await ensureRoom(joinCode, clientId);
+      if (cancelled) return;
+      const mine = await participantExists(joinCode, clientId);
+      if (cancelled || mine) return;
+      const now = Date.now();
+      await putParticipant(joinCode, {
+        id: clientId, name: t('mp_you'),
+        address: joinedViaUrl ? '' : spots[0],
+        taste: joinedViaUrl ? '' : t('mp_taste_hotpot'), joinedAt: now,
+      });
+      if (!joinedViaUrl) {
+        await putParticipant(joinCode, {
+          id: 'sample-friend', name: t('mp_classmate'),
+          address: spots[1], taste: t('mp_taste_japanese'), joinedAt: now + 1,
+        });
+      }
+    })();
+
+    const unsubParts = watchParticipants(joinCode, (server) => {
+      if (cancelled) return;
+      setSynced(true);
+      if (server.length === 0) return; // brief gap before the seed lands — keep local copy
+      setParticipants((prev) => {
+        const mapped = server.map(({ id, name, address, taste }) => ({ id, name, address, taste }));
+        const editId = editingIdRef.current;
+        if (!editId) return mapped;
+        const localEditing = prev.find((p) => p.id === editId); // don't clobber in-progress typing
+        return localEditing ? mapped.map((p) => (p.id === editId ? localEditing : p)) : mapped;
+      });
+    }, () => setSynced(false));
+
+    const unsubRoom = watchRoom(joinCode, (data) => {
+      if (cancelled || !data) return;
+      if ('result' in data) setResult((data.result as Result) ?? null);
+      if ('chosen' in data && !spinningRef.current) setChosen(data.chosen ?? null);
+    }, () => {});
+
+    return () => {
+      cancelled = true;
+      unsubParts(); unsubRoom();
+      Object.values(editTimers.current).forEach(clearTimeout);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [joinCode]);
+
+  const update = (id: string, key: keyof Participant, val: string) => {
+    editingIdRef.current = id;
     setParticipants((prev) => prev.map((p) => (p.id === id ? { ...p, [key]: val } : p)));
-  const addPerson = () =>
-    setParticipants((prev) => [...prev, { id: Date.now(), name: t('mp_friend_n', { n: prev.length + 1 }), address: '', taste: '' }]);
-  const removePerson = (id: number) =>
-    setParticipants((prev) => (prev.length > 2 ? prev.filter((p) => p.id !== id) : prev));
+    clearTimeout(editTimers.current[id]);
+    editTimers.current[id] = setTimeout(() => {
+      setParticipants((cur) => {
+        const p = cur.find((x) => x.id === id);
+        if (p) patchParticipant(joinCode, id, { name: p.name, address: p.address, taste: p.taste });
+        return cur;
+      });
+      if (editingIdRef.current === id) editingIdRef.current = null;
+    }, 450);
+  };
+  const addPerson = () => {
+    const id = `sim-${Date.now()}`;
+    const name = t('mp_friend_n', { n: participants.length + 1 });
+    setParticipants((prev) => [...prev, { id, name, address: '', taste: '' }]);
+    putParticipant(joinCode, { id, name, address: '', taste: '', joinedAt: Date.now() });
+  };
+  const removePerson = (id: string) => {
+    if (participants.length <= 1) return;
+    setParticipants((prev) => prev.filter((p) => p.id !== id));
+    dropParticipant(joinCode, id);
+  };
 
   const copyCode = () => {
     navigator.clipboard.writeText(joinCode);
@@ -75,6 +171,7 @@ export default function MeetupPlanner() {
       const d: Result = await res.json();
       if (!d.candidates?.length) throw new Error('empty');
       setResult(d);
+      putResult(joinCode, d, null); // share candidates with everyone in the room
     } catch {
       setError(true);
     } finally {
@@ -104,6 +201,7 @@ export default function MeetupPlanner() {
     setTimeout(() => {
       setChosen(target);
       setSpinning(false);
+      putChosen(joinCode, target); // everyone in the room sees the same pick
     }, 3600);
   };
 
@@ -122,10 +220,22 @@ export default function MeetupPlanner() {
         </div>
         {/* Join code (Kahoot-style) */}
         <div className="shrink-0 text-center bg-surface-soft border border-hairline rounded-2xl px-4 py-3">
-          <div className="text-[10px] font-bold text-muted-soft uppercase tracking-wider">{t('mp_join_code')}</div>
-          <button onClick={copyCode} className="font-mono text-2xl font-black text-ink tracking-[0.2em] flex items-center gap-1.5">
+          <div className="flex items-center justify-center gap-1.5 text-[10px] font-bold text-muted-soft uppercase tracking-wider">
+            {t('mp_join_code')}
+            {synced && (
+              <span className="inline-flex items-center gap-1 text-success normal-case tracking-normal">
+                <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" /> {t('mp_live')}
+              </span>
+            )}
+          </div>
+          <button onClick={copyCode} className="font-mono text-2xl font-black text-ink tracking-[0.2em] flex items-center gap-1.5 mx-auto">
             {joinCode} {codeCopied ? <Check size={15} className="text-success" /> : <Copy size={14} className="text-muted-soft" />}
           </button>
+          {/* Scannable join QR — scan to land in Serene with this code prefilled */}
+          <a href={joinUrl} target="_blank" rel="noreferrer" title={joinUrl} className="block mt-2 mx-auto w-fit rounded-xl bg-white p-2 border border-hairline shadow-sm transition-transform hover:scale-105 active:scale-95">
+            <QRCodeSVG value={joinUrl} size={84} level="M" bgColor="#ffffff" fgColor="#221c15" />
+          </a>
+          <div className="text-[10px] font-bold text-ink mt-1.5">{t('mp_scan_join')}</div>
           <div className="text-[10px] text-muted-soft mt-0.5">{t('mp_join_hint')}</div>
         </div>
       </div>

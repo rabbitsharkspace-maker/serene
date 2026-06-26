@@ -15,5 +15,16 @@ service cloud.firestore {
       allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
       allow read, update, delete: if request.auth != null && resource.data.uid == request.auth.uid;
     }
+
+    // Group-meal rooms (拼饭局). Login-free so a friend can scan the QR and join instantly,
+    // so these are intentionally open read/write — scoped to this collection only.
+    // The room code is a random 6-char key, hard to guess. Tighten later with anonymous
+    // auth or per-field validation if abuse becomes a concern.
+    match /meetups/{code} {
+      allow read, write: if true;
+      match /participants/{participantId} {
+        allow read, write: if true;
+      }
+    }
   }
 }

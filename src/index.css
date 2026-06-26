@@ -2,13 +2,13 @@
    Recipe: Apple skeleton (cool fog canvas, huge tight-tracked sans, flat color-value
    elevation, one rationed accent) + Duolingo pressable CTA (warmth) + monopo dark
    stage (drama) + a single warm coral voltage so it reads premium-but-not-cold. */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
 @import "tailwindcss";
 
 @theme {
   /* ---- Type ---- */
   --font-sans: "Inter", "Noto Sans SC", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Inter", "Noto Sans SC", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", "Inter", "Noto Sans SC", ui-sans-serif, system-ui, sans-serif;
 
   /* ---- Surfaces (Apple value-elevation, but WARM: ivory canvas, warm-white cards) ---- */
   --color-canvas: #f6f2ec;            /* page canvas — warm ivory, not cold fog */
@@ -152,6 +152,37 @@
   }
 
   .animate-in { animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important; }
+
+  /* ── Redesign pass: global craft + accessibility upgrades (lift every tab) ── */
+
+  /* Smooth anchored scroll + on-brand text selection */
+  html { scroll-behavior: smooth; }
+  ::selection { background: var(--color-primary); color: var(--color-on-primary); }
+
+  /* Headings carry the Bricolage display voice; balance kills orphaned last words */
+  h1, h2, h3, .font-display { text-wrap: balance; }
+  p { text-wrap: pretty; }
+
+  /* Data numerals (prices, %, phone) line up in columns instead of drifting */
+  .font-mono { font-variant-numeric: tabular-nums; }
+
+  /* One visible, on-brand keyboard focus ring everywhere (was missing on buttons/nav) */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  :focus:not(:focus-visible) { outline: none; }
+
+  /* Respect reduced-motion: the UI is pulse/bounce/spring heavy */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 
   /* Markdown rendering inside results */
   .markdown-body strong { font-weight: 700; color: var(--color-ink); }
