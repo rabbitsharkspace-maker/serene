@@ -10,12 +10,14 @@ import { Mail, Shield, AlertTriangle, Compass, LogIn, LogOut, Clock, Scale, List
 import { initAuth, googleSignIn, consumeRedirectResult, logout } from './lib/firebase';
 import { createGmailDraft } from './lib/gmail';
 import { User } from 'firebase/auth';
-import { useLocale, COUNTRIES, LANGUAGES, REGIONS } from './lib/locale';
+import { useLocale, COUNTRIES, LANGUAGES, REGIONS, getCountryName } from './lib/locale';
+import { useT } from './lib/i18n';
 
 type TabView = 'letter' | 'shield' | 'legalhub' | 'emergency' | 'roadmap' | 'history';
 
 export default function App() {
   const { country, language, region, setCountry, setLanguage, setRegion } = useLocale();
+  const t = useT();
   const regionOptions = REGIONS[country] || [];
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -98,12 +100,12 @@ export default function App() {
   };
 
   const tabs: { id: TabView; label: string; icon: React.ReactNode }[] = [
-    { id: 'letter', label: '信件官', icon: <Mail size={24} /> },
-    { id: 'shield', label: '防坑盾', icon: <Shield size={24} /> },
-    { id: 'legalhub', label: '法援站', icon: <Scale size={24} /> },
-    { id: 'history', label: '我的案头', icon: <ListTodo size={24} /> },
-    { id: 'emergency', label: '急救包', icon: <AlertTriangle size={24} /> },
-    { id: 'roadmap', label: '生态', icon: <Compass size={24} /> }
+    { id: 'letter', label: t('nav_letter'), icon: <Mail size={24} /> },
+    { id: 'shield', label: t('nav_shield'), icon: <Shield size={24} /> },
+    { id: 'legalhub', label: t('nav_legalhub'), icon: <Scale size={24} /> },
+    { id: 'history', label: t('nav_history'), icon: <ListTodo size={24} /> },
+    { id: 'emergency', label: t('nav_emergency'), icon: <AlertTriangle size={24} /> },
+    { id: 'roadmap', label: t('nav_roadmap'), icon: <Compass size={24} /> }
   ];
 
   return (
@@ -115,7 +117,7 @@ export default function App() {
           <span className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center text-on-primary font-display text-lg shadow-sm">S</span>
           <span className="flex flex-col leading-none">
             <span className="font-display font-medium text-ink tracking-tight">Serene</span>
-            <span className="hidden sm:block text-[11px] font-sans font-medium text-muted mt-0.5 tracking-wide">海外落地安心副驾 · Landing Copilot</span>
+            <span className="hidden sm:block text-[11px] font-sans font-medium text-muted mt-0.5 tracking-wide">{t('subtitle')}</span>
           </span>
         </h1>
         <div className="flex items-center gap-2 md:gap-2.5 w-full sm:w-auto">
@@ -123,21 +125,21 @@ export default function App() {
           <select
             value={country}
             onChange={(e) => setCountry(e.target.value)}
-            title="目的国 Destination country"
+            title={t('title_country')}
             className="flex-1 sm:flex-none min-w-0 truncate text-xs md:text-sm font-medium text-body bg-surface-soft border border-hairline rounded-lg px-2.5 py-2 cursor-pointer hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
           >
             {COUNTRIES.map((c) => (
-              <option key={c.code} value={c.code}>{c.flag} {c.label}</option>
+              <option key={c.code} value={c.code}>{c.flag} {getCountryName(c.code, language)}</option>
             ))}
           </select>
           {regionOptions.length > 0 && (
             <select
               value={region}
               onChange={(e) => setRegion(e.target.value)}
-              title="州/省 State or province"
+              title={t('title_region')}
               className="flex-1 sm:flex-none min-w-0 truncate text-xs md:text-sm font-medium text-body bg-surface-soft border border-hairline rounded-lg px-2.5 py-2 cursor-pointer hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary sm:max-w-[9rem]"
             >
-              <option value="">州/省 (可选)</option>
+              <option value="">{t('region_placeholder')}</option>
               {regionOptions.map((r) => (
                 <option key={r.code} value={r.code}>{r.label}</option>
               ))}
@@ -146,7 +148,7 @@ export default function App() {
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
-            title="显示语言 Display language"
+            title={t('title_language')}
             className="flex-1 sm:flex-none min-w-0 truncate text-xs md:text-sm font-medium text-body bg-surface-soft border border-hairline rounded-lg px-2.5 py-2 cursor-pointer hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
           >
             {LANGUAGES.map((l) => (

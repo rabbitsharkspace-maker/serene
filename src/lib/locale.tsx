@@ -22,7 +22,9 @@ export const LANGUAGES: { code: string; flag: string; label: string }[] = [
 // (default identity, emergency number, currency) — not just the AI output.
 export type CountryContent = {
   nameZh: string;
-  defaultVisaZh: string;   // shown in the "记忆副驾" identity pill by default
+  nameEn: string;        // shown when display language is not Chinese (non-zh users can't read 中文)
+  defaultVisaZh: string;   // shown in the "记忆副驾" identity pill by default (Chinese UI)
+  defaultVisaEn: string;   // same pill for non-Chinese UI
   emergency: string;       // emergency phone number
   currency: string;        // currency symbol shown in UI
   currencyCode: string;
@@ -30,14 +32,27 @@ export type CountryContent = {
 };
 
 export const COUNTRY_CONTENT: Record<string, CountryContent> = {
-  AU: { nameZh: '澳大利亚', defaultVisaZh: '500 学生签证', emergency: '000', currency: '$', currencyCode: 'AUD', sampleAddress: '123 Swanston St, Melbourne VIC 3000' },
-  US: { nameZh: '美国', defaultVisaZh: 'F-1 学生签证', emergency: '911', currency: '$', currencyCode: 'USD', sampleAddress: '350 5th Ave, New York, NY 10118' },
-  UK: { nameZh: '英国', defaultVisaZh: 'Student visa 学生签证', emergency: '999', currency: '£', currencyCode: 'GBP', sampleAddress: '10 Downing St, London SW1A 2AA' },
-  CA: { nameZh: '加拿大', defaultVisaZh: 'Study Permit 学习许可', emergency: '911', currency: '$', currencyCode: 'CAD', sampleAddress: '290 Bremner Blvd, Toronto ON M5V 3L9' },
+  AU: { nameZh: '澳大利亚', nameEn: 'Australia', defaultVisaZh: '500 学生签证', defaultVisaEn: 'Subclass 500 Student visa', emergency: '000', currency: '$', currencyCode: 'AUD', sampleAddress: '123 Swanston St, Melbourne VIC 3000' },
+  US: { nameZh: '美国', nameEn: 'United States', defaultVisaZh: 'F-1 学生签证', defaultVisaEn: 'F-1 Student visa', emergency: '911', currency: '$', currencyCode: 'USD', sampleAddress: '350 5th Ave, New York, NY 10118' },
+  UK: { nameZh: '英国', nameEn: 'United Kingdom', defaultVisaZh: 'Student visa 学生签证', defaultVisaEn: 'Student visa', emergency: '999', currency: '£', currencyCode: 'GBP', sampleAddress: '10 Downing St, London SW1A 2AA' },
+  CA: { nameZh: '加拿大', nameEn: 'Canada', defaultVisaZh: 'Study Permit 学习许可', defaultVisaEn: 'Study Permit', emergency: '911', currency: '$', currencyCode: 'CAD', sampleAddress: '290 Bremner Blvd, Toronto ON M5V 3L9' },
 };
 
 export function getCountryContent(code: string): CountryContent {
   return COUNTRY_CONTENT[code] || COUNTRY_CONTENT.AU;
+}
+
+// Country name in the user's display language. Chinese users see 中文; everyone else
+// sees the English name (they can't read 中文), never the raw nameZh.
+export function getCountryName(code: string, language: string): string {
+  const c = getCountryContent(code);
+  return language === 'zh' ? c.nameZh : c.nameEn;
+}
+
+// Default visa label in the user's display language (Chinese users see 中文, others English).
+export function getDefaultVisa(code: string, language: string): string {
+  const c = getCountryContent(code);
+  return language === 'zh' ? c.defaultVisaZh : c.defaultVisaEn;
 }
 
 // English name of the user's language, for shouting to the emergency interpreter line

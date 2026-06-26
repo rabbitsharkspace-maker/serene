@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Scale, Phone, Shield, BookOpen, AlertCircle, ExternalLink, Loader2, ListChecks, ShieldCheck, Check, ArrowRight } from 'lucide-react';
-import { useLocale, getCountryContent, REGIONS } from '../lib/locale';
+import { useLocale, getCountryContent, getCountryName, REGIONS } from '../lib/locale';
+import { useT, StringKey } from '../lib/i18n';
 import GroundingSources, { Grounding } from './GroundingSources';
 
 interface ContactInfo { name: string; phone?: string; website?: string; desc: string; }
@@ -109,7 +110,10 @@ function auFallbackFor(domain: Domain): LegalData {
 
 export default function LegalHubDemo({ onOpenLetterOfficer }: { onOpenLetterOfficer?: () => void }) {
   const { country, region, language, setRegion } = useLocale();
+  const t = useT();
   const content = getCountryContent(country);
+  const countryName = getCountryName(country, language);
+  const place = `${countryName}${region ? ' · ' + region : ''}`;
   const regionOptions = REGIONS[country] || [];
 
   const [selectedDomain, setSelectedDomain] = useState<Domain>('rent');
@@ -134,7 +138,8 @@ export default function LegalHubDemo({ onOpenLetterOfficer }: { onOpenLetterOffi
         // The bundled AU fallback is VIC-specific. Only serve it for VIC (or the
         // national default, which this product treats as Melbourne-first). Other
         // states must NOT show Victoria's phone numbers — fall through to retry.
-        if (country === 'AU' && (region === '' || region === 'VIC')) setData(auFallbackFor(selectedDomain));
+        // The bundled fallback is Chinese-only; never show it to a non-Chinese user.
+        if (language === 'zh' && country === 'AU' && (region === '' || region === 'VIC')) setData(auFallbackFor(selectedDomain));
         else setError(true);
       })
       .finally(() => { if (!cancelled) setLoading(false); });
@@ -151,11 +156,11 @@ export default function LegalHubDemo({ onOpenLetterOfficer }: { onOpenLetterOffi
       <div className="mb-12 text-center max-w-3xl mx-auto">
         <div className="inline-flex items-center justify-center space-x-2 bg-white px-5 py-2 rounded-full border border-hairline shadow-sm mb-4">
           <Scale className="text-primary" size={18} />
-          <span className="text-ink text-xs font-black tracking-wider uppercase">Legal Station · 维权流程 &amp; 官方机构</span>
+          <span className="text-ink text-xs font-black tracking-wider uppercase">{t('lh_eyebrow')}</span>
         </div>
-        <h2 className="text-4xl md:text-5xl font-extrabold text-ink mb-4 tracking-tight">该找谁、走哪步、怎么写。</h2>
+        <h2 className="text-4xl md:text-5xl font-extrabold text-ink mb-4 tracking-tight">{t('lh_hero')}</h2>
         <p className="text-muted text-sm md:text-base leading-relaxed max-w-xl mx-auto">
-          收到罚单/扣押金/被克扣工资?信件官帮你<strong className="text-body">读懂手里的文件</strong>;法援站帮你<strong className="text-body">查清该国官方机构、维权流程和申诉模板</strong>。按你所选的国家/州由 AI 实时生成。
+          {t('lh_intro')}
         </p>
       </div>
 
@@ -163,11 +168,11 @@ export default function LegalHubDemo({ onOpenLetterOfficer }: { onOpenLetterOffi
       <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-hairline mb-8 max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center pb-6 border-b border-hairline gap-4">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-black text-muted uppercase tracking-wider mr-1">📍 {content.nameZh} · 选择州/省:</span>
+            <span className="text-xs font-black text-muted uppercase tracking-wider mr-1">📍 {countryName} · {t('lh_select_region')}</span>
             <button
               onClick={() => setRegion('')}
               className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${region === '' ? 'bg-ink text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-            >全国/全境</button>
+            >{t('lh_nationwide')}</button>
             {regionOptions.slice(0, 8).map((r) => (
               <button
                 key={r.code}
@@ -177,7 +182,7 @@ export default function LegalHubDemo({ onOpenLetterOfficer }: { onOpenLetterOffi
             ))}
           </div>
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-surface-soft text-ink border border-hairline shrink-0">
-            <Shield size={14} className="mr-1" /> AI 实时查证官方渠道
+            <Shield size={14} className="mr-1" /> {t('lh_badge')}
           </span>
         </div>
 
@@ -189,7 +194,7 @@ export default function LegalHubDemo({ onOpenLetterOfficer }: { onOpenLetterOffi
               className={`p-4 rounded-2xl flex flex-col items-center gap-1.5 border text-center transition-all ${selectedDomain === d.id ? 'border-primary bg-primary-soft text-ink font-black' : 'border-gray-100 bg-gray-50/50 hover:border-gray-200 text-gray-600 hover:bg-gray-100'}`}
             >
               <span className="text-xl">{d.emoji}</span>
-              <span className="text-xs font-bold">{d.label}</span>
+              <span className="text-xs font-bold">{t(('dom_' + d.id) as StringKey)}</span>
             </button>
           ))}
         </div>
@@ -198,7 +203,7 @@ export default function LegalHubDemo({ onOpenLetterOfficer }: { onOpenLetterOffi
       {/* Content */}
       {error ? (
         <div className="max-w-6xl mx-auto bg-white border border-hairline rounded-3xl p-10 text-center text-muted">
-          暂时无法生成本地化法援信息,请稍后重试,或直接搜索「{content.nameZh} {DOMAINS.find(d => d.id === selectedDomain)?.label} legal aid」。
+          {t('lh_error')}「{countryName} {t(('dom_' + selectedDomain) as StringKey)} legal aid」
         </div>
       ) : (
         <>
@@ -208,12 +213,12 @@ export default function LegalHubDemo({ onOpenLetterOfficer }: { onOpenLetterOffi
           <div className="dark-stage rounded-3xl p-6 md:p-8">
             <div className="flex items-center gap-2 mb-1">
               <ShieldCheck size={18} className="text-primary" />
-              <span className="text-xs font-black tracking-widest uppercase text-on-dark-soft">你的法律权利 · KNOW YOUR RIGHTS</span>
+              <span className="text-xs font-black tracking-widest uppercase text-on-dark-soft">{t('lh_rights_title')}</span>
             </div>
-            <p className="text-on-dark-soft text-xs mb-5">本地人默认知道、新移民却从没人告诉你的那几条——先知道你「站得住脚」，再去交涉。</p>
+            <p className="text-on-dark-soft text-xs mb-5">{t('lh_rights_sub')}</p>
             {loading ? (
               <div className="text-on-dark-soft text-sm flex items-center gap-2 py-4">
-                <Loader2 size={16} className="animate-spin text-primary" /> AI 正在核对你在「{content.nameZh}{region ? ' · ' + region : ''}」依法享有的权利…
+                <Loader2 size={16} className="animate-spin text-primary" /> {t('lh_rights_loading').replace('{place}', place)}
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5">
@@ -235,13 +240,13 @@ export default function LegalHubDemo({ onOpenLetterOfficer }: { onOpenLetterOffi
             <div className="bg-white border border-hairline rounded-3xl p-5 md:p-6 shadow-sm flex-1 flex flex-col">
               <h3 className="text-base font-extrabold text-ink border-b border-hairline pb-3 mb-4 flex items-center gap-2">
                 <Phone size={18} className="text-primary" />
-                <span>{content.nameZh}官方免费接洽站</span>
+                <span>{countryName} {t('lh_intake')}</span>
               </h3>
 
               {loading ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-muted-soft py-10 gap-2">
                   <Loader2 size={22} className="animate-spin text-primary" />
-                  <span className="text-xs">AI 正在按「{content.nameZh}{region ? ' · ' + region : ''}」检索官方机构…</span>
+                  <span className="text-xs">{t('lh_agencies_loading').replace('{place}', place)}</span>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -267,7 +272,7 @@ export default function LegalHubDemo({ onOpenLetterOfficer }: { onOpenLetterOffi
               {scenario?.interpreterTip && (
                 <div className="mt-5 bg-amber-50/60 p-3.5 rounded-2xl border border-amber-100 text-[11px] text-amber-900 leading-normal flex items-start gap-1.5">
                   <AlertCircle size={16} className="text-amber-600 shrink-0 mt-0.5" />
-                  <div><strong>需要口译?</strong> {scenario.interpreterTip}</div>
+                  <div><strong>{t('lh_interpreter')}</strong> {scenario.interpreterTip}</div>
                 </div>
               )}
             </div>
@@ -277,9 +282,9 @@ export default function LegalHubDemo({ onOpenLetterOfficer }: { onOpenLetterOffi
           <div className="lg:col-span-8 flex flex-col gap-4">
             <div className="bg-white border border-hairline rounded-3xl p-6 md:p-8 shadow-sm flex-1 flex flex-col">
               <span className="text-[10px] font-black tracking-widest text-primary uppercase mb-2 flex items-center gap-1.5">
-                <ListChecks size={14} /> 维权流程 / STEP-BY-STEP
+                <ListChecks size={14} /> {t('lh_steps_label')}
               </span>
-              <h3 className="text-lg font-black text-ink mb-4">{loading ? '正在生成维权流程…' : scenario?.title}</h3>
+              <h3 className="text-lg font-black text-ink mb-4">{loading ? t('lh_generating') : scenario?.title}</h3>
 
               <div className="bg-surface-soft p-5 rounded-3xl border border-hairline mb-6">
                 <h4 className="text-xs font-extrabold text-ink mb-3 uppercase">🛡️ 专家级抗辩自卫流程</h4>
@@ -297,7 +302,7 @@ export default function LegalHubDemo({ onOpenLetterOfficer }: { onOpenLetterOffi
                 <div className="flex justify-between items-center text-xs font-bold text-muted mb-2">
                   <span className="flex items-center gap-1">
                     <BookOpen size={14} className="text-ink" />
-                    <span>官方申诉英文草稿模板（[方括号]处自行替换）</span>
+                    <span>{t('lh_template_label')}</span>
                   </span>
                   {scenario?.template && (
                     <button

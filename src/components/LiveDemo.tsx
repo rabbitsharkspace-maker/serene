@@ -5,7 +5,8 @@ import { User } from 'firebase/auth';
 import { db } from '../lib/firebase';
 import { saveExtractedTasks, KanbanTask } from '../lib/kanbanService';
 import Markdown from 'react-markdown';
-import { useLocale, getCountryContent } from '../lib/locale';
+import { useLocale, getCountryContent, getDefaultVisa } from '../lib/locale';
+import { useT } from '../lib/i18n';
 import GroundingSources from './GroundingSources';
 
 type AppState = 'upload' | 'analyzing' | 'result' | 'sent';
@@ -180,6 +181,7 @@ interface LiveDemoProps {
 
 export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendEmail }: LiveDemoProps) {
   const { country, language, region } = useLocale();
+  const t = useT();
   const content = getCountryContent(country);
   const [appState, setAppState] = useState<AppState>('upload');
   const [claimMode, setClaimMode] = useState<'single' | 'cross'>('single');
@@ -438,7 +440,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
         }
         
         // Append user profile for personalized memory context
-        formData.append('visaType', profileVisaType || content.defaultVisaZh);
+        formData.append('visaType', profileVisaType || getDefaultVisa(country, language));
         formData.append('school', profileSchool);
         formData.append('leaseKeyTerms', profileLeaseKeyTerms);
         formData.append('additionalDetails', profileAdditionalDetails);
@@ -740,9 +742,9 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
       <div className="w-full md:p-4">
         
         <div className="mb-14 relative z-10">
-          <p className="text-[#ff5a3c] text-xs font-semibold tracking-[0.18em] mb-3 uppercase font-sans">Letter Officer · 信件官</p>
+          <p className="text-[#ff5a3c] text-xs font-semibold tracking-[0.18em] mb-3 uppercase font-sans">{t('lo_eyebrow')}</p>
           <h2 className="font-display text-4xl md:text-[3.25rem] font-medium text-[#1d1d1f] leading-[1.1] tracking-tight">
-            全能信件官。<br className="hidden md:block"/>三步，从慌张到搞定。
+            {t('lo_hero_1')}<br className="hidden md:block"/>{t('lo_hero_2')}
           </h2>
         </div>
 
@@ -759,10 +761,10 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                       <div className="flex items-center gap-2.5 min-w-0">
                         <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-on-primary bg-primary rounded-full px-2.5 py-1 shrink-0">
                           <Settings size={12} className="animate-spin" style={{ animationDuration: '6s' }} />
-                          记忆副驾
+                          {t('lo_memory')}
                         </span>
                         <p className="text-xs text-muted truncate">
-                          <strong className="text-body-strong font-semibold">{profileVisaType || content.defaultVisaZh}</strong>
+                          <strong className="text-body-strong font-semibold">{profileVisaType || getDefaultVisa(country, language)}</strong>
                           {profileSchool && <span className="text-muted-soft"> · {profileSchool}</span>}
                           {profileLeaseKeyTerms && <span className="text-muted-soft"> · {profileLeaseKeyTerms}</span>}
                         </p>
@@ -771,7 +773,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                         onClick={() => setShowProfileWidget(!showProfileWidget)}
                         className="text-xs text-ink hover:text-primary font-semibold transition-all flex items-center gap-1 cursor-pointer shrink-0"
                       >
-                        {showProfileWidget ? "收起档案" : "修改专属档案"}
+                        {showProfileWidget ? t('lo_collapse_profile') : t('lo_edit_profile')}
                         <ArrowRight size={13} className={`transition-transform duration-300 ${showProfileWidget ? 'rotate-90' : ''}`} />
                       </button>
                     </div>
@@ -785,7 +787,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                               type="text" 
                               value={profileVisaType} 
                               onChange={(e) => setProfileVisaType(e.target.value)} 
-                              placeholder={`例如: ${content.defaultVisaZh}`}
+                              placeholder={`${t('lo_eg')} ${getDefaultVisa(country, language)}`}
                               className="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-800 focus:outline-none focus:ring-2 ring-[#1d1d1f]/10 hover:border-gray-300 font-bold"
                             />
                           </div>
@@ -857,7 +859,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                     <div className="lg:col-span-5 flex flex-col justify-between">
                       <div>
                         <div className="text-[11px] font-semibold text-muted mb-2.5 uppercase tracking-wider flex justify-between items-center">
-                          <span>信件原文预览 / 上传选区</span>
+                          <span>{t('lo_original_preview')}</span>
                           {activeCase && (
                             <span className="text-[10px] text-amber-600 bg-amber-100 px-2 py-0.5 rounded font-bold">内置经典案例载入</span>
                           )}
@@ -882,8 +884,8 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                  <div className="w-12 h-12 border border-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 border-dashed group-hover:border-[#ff5a3c]/50 transition-colors">
                                    <Camera className="text-white/50 group-hover:text-white transition-colors" size={24} />
                                  </div>
-                                 <p className="text-white/60 text-xs font-bold font-sans">拍照或上传英文公文/罚单</p>
-                                 <p className="text-white/30 text-[10px] mt-1 px-4 leading-normal">点击区域选择图片 或 在右侧一键导入经典高频案例</p>
+                                 <p className="text-white/60 text-xs font-bold font-sans">{t('lo_upload_hint1')}</p>
+                                 <p className="text-white/30 text-[10px] mt-1 px-4 leading-normal">{t('lo_upload_hint2')}</p>
                                 </div>
                              )
                            )}
@@ -920,7 +922,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                           disabled={!file}
                           className={`w-full py-3.5 rounded-2xl font-extrabold flex justify-center items-center space-x-2 transition-all duration-350 ${file ? 'bg-[#ff5a3c] hover:bg-[#e6492d] text-white shadow-lg active:scale-95' : 'bg-gray-150 text-gray-400 cursor-not-allowed'}`}
                         >
-                          <span className="tracking-wide">AI 一键深度汉化翻译</span>
+                          <span className="tracking-wide">{t('lo_translate_btn')}</span>
                           <ArrowRight size={18} />
                         </button>
                       </div>
@@ -932,38 +934,38 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                       {/* Presets Grid */}
                       <div className="bg-surface-card/50 p-5 rounded-2xl border border-hairline">
                          <div className="text-[11px] font-semibold text-muted uppercase mb-3.5 tracking-wider flex items-center gap-1.5">
-                           <span>💡 一键载入真实高频法律/申诉案例</span>
+                           <span>{t('lo_load_examples')}</span>
                          </div>
                          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                             <button onClick={() => loadExample('fine')} className={`text-xs font-bold border rounded-xl p-3 transition-all flex flex-col items-center gap-1 cursor-pointer ${activeCase === 'fine' ? 'border-[#1d1d1f] bg-[#1d1d1f]/5 shadow-sm text-neutral-900 ring-1 ring-[#1d1d1f]/25' : 'border-gray-100 bg-white hover:border-[#1d1d1f]/30 hover:bg-[#1d1d1f]/5 text-gray-700'}`}>
                               <span className="text-base">🎫</span>
-                              <span className="text-gray-800">停车 / 交通罚单</span>
-                              <span className="text-[10px] font-normal text-muted-soft text-center leading-tight">例：超时停车被开罚单</span>
+                              <span className="text-gray-800">{t('ex_fine_t')}</span>
+                              <span className="text-[10px] font-normal text-muted-soft text-center leading-tight">{t('ex_fine_d')}</span>
                             </button>
                             <button onClick={() => loadExample('coe')} className={`text-xs font-bold border rounded-xl p-3 transition-all flex flex-col items-center gap-1 cursor-pointer ${activeCase === 'coe' ? 'border-[#ff5a3c] bg-[#ff5a3c]/5 shadow-sm text-neutral-900 ring-1 ring-[#ff5a3c]/25' : 'border-gray-100 bg-white hover:border-[#ff5a3c]/30 hover:bg-[#ff5a3c]/5 text-gray-700'}`}>
                               <span className="text-base">⚠️</span>
-                              <span className="text-gray-800">学籍 / 签证警告</span>
-                              <span className="text-[10px] font-normal text-muted-soft text-center leading-tight">例：挂科收到 Show Cause</span>
+                              <span className="text-gray-800">{t('ex_coe_t')}</span>
+                              <span className="text-[10px] font-normal text-muted-soft text-center leading-tight">{t('ex_coe_d')}</span>
                             </button>
                             <button onClick={() => loadExample('bond')} className={`text-xs font-bold border rounded-xl p-3 transition-all flex flex-col items-center gap-1 cursor-pointer ${activeCase === 'bond' ? 'border-amber-500 bg-amber-500/10 shadow-sm text-neutral-900 ring-1 ring-amber-500/25' : 'border-gray-100 bg-white hover:border-amber-200 hover:bg-amber-50 text-gray-700'}`}>
                               <span className="text-base">🏠</span>
-                              <span className="text-gray-800">租房押金扣除</span>
-                              <span className="text-[10px] font-normal text-muted-soft text-center leading-tight">例：房东借故克扣押金</span>
+                              <span className="text-gray-800">{t('ex_bond_t')}</span>
+                              <span className="text-[10px] font-normal text-muted-soft text-center leading-tight">{t('ex_bond_d')}</span>
                             </button>
                             <button onClick={() => loadExample('plagiarism')} className={`text-xs font-bold border rounded-xl p-3 transition-all flex flex-col items-center gap-1 cursor-pointer ${activeCase === 'plagiarism' ? 'border-red-500 bg-red-50 shadow-sm text-neutral-900 ring-1 ring-red-500/25' : 'border-gray-100 bg-white hover:border-red-200 hover:bg-red-50 text-gray-700'}`}>
                               <span className="text-base">🎓</span>
-                              <span className="text-gray-800">学术抄袭指控</span>
-                              <span className="text-[10px] font-normal text-muted-soft text-center leading-tight">例：论文查重过高被指控</span>
+                              <span className="text-gray-800">{t('ex_plag_t')}</span>
+                              <span className="text-[10px] font-normal text-muted-soft text-center leading-tight">{t('ex_plag_d')}</span>
                             </button>
                             <button onClick={() => loadExample('noise')} className={`text-xs font-bold border rounded-xl p-3 transition-all flex flex-col items-center gap-1 cursor-pointer ${activeCase === 'noise' ? 'border-hairline bg-surface-soft shadow-sm text-neutral-900 ring-1 ring-primary/25' : 'border-gray-100 bg-white hover:border-hairline hover:bg-surface-soft text-gray-700'}`}>
                               <span className="text-base">📢</span>
-                              <span className="text-gray-800">邻里噪音警告</span>
-                              <span className="text-[10px] font-normal text-muted-soft text-center leading-tight">例：聚会被投诉收警告</span>
+                              <span className="text-gray-800">{t('ex_noise_t')}</span>
+                              <span className="text-[10px] font-normal text-muted-soft text-center leading-tight">{t('ex_noise_d')}</span>
                             </button>
                             <button onClick={() => loadExample('utility')} className={`text-xs font-bold border rounded-xl p-3 transition-all flex flex-col items-center gap-1 cursor-pointer ${activeCase === 'utility' ? 'border-amber-500 bg-amber-50 shadow-sm text-neutral-900 ring-1 ring-amber-500/25' : 'border-gray-100 bg-white hover:border-amber-200 hover:bg-amber-50 text-gray-700'}`}>
                               <span className="text-base">💧</span>
-                              <span className="text-gray-800">水电账单逾期</span>
-                              <span className="text-[10px] font-normal text-muted-soft text-center leading-tight">例：收到天价水电催缴</span>
+                              <span className="text-gray-800">{t('ex_util_t')}</span>
+                              <span className="text-[10px] font-normal text-muted-soft text-center leading-tight">{t('ex_util_d')}</span>
                             </button>
                          </div>
                       </div>
@@ -1062,10 +1064,9 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                          ) : (
                            <div className="flex-1 flex flex-col items-center justify-center text-center py-10">
                               <Info className="text-amber-500 mb-3 animate-bounce" size={32} />
-                              <h3 className="text-base font-bold text-[#1d1d1f] mb-1">等待选择公文案例</h3>
+                              <h3 className="text-base font-bold text-[#1d1d1f] mb-1">{t('lo_waiting_title')}</h3>
                               <p className="text-xs text-gray-500 max-w-sm leading-relaxed px-4">
-                                请在上方点击选择任意常见罚单、租房、抄袭、噪音案例一键导入。
-                                载入后，此区域将自动解锁专业保姆级法律指导(More Info)以及高清排版原件。
+                                {t('lo_waiting_body')}
                               </p>
                            </div>
                          )}
@@ -1159,7 +1160,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
               {appState === 'result' && (claimMode === 'cross' ? !!crossAnalysis : !!analysis) && (
                <div className="flex-1 flex flex-col w-full h-full animate-in slide-in-from-bottom-4 duration-500">
                  <button onClick={reset} className="text-xs font-bold text-gray-400 hover:text-gray-900 mb-4 self-start flex items-center space-x-1 hover:underline">
-                   <span>← {claimMode === 'cross' ? '返回重新交叉核验' : '换一封信'}</span>
+                   <span>← {claimMode === 'cross' ? t('lo_back_cross') : t('lo_back_letter')}</span>
                  </button>
 
                  {/* Locally-powered failsafe mode alert banner */}
@@ -1279,12 +1280,12 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                              </div>
 
                              <div className="flex flex-col gap-1">
-                               <label className="text-[10px] font-black uppercase text-gray-400">EMAIL SUBJECT (邮件主题)</label>
+                               <label className="text-[10px] font-black uppercase text-gray-400">{t('lo_subject_label')}</label>
                                <input readOnly type="text" value={crossAnalysis.englishDraft.subject} className="bg-white text-xs font-bold border border-gray-200 rounded-lg p-2 focus:outline-none" />
                              </div>
 
                              <div className="flex flex-col gap-1">
-                               <label className="text-[10px] font-black uppercase text-gray-400">EN DRAFT (英语抗诉正文)</label>
+                               <label className="text-[10px] font-black uppercase text-gray-400">{t('lo_draft_label')}</label>
                                <textarea 
                                  value={draftBody}
                                  onChange={(e) => setDraftBody(e.target.value)}
@@ -1338,7 +1339,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                    {/* Left Column: Side-by-side active original document preview */}
                    <div className="lg:col-span-5 flex flex-col bg-neutral-150/60 p-4 rounded-3xl border border-gray-150/50 max-h-[85vh] overflow-y-auto custom-scrollbar">
                      <div className="text-xs font-black text-gray-400 mb-2.5 uppercase tracking-wider flex justify-between items-center">
-                       <span>当前分析原文信件</span>
+                       <span>{t('lo_current_original')}</span>
                        {activeCase ? (
                          <span className="text-[10px] text-amber-700 bg-amber-100 px-2 py-0.5 rounded font-bold">内置经典案例</span>
                        ) : (
@@ -1484,7 +1485,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                  </div>
 
                  <div className="mt-8 flex-1 flex flex-col border-t border-gray-100 pt-8">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-6 font-serif">拟定英文回信</h3>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-6 font-serif">{t('lo_draft_reply_title')}</h3>
                     
                     <div className="bg-[#FFF8E7] p-5 rounded-xl border border-[#FBEAC3] mb-6 flex items-start space-x-4 shadow-sm">
                        <div className="w-10 h-10 rounded-full bg-[#ff5a3c]/20 flex items-center justify-center flex-shrink-0 mt-0.5 border border-[#ff5a3c]/30">
@@ -1504,7 +1505,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                        <div className="bg-surface-soft/15 border border-hairline p-5 rounded-2xl mb-6 flex flex-col gap-3 font-sans shadow-sm">
                          <div className="text-[10px] font-black text-[#1d1d1f] tracking-wider uppercase flex items-center gap-1.5 leading-none">
                            <Globe size={13} className="text-ink shrink-0"/>
-                           <span>⚖️ 基石：申诉法定依据（真 Grounding 官方信源支撑）</span>
+                           <span>{t('lo_legal_basis')}</span>
                          </div>
                          <div className="divide-y divide-ink/60 flex flex-col">
                            {analysis.userRights.map((right, index) => (
@@ -1596,7 +1597,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                            className="w-full bg-[#1d1d1f] hover:bg-[#1a1a1a] text-white py-4 rounded-xl font-bold flex items-center justify-center space-x-3 shadow-xl shadow-[#1d1d1f]/20 transition-all hover:-translate-y-0.5 active:scale-95"
                          >
                             <img src="https://www.gstatic.com/images/branding/product/1x/gmail_32dp.png" alt="Gmail" className="w-5 h-5 filter brightness-0 invert" />
-                            <span>一键在 Gmail 打开（整封信已预填）</span>
+                            <span>{t('lo_open_gmail')}</span>
                             <ExternalLink size={16} className="ml-1 opacity-70" />
                          </button>
                          <p className="text-[10px] text-gray-400 text-center mt-2">自动打开 Gmail 网页版，收件人、主题、正文已替你填好；你过目无误后点发送（不会自动发出）。</p>
@@ -1614,13 +1615,13 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                   <div className="w-24 h-24 bg-[#EBF1ED] text-[#1d1d1f] rounded-full flex items-center justify-center mb-8 shadow-inner border border-[#1d1d1f]/10">
                     <Send size={40} className="ml-2" />
                   </div>
-                  <h3 className="text-3xl font-extrabold text-gray-900 mb-4 font-serif">已在 Gmail 打开，整封信替你填好了！</h3>
+                  <h3 className="text-3xl font-extrabold text-gray-900 mb-4 font-serif">{t('lo_gmail_done_title')}</h3>
                   <p className="text-gray-500 text-base max-w-sm mb-8 leading-relaxed">
                     切到 Gmail 标签页，收件人、主题、正文都已预填；过目无误后点发送。这道难关，就快跨过去了。
                   </p>
                   
                   <button onClick={reset} className="text-[#1d1d1f] font-bold bg-white border-2 border-[#1d1d1f] hover:bg-[#1d1d1f] hover:text-white px-10 py-4 rounded-full transition-all shadow-sm flex items-center space-x-2 active:scale-95">
-                     <span>处理下一封信</span>
+                     <span>{t('lo_next_letter')}</span>
                      <ArrowRight size={18} />
                   </button>
                </div>
