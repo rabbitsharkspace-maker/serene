@@ -1,39 +1,40 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, Phone, MapPin, AlertCircle, Volume2, ShieldAlert, BookOpen, Sparkles, Copy, Check, HeartHandshake, ExternalLink, ArrowRight, ShieldCheck, CheckSquare, Square, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useLocale, getCountryContent, getInterpreterName } from '../lib/locale';
+import { useLocale, getCountryContent, getCountryName, getInterpreterName } from '../lib/locale';
+import { useT, type StringKey } from '../lib/i18n';
 
 interface CheatsheetType {
-  title: string;
+  titleKey: StringKey;
   emoji: string;
   english: string;
-  chinese: string;
+  meaningKey: StringKey;
 }
 
 const EMERGENCY_CHEATSHEETS: CheatsheetType[] = [
   {
-    title: "突发急病 / 昏迷",
+    titleKey: "ea_cs1_title",
     emoji: "🚑",
     english: "I need an ambulance, someone passed out and has severe difficulty breathing.",
-    chinese: "我需要一辆救护车，有人昏迷了且呼吸非常困难。"
+    meaningKey: "ea_cs1_meaning"
   },
   {
-    title: "遭受抢劫 / 暴力袭击",
+    titleKey: "ea_cs2_title",
     emoji: "🛡️",
     english: "I was just mugged and assaulted. I need immediate police assistance at my location.",
-    chinese: "我刚刚被抢劫并遭到袭击。我需要立刻派警察到我当前的位置。"
+    meaningKey: "ea_cs2_meaning"
   },
   {
-    title: "入室盗窃 / 安全威胁",
+    titleKey: "ea_cs3_title",
     emoji: "🚪",
     english: "My residence is being broken into right now. There is an active intruder and we are in danger.",
-    chinese: "我的住处有人正强行闯入。屋内有入侵者，我们处于危险之中。"
+    meaningKey: "ea_cs3_meaning"
   },
   {
-    title: "发生火灾 / 浓烟",
+    titleKey: "ea_cs4_title",
     emoji: "🔥",
     english: "There is a fire breaking out at this address. Please send a fire brigade immediately.",
-    chinese: "这个地址发生了火灾，请立刻派遣消防队。"
+    meaningKey: "ea_cs4_meaning"
   }
 ];
 
@@ -54,11 +55,24 @@ interface TenancyEmergency {
   lawShield: string;
 }
 
-const TENANCY_EMERGENCIES: TenancyEmergency[] = [
+// titleKey/situationKey drive the (localized) picker UI; the zh calmAdvice/contacts/
+// steps/lawShield are the static AU source-of-truth shown only to zh users — other
+// locales get an AI-generated, localized guide (see /api/tenancy-guide below).
+interface TenancyScenario {
+  titleKey: StringKey;
+  situationKey: StringKey;
+  emoji: string;
+  calmAdvice: string;
+  contacts: TenancyContact[];
+  steps: string[];
+  lawShield: string;
+}
+
+const TENANCY_EMERGENCIES: TenancyScenario[] = [
   {
-    title: "房东擅自锁匙开门闯入",
+    titleKey: "ea_t1_title",
+    situationKey: "ea_t1_situation",
     emoji: "🚪",
-    situation: "中介或房东无端在没有法律通知的情况下自主开锁侵入家里，或者强行进屋骚扰查房。",
     calmAdvice: "【保持冷静】切记不要与对方发生暴力冲突。在澳洲，只要存在合法事实租约，您对居所享有完完全全、不可分割的【排他占有权 (Exclusive Possession)】。任何未经正规书面通告的擅自闯入，均构成重度违规乃至非法侵入罪 (Trespassing)！",
     contacts: [
       { name: "澳洲非紧急报警中心 (Police Assistance Branch)", phone: "131444", desc: "如遭遇房东暴力推门、拒绝离开，大声抗议未果后，直接该号报警协助驱赶非法侵入者。" },
@@ -73,9 +87,9 @@ const TENANCY_EMERGENCIES: TenancyEmergency[] = [
     lawShield: "维多利亚州《住宅租约法》(RTA) 第 85-91 条严格规定：房东或中介只有在极少数极个别法定义务下（如发生24小时紧急水漏事件、或提前不少于 24 小时发放法定纸质 / 邮件书面许可通知），方可进屋。未有通知者擅入一律犯法。"
   },
   {
-    title: "突然遭驱 evicted 被逼搬走",
+    titleKey: "ea_t2_title",
+    situationKey: "ea_t2_situation",
     emoji: "🎒",
-    situation: "大房东或二房东由于琐事或租金欠发，突然威胁并强令我今天、今晚立刻拎行李打包滚出去，甚至威胁换锁。",
     calmAdvice: "【保持冷静】请在心底坚信澳洲法律的坚韧度！没有任何一个房东可以自说自话“驱赶”合法事实定居的租户，甚至本地警察也绝无哪怕一丝权力在没有 VCAT 判决书（Warrant of Possession）的情况下强行请您离开。只要您还在锁内，任何自力赶人换锁行为皆触犯澳洲刑法！",
     contacts: [
       { name: "当地公办安全派出所", phone: "131444", desc: "若房东正对您实施野蛮撬锁暴力，立即叫警察说：“My landlord is performing an illegal self-help eviction right now.”。巡警会当场勒令房东停止违法行为。" },
@@ -90,9 +104,9 @@ const TENANCY_EMERGENCIES: TenancyEmergency[] = [
     lawShield: "维特州 RTA 行政规定：房东赶人必须严格执行发送 Notice to Vacate（正常情况下需提前 14-120 天不等），随后自费走完开庭程序，最终拿到 VCAT 签发的占有证，交由维州警察局总法警执行。不走此渠道的任何硬碰硬驱赶都被认定构成租务民事重大违法犯罪。"
   },
   {
-    title: "漏水断电重大故障失联",
+    titleKey: "ea_t3_title",
+    situationKey: "ea_t3_situation",
     emoji: "💧",
-    situation: "家里自来水管暴裂涨水、房瓦塌漏、彻底没电、无法出冷热水，给中介发无数信息都快过了一昼夜也全无回音。",
     calmAdvice: "【保持冷静】请注意这在大洋洲法律中被清晰认定为“紧急维修（Urgent Repairs）”范畴！一旦属于紧急抢修事件，维州租客被赋予極高的“极速自保额度保护”。若中介或房东失联 24 小时，您全权享有最高 $2,500 AUD 的自理雇工处理并向房东按日等值报销、1分钱不少退还的硬核权利！",
     contacts: [
       { name: "维多利亚民防灾难局 (SES Disaster Service)", phone: "132500", desc: "如暴风雨引发严重断瓦、树木爆倒压塌、整栋楼彻底淹水引发不安全，请无偿找 SES 出动进行救援。" },
@@ -107,9 +121,9 @@ const TENANCY_EMERGENCIES: TenancyEmergency[] = [
     lawShield: "维省《住宅租约法》第 3 条与第 72 条款明规：大暴水、天然气煤气泄露、主大门进不去或断热水属于法定「急速紧急维修」。其倒计时为 24 小时内必须修复，租商故意拖延，会被课以全额垫付款归还和庭外高价追讨索赔。"
   },
   {
-    title: "钥匙丢失被关门外要挟",
+    titleKey: "ea_t4_title",
+    situationKey: "ea_t4_situation",
     emoji: "🔑",
-    situation: "钥匙反锁拿不到，或者钥匙丢了。二房东或大中介态度嚣张，拒绝下发本分备用钥匙，甚至借机威吓要高额罚款否则就把行李扔掉。",
     calmAdvice: "【保持冷静】请不要害怕。丢配钥匙虽然会耽误行程，但绝对是单纯极普通的民事无心之失！在澳洲法律上，任何人一律绝对禁止以“丢失钥匙”为把柄非法霸占、物理压扣、没收您的护照、学生卡、包箱、数码设备等人身生活必需品。这涉及非法占执！",
     contacts: [
       { name: "本地合法挂牌配匙锁匠 (Licensed Locksmith)", desc: "如果房子只属于您名下租套。您是当前绝对权利人，有权在出示身份证前提下直接聘锁匠合法换新锁芯并拿到钥匙，房主无权干预。" },
@@ -123,9 +137,9 @@ const TENANCY_EMERGENCIES: TenancyEmergency[] = [
     lawShield: "依照《租务住宅法》Section 411A 条款明字： 禁止房东及二房东由于一切租房纠纷，擅自搜缴、压扣租户床褥、行装、微波炉、电脑和随行卡包证件，此行当场触发民法重惩违法警铃。"
   },
   {
-    title: "二房东掐吵架私自掐网断电",
+    titleKey: "ea_t5_title",
+    situationKey: "ea_t5_situation",
     emoji: "⚡",
-    situation: "同居二房东、或者是无赖大房东为了争抢电费、卫生分担纠纷强硬拉下闸箱、把网络网线私自剪断、逼我低头妥协。",
     calmAdvice: "【保持冷静】在澳洲法治社会，私掐民生大电网、故意停水断网被明确定性为极其嚣张的【严重非合规租约侵犯行为】！即便真的在经济上稍有扯皮过错，对方只要使用这种私刑，法官对他的倾向度会直接降到冰点！您已占领100%正义神主高地，请沉住气搜集他的证据！",
     contacts: [
       { name: "维多利亚水电能源监理署 (EWOV)", phone: "1800500509", url: "https://www.ewov.com.au", desc: "极强大一级的公共水电能源局。由于只要提供无端被房东掐电地址，将上报由电力水务集团严惩该房东，令其强开供能通道。" },
@@ -139,9 +153,9 @@ const TENANCY_EMERGENCIES: TenancyEmergency[] = [
     lawShield: "《住宅租约法》第 27 条例严格严厉宣布：房东或任何人绝不可以用直接或蓄意妨碍的方法切断、干预、暂停或终结向承租物业供应基本电力、自来水、互联网、下水道等必备公用事业，犯规人必受严厉民事仲裁大额惩戒。"
   },
   {
-    title: "无理由扣留海量 Bond 押金",
+    titleKey: "ea_t6_title",
+    situationKey: "ea_t6_situation",
     emoji: "💰",
-    situation: "退房时无微不至打扫了，中介或房东居然因为‘浴室有水痕、自然磨损、地毯老旧折旧’等漫天要价直接想吞掉我好千块的 Bond 押金！",
     calmAdvice: "【保持冷静】最要紧的一点认识是：中介/房东【完全没有一丝主动直接拿走您一分钱押金的任何物理权利】。全澳所有正规房租押金都是由省独立押金局（比如维州的 RTBA）在联邦级安全看护下闭包托管的。没有你的数字签名，他就是抢破头一分钱也提现不了！",
     contacts: [
       { name: "住宅押金存管最高主管局 (RTBA)", url: "https://rentalbonds.vic.gov.au", desc: "掌握着核心押金生杀大权。您可以在这直接操作不经中介、由租客自主申请 100% 完全退还押金的无尚密钥！" },
@@ -155,9 +169,9 @@ const TENANCY_EMERGENCIES: TenancyEmergency[] = [
     lawShield: "维特州 RTA 新条款（2021修订）宣布： 租约期满后，如果物业已达“合理干净程度”，中介绝不可强索指定地毯高昂洗护；只要租客先在 RTBA 发起退款声讨，后续全部开庭及搜证自证的巨额举证责任一律全部【强行转加扣于中介与老房东身上】。不自证即退回！"
   },
   {
-    title: "收到 VCAT 传票不知道怎么办",
+    titleKey: "ea_t7_title",
+    situationKey: "ea_t7_situation",
     emoji: "⚖️",
-    situation: "完了！真的收到了一封带 VCAT 仲裁庭标徽文件或者是中介起诉我的开庭听证 summons 传单，我恐慌地生怕会连累学生签证或在澳洲留下可怕案底，打算买机票逃学回国了！",
     calmAdvice: "【保持冷静】请在胸中重重长舒一口气！VCAT 不是刑事大法院，没有派人关押、剥夺签证、或记入刑事有罪判决的任何警务威能。它只是平等的【小额民事消费纠纷仲裁庭】，在这里不留一切背景案底，不需要哪怕一毛钱巨款找私人大律师，完全是一个只认事实的公开摆摊说理庭。它是最保护咱们留学生语言弱势的，裁判Member对蛮梁大中介、大房东一向严打得紧，这甚至是你的绝地大反击阵地！",
     contacts: [
       { name: "VCAT 免费同声翻译客户窗口 (Request Interpreter)", phone: "1300018228", desc: "直接给客服打电话报告，您的开庭注册号，告知您是 international student，需要：‘Free Chinese Mandarin Interpreter Support’。开庭时会委派中澳最高级权威翻译官在线全程帮您中英精准翻译辩护，分文不取！" },
@@ -171,9 +185,9 @@ const TENANCY_EMERGENCIES: TenancyEmergency[] = [
     lawShield: "《维多利亚省民事和行政公开法规定》：为确保公允性，VCAT 审辩的核心立基在于：任何人不需要背负支付几万刀大律师法费也能为自己维权。除极其罕见例外，中介与房东除非能自证正当理由并获得法官允许，否则【一律严厉禁止雇佣职业诉讼大律师代其出庭】，这完全打破了财阀中介的资本不对等壁垒，把学生直接推向天平的最公平一侧！"
   },
   {
-    title: "虚报高昂清洁费锁钥匙对抗",
+    titleKey: "ea_t8_title",
+    situationKey: "ea_t8_situation",
     emoji: "🧼",
-    situation: "退钥匙之后，中介拿着微信吼我，说浴室有水痕烤箱不够反油光亮，命令必须三天里找他私派的贵死人的 $600 刀清洁渠道重新洗，不然就不退 Bond，还不履行把钥匙取走，说钥匙不送进去钥匙算多扣租金天数！",
     calmAdvice: "【保持冷静】这极其缺乏任何本地合规常识的商业讹计！澳洲租务法条严密警告，房东绝无命令您选择哪个特定名下保洁清洁队的硬权力。同样更别被“不还钥匙多扣日金”的粗俗中介手段唬住，我们可以无形物理出击，两秒钟破局！",
     contacts: [
       { name: "CAV 政府合规稽查行动局", phone: "1300558181", desc: "遇到这种涉嫌强绑消费的，直接告知 CAV 该中介名。官方一纸警告单砸到他们写字楼，必定能令其噤若寒蝉。" },
@@ -191,7 +205,11 @@ const TENANCY_EMERGENCIES: TenancyEmergency[] = [
 export default function EmergencyAidDemo() {
   const { country, language, region } = useLocale();
   const content = getCountryContent(country);
+  const countryName = getCountryName(country, language);
   const interpreter = getInterpreterName(language);
+  const t = useT();
+  // Country+state label in the user's language, reused across guide copy.
+  const locationLabel = `${countryName}${region ? ` · ${region}` : ''}`;
   const [isListening, setIsListening] = useState(false);
   const [voiceUnavailable, setVoiceUnavailable] = useState(false);
   const recognitionRef = useRef<any>(null);
@@ -246,15 +264,11 @@ export default function EmergencyAidDemo() {
       // Fallback matching client-side
       const s = scenarioText.toLowerCase();
       let fallback = {
-        scenarioTitle: "突发急迫险境 (Custom Emergency)",
-        englishTalk: "I am in danger! Please send immediate rescue to 123 Swanston St, Melbourne. I need a Chinese interpreter!",
-        chineseTalk: "我正处于危险中！请立刻派救助力量到 123 Swanston St, Melbourne。我需要中文翻译接驳！",
-        actions: [
-          "一、保持绝对冷静，迅速退后到有门锁或重物硬物的安全掩体区域，避免正面激怒或对抗袭击。",
-          "二、保护好头部及致命器官，配合歹徒交出金钱等财物，生命是无价大局，切莫激动！",
-          "三、在安全后一键紧急拨打 000 特服电话，对线时高喊 Chinese Mandarin 获取三方同声传译。"
-        ],
-        tisTips: "⚠️ 黄金急救底线：电话接通后一秒钟都不要迟疑，大声说 'Chinese Mandarin, Please!' 即可无缝自动接入 24 小时待命的国家口译大厅（分文不取，全免费）。"
+        scenarioTitle: t('ea_fb_title'),
+        englishTalk: `I am in danger! Please send immediate rescue to ${content.sampleAddress}. I need a ${interpreter} interpreter!`,
+        chineseTalk: t('ea_fb_meaning'),
+        actions: [t('ea_fb_act1'), t('ea_fb_act2'), t('ea_fb_act3')],
+        tisTips: t('ea_fb_tips')
       };
       
       if (s.includes("撬门") || s.includes("闯入") || s.includes("砸门") || s.includes("小偷") || s.includes("强行") || s.includes("入室")) {
@@ -431,7 +445,7 @@ export default function EmergencyAidDemo() {
   // Explicit, user-initiated demo. Clearly surfaced as a sample scenario (never
   // presented as if it were the user's real spoken input).
   const runVoiceExample = () => {
-     const text = "刚刚有人在街上袭击了我！";
+     const text = t('ea_voice_example_text');
      setVoiceUnavailable(false);
      setCustomScenario(text);
      handleGenerateEmergencyGuide(text);
@@ -448,8 +462,13 @@ export default function EmergencyAidDemo() {
   const [aiTenancy, setAiTenancy] = useState<Partial<TenancyEmergency> | null>(null);
   const [tenancyLoading, setTenancyLoading] = useState(false);
 
+  // The hand-tuned static guide is the source of truth only for Chinese users in AU.
+  // Everyone else (other countries, or AU with a non-Chinese display language) gets an
+  // AI-generated, Search-grounded guide localized to their country / state / language.
+  const useStaticZh = country === 'AU' && language === 'zh';
+
   useEffect(() => {
-    if (emergencyTab !== 'tenancy' || country === 'AU') {
+    if (emergencyTab !== 'tenancy' || useStaticZh) {
       setAiTenancy(null);
       setTenancyLoading(false);
       return;
@@ -461,7 +480,7 @@ export default function EmergencyAidDemo() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        situation: `${tenancyBase.title}：${tenancyBase.situation}`,
+        situation: `${t(tenancyBase.titleKey)}：${t(tenancyBase.situationKey)}`,
         country,
         region,
         language,
@@ -472,21 +491,25 @@ export default function EmergencyAidDemo() {
       .catch(() => { if (!cancelled) setAiTenancy(null); })
       .finally(() => { if (!cancelled) setTenancyLoading(false); });
     return () => { cancelled = true; };
-  }, [emergencyTab, country, region, language, selectedTenancyIdx]);
+  }, [emergencyTab, country, region, language, selectedTenancyIdx, useStaticZh]);
 
-  const currentTenancy: TenancyEmergency = country === 'AU'
-    ? tenancyBase
-    : {
-        title: tenancyBase.title,
-        emoji: tenancyBase.emoji,
-        situation: tenancyBase.situation,
-        calmAdvice: tenancyLoading
-          ? `正在为「${content.nameZh}」生成本地化维权指南，请稍候…`
-          : (aiTenancy?.calmAdvice || '暂时无法生成本地化指南，请稍后重试，或直接联系当地租客援助机构 / 非紧急报警电话。'),
-        contacts: aiTenancy?.contacts || [],
-        steps: tenancyLoading ? ['AI 正在检索当地法规与求助渠道…'] : (aiTenancy?.steps || []),
-        lawShield: tenancyLoading ? '正在检索当地《住宅租赁法》相关条款…' : (aiTenancy?.lawShield || ''),
-      };
+  const currentTenancy: TenancyEmergency = {
+    title: t(tenancyBase.titleKey),
+    emoji: tenancyBase.emoji,
+    situation: t(tenancyBase.situationKey),
+    calmAdvice: useStaticZh
+      ? tenancyBase.calmAdvice
+      : tenancyLoading
+        ? t('ea_tenancy_loading', { country: countryName })
+        : (aiTenancy?.calmAdvice || t('ea_tenancy_fail')),
+    contacts: useStaticZh ? tenancyBase.contacts : (aiTenancy?.contacts || []),
+    steps: useStaticZh
+      ? tenancyBase.steps
+      : tenancyLoading ? [t('ea_tenancy_loading_steps')] : (aiTenancy?.steps || []),
+    lawShield: useStaticZh
+      ? tenancyBase.lawShield
+      : tenancyLoading ? t('ea_tenancy_loading_law') : (aiTenancy?.lawShield || ''),
+  };
 
   const handleCopy = (text: string) => {
     try {
@@ -522,12 +545,12 @@ export default function EmergencyAidDemo() {
   };
 
 
-  const simulateEmergency = (mockText: string) => {
+  const simulateEmergency = (mockText: string, cheatsheetIdx: number) => {
     setIsListening(true);
     setTranscript('');
     let currentLog = "";
     let i = 0;
-    
+
     const interval = setInterval(() => {
       if (i < mockText.length) {
         currentLog += mockText[i];
@@ -538,12 +561,8 @@ export default function EmergencyAidDemo() {
         setTimeout(() => {
           setIsListening(false);
           setMeltdownTriggered(true);
-          // Auto-match active index based on voice keywords
-          if (mockText.includes("抢劫")) {
-            setActiveCheatsheetIdx(1);
-          } else if (mockText.includes("晕倒") || mockText.includes("呼吸")) {
-            setActiveCheatsheetIdx(0);
-          }
+          // Jump straight to the matching cheat sheet for this simulated scenario.
+          setActiveCheatsheetIdx(cheatsheetIdx);
         }, 800);
       }
     }, 100);
@@ -571,15 +590,15 @@ export default function EmergencyAidDemo() {
               <div>
                 <div className="inline-flex items-center space-x-2 bg-[#ff5a3c]/10 text-[#ff5a3c] border border-[#ff5a3c]/20 px-3 py-1 rounded-full text-xs font-black tracking-wider mb-2">
                   <ShieldAlert size={14} />
-                  <span>RESPONSIBLE AI · 海外新移民安全险境红线守则</span>
+                  <span>{t('ea_eyebrow')}</span>
                 </div>
                 <h1 className="text-2.5xl md:text-3.5xl font-black text-[#1d1d1f] tracking-tight">
-                  First Aid 租客应急第一求助箱
+                  {t('ea_title')}
                 </h1>
-                <p className="text-xs text-gray-400 mt-1 font-medium">（专门针对海外新移民租房高危纠纷提供即时心理脱敏、官方对线通联、与保姆级避坑指南）</p>
+                <p className="text-xs text-gray-400 mt-1 font-medium">{t('ea_subtitle')}</p>
               </div>
               <div className="bg-amber-50/70 border border-amber-200/50 rounded-2xl p-3.5 max-w-sm text-[11px] leading-relaxed text-amber-900 shadow-sm shrink-0">
-                ⚠️ <strong>安全提示：</strong>如果您的生命财产正受到恶意暴力或物理入侵威胁，请立即切换至<strong>「{content.emergency} 特服口译卡」</strong>直接拨打 {content.nameZh} 官方紧急救援专线 {content.emergency}。
+                {t('ea_safety_tip', { emergency: content.emergency, country: countryName })}
               </div>
             </div>
 
@@ -595,8 +614,8 @@ export default function EmergencyAidDemo() {
                 }`}
               >
                 <span>🚪</span>
-                <span>租房恶劣纠纷自救箱</span>
-                <span className="text-[10px] bg-red-100 text-red-700 px-1.5 py-0.2 rounded-md ml-1">高频推荐</span>
+                <span>{t('ea_tab_tenancy')}</span>
+                <span className="text-[10px] bg-red-100 text-red-700 px-1.5 py-0.2 rounded-md ml-1">{t('ea_tab_tenancy_badge')}</span>
               </button>
               <button
                 type="button"
@@ -608,7 +627,7 @@ export default function EmergencyAidDemo() {
                 }`}
               >
                 <span>🚑</span>
-                <span>人身安危实体限时 {content.emergency} 盾</span>
+                <span>{t('ea_tab_physical', { emergency: content.emergency })}</span>
               </button>
             </div>
 
@@ -619,8 +638,8 @@ export default function EmergencyAidDemo() {
                 {/* Left Side Menu: List of 8 common emergencies */}
                 <div className="lg:col-span-4 space-y-2.5">
                   <div className="flex items-center justify-between px-2 mb-2">
-                    <span className="text-[11px] font-black text-gray-400 uppercase tracking-wider">选择您当前不幸遭遇的惨剧：</span>
-                    <span className="text-[10px] text-ink bg-surface-soft px-2 py-0.5 rounded font-bold font-mono">8大顽疾覆盖</span>
+                    <span className="text-[11px] font-black text-gray-400 uppercase tracking-wider">{t('ea_picker_label')}</span>
+                    <span className="text-[10px] text-ink bg-surface-soft px-2 py-0.5 rounded font-bold font-mono">{t('ea_picker_count')}</span>
                   </div>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
@@ -639,9 +658,9 @@ export default function EmergencyAidDemo() {
                           {item.emoji}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="text-xs sm:text-sm font-black truncate">{item.title}</h4>
+                          <h4 className="text-xs sm:text-sm font-black truncate">{t(item.titleKey)}</h4>
                           <p className={`text-[10px] mt-0.5 truncate ${selectedTenancyIdx === idx ? "text-gray-300" : "text-gray-400"}`}>
-                            {item.situation}
+                            {t(item.situationKey)}
                           </p>
                         </div>
                         {selectedTenancyIdx !== idx && (
@@ -659,12 +678,12 @@ export default function EmergencyAidDemo() {
                   <div className="p-4 bg-surface-soft/50 border border-hairline rounded-3xl mt-4">
                     <h5 className="text-xs font-bold text-ink flex items-center gap-1.5 mb-1.5">
                       <ShieldCheck size={14} className="text-ink" />
-                      <span>Serene 中外法条对账底限机制</span>
+                      <span>{t('ea_legal_mech_title')}</span>
                     </h5>
                     <p className="text-[10px] text-ink/95 leading-relaxed font-medium">
-                      {country === 'AU'
-                        ? '本求助箱内置维多利亚州（VIC）、新南威尔士州（NSW）最新版本的《住宅租赁法 RTA》红线判例。AI 绝不编造虚假法庭条款，确保每一句对外英文震慑警告都有据可考，底气十足！'
-                        : `本求助箱由 AI 结合 Google 实时检索，按你所选的「${content.nameZh}${region ? ' · ' + region : ''}」当地《住宅租赁法》生成。AI 绝不编造虚假条款，确保每条维权依据都有据可考。`}
+                      {useStaticZh
+                        ? t('ea_legal_mech_au')
+                        : t('ea_legal_mech_other', { location: locationLabel })}
                     </p>
                   </div>
                 </div>
@@ -680,7 +699,7 @@ export default function EmergencyAidDemo() {
                     </div>
                     <div>
                       <span className="text-[10px] text-red-500 font-extrabold uppercase tracking-widest bg-red-50 px-2.5 py-1 rounded-full border border-red-100 inline-block mb-1">
-                        我现在不幸遭遇：
+                        {t('ea_now_facing')}
                       </span>
                       <h2 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">
                         {currentTenancy.title}
@@ -699,7 +718,7 @@ export default function EmergencyAidDemo() {
                       </div>
                       <div>
                         <h4 className="text-xs font-black text-red-900 mb-1.5 uppercase tracking-widest flex items-center gap-1">
-                          <span>第一步：保持冷静 · 心理脱敏解压（不吃下威吓）</span>
+                          <span>{t('ea_step1_title')}</span>
                         </h4>
                         <p className="text-xs sm:text-sm text-red-950 font-sans font-medium leading-relaxed">
                           {currentTenancy.calmAdvice}
@@ -711,7 +730,7 @@ export default function EmergencyAidDemo() {
                   {/* 2. WHO TO CONTACT */}
                   <div className="space-y-3.5">
                     <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest block">
-                      第二步：我该找谁帮忙？（{content.nameZh}官方和救助热线）
+                      {t('ea_step2_title', { country: countryName })}
                     </h4>
                     
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5">
@@ -738,7 +757,7 @@ export default function EmergencyAidDemo() {
                                 className="px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-[#1d1d1f] hover:bg-[#1d1d1f] hover:text-white transition-all text-[11px] font-black shadow-sm flex items-center gap-1 group active:scale-95 cursor-pointer"
                               >
                                 <Phone size={11} className="group-hover:animate-bounce" />
-                                <span>拨打 / 复制 {contact.phone}</span>
+                                <span>{t('ea_call_copy', { phone: contact.phone || '' })}</span>
                               </button>
                             )}
                             {contact.url && (
@@ -749,7 +768,7 @@ export default function EmergencyAidDemo() {
                                 className="px-3 py-1.5 rounded-lg bg-surface-soft border border-hairline text-ink hover:bg-primary hover:text-white transition-all text-[11px] font-black shadow-sm flex items-center gap-1 active:scale-95 cursor-pointer"
                               >
                                 <ExternalLink size={11} />
-                                <span>进入官方大厅</span>
+                                <span>{t('ea_enter_hall')}</span>
                               </a>
                             )}
                           </div>
@@ -762,9 +781,9 @@ export default function EmergencyAidDemo() {
                   <div className="space-y-3.5">
                     <div className="flex items-center justify-between">
                       <h4 className="text-xs font-black text-gray-400 tracking-widest uppercase">
-                        第三步：我该立刻采取什么行动？（自救连招对线表）
+                        {t('ea_step3_title')}
                       </h4>
-                      <span className="text-[10px] text-gray-400 font-medium">请一步步勾选完成：</span>
+                      <span className="text-[10px] text-gray-400 font-medium">{t('ea_check_hint')}</span>
                     </div>
 
                     <div className="border border-gray-150 rounded-2.5xl p-4 md:p-6 bg-gray-50/50 space-y-4">
@@ -810,7 +829,7 @@ export default function EmergencyAidDemo() {
                       </div>
                       <div>
                         <h4 className="text-xs font-black text-amber-950 mb-1 uppercase tracking-widest flex items-center gap-1.5">
-                          <span>抗辩底层法条盾牌 (Local Tenancy Legal Backup)</span>
+                          <span>{t('ea_lawshield_title')}</span>
                         </h4>
                         <p className="text-xs text-amber-900/90 leading-relaxed font-sans font-semibold">
                           {currentTenancy.lawShield}
@@ -821,8 +840,8 @@ export default function EmergencyAidDemo() {
 
                   {/* Share advice panel */}
                   <div className="pt-2 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] text-gray-400 font-bold">
-                    <span>💡 温馨提醒：任何情况下保护人身安全第一。如中介在对线中言行出格，请果断保留全部信件交由系统信件官投诉！</span>
-                    <span>维权依据：{content.nameZh}{region ? ` · ${region}` : ''} 当地住宅租赁法</span>
+                    <span>{t('ea_share_tip')}</span>
+                    <span>{t('ea_legal_basis', { location: locationLabel })}</span>
                   </div>
 
                 </div>
@@ -840,19 +859,19 @@ export default function EmergencyAidDemo() {
                   <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-12">
                     <div className="flex-1 text-center md:text-left">
                       <div className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-on-primary bg-primary rounded-full px-3 py-1 mb-4">
-                        <Sparkles size={12} /> Gemini 语音急救
+                        <Sparkles size={12} /> {t('ea_voice_badge')}
                       </div>
                       <h3 className="font-display text-3xl md:text-5xl font-medium text-on-dark leading-[1.1] mb-4">
-                        AI 智能语音急救向导
+                        {t('ea_voice_title')}
                       </h3>
                       <p className="text-sm md:text-lg text-on-dark-soft leading-relaxed max-w-xl mb-3">
-                        遇到突发状况、英语卡壳不知道怎么说？<b className="text-on-dark">直接对着手机说出你的处境</b>，AI 立刻为你生成 {content.emergency} 报警口语小抄 + 现场保命指南。
+                        {t('ea_voice_desc', { emergency: content.emergency })}
                       </p>
                       {isListening && (
                         <div className="mt-2">
                           <div className="text-sm text-red-300 font-bold flex items-center justify-center md:justify-start gap-2">
                             <span className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></span>
-                            正在聆听，请说明你的状况…（再次点击麦克风可停止）
+                            {t('ea_listening')}
                           </div>
                           {transcript && (
                             <p className="mt-2 text-on-dark text-sm bg-white/10 rounded-xl px-3 py-2 text-left">
@@ -864,13 +883,13 @@ export default function EmergencyAidDemo() {
                       {isGeneratingCustom && (
                         <div className="text-sm text-amber-300 font-bold flex items-center justify-center md:justify-start gap-2 mt-2">
                           <div className="w-3.5 h-3.5 border-2 border-amber-300/30 border-t-amber-300 rounded-full animate-spin"></div>
-                          AI 正在紧急分析最优对策...
+                          {t('ea_analyzing')}
                         </div>
                       )}
                       {voiceUnavailable && (
                         <div className="mt-4 bg-on-dark/5 border border-on-dark/15 rounded-2xl p-4 text-left">
                           <p className="text-xs text-on-dark-soft leading-relaxed mb-3">
-                            🎤 当前环境（如预览沙盒或未授权麦克风）无法调用实时语音识别。你可以<b className="text-on-dark">在下方直接输入你的处境</b>，或点此体验一个示例场景：
+                            {t('ea_voice_unavailable')}
                           </p>
                           <button
                             type="button"
@@ -878,7 +897,7 @@ export default function EmergencyAidDemo() {
                             disabled={isGeneratingCustom}
                             className="inline-flex items-center gap-2 text-xs font-bold bg-primary text-on-primary rounded-full px-4 py-2 hover:bg-primary-active transition-colors disabled:opacity-50"
                           >
-                            🎬 体验示例场景：「有人在街上袭击我」
+                            {t('ea_voice_example_btn')}
                           </button>
                         </div>
                       )}
@@ -887,7 +906,7 @@ export default function EmergencyAidDemo() {
                       type="button"
                       onClick={toggleVoiceAssistance}
                       disabled={isGeneratingCustom}
-                      aria-label={isListening ? '停止聆听' : '点击说话'}
+                      aria-label={isListening ? t('ea_mic_stop') : t('ea_mic_talk')}
                       className={`w-40 h-40 md:w-52 md:h-52 shrink-0 rounded-full flex flex-col items-center justify-center transition-all shadow-2xl active:scale-95 cursor-pointer relative ${
                         isListening
                           ? "bg-red-600 text-white"
@@ -915,7 +934,7 @@ export default function EmergencyAidDemo() {
                         <Mic size={60} className="mb-2" />
                       )}
                       <span className="text-xs font-bold uppercase tracking-wider">
-                        {isGeneratingCustom ? '分析中…' : isListening ? '聆听中 · 点击停止' : '点击说话'}
+                        {isGeneratingCustom ? t('ea_mic_analyzing') : isListening ? t('ea_mic_listening') : t('ea_mic_talk')}
                       </span>
                     </button>
                   </div>
@@ -931,19 +950,19 @@ export default function EmergencyAidDemo() {
                     </div>
                     <div className="relative z-10">
                       <div className="inline-block bg-red-800/80 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full mb-3">
-                        🚨 最高优先保命策略
+                        {t('ea_strategy_badge')}
                       </div>
                       <h3 className="text-xl md:text-2xl font-black mb-2 flex items-center gap-2">
-                        直接呼叫母语口译官！
+                        {t('ea_strategy_title')}
                       </h3>
                       <p className="text-sm font-medium leading-relaxed text-red-50 max-w-xl">
-                        无论您的英语在这时卡壳得多厉害，无需任何语法，只需在 {content.emergency} 电话接通的第一秒，用嘴巴对着话筒高喊：
+                        {t('ea_strategy_desc', { emergency: content.emergency })}
                       </p>
                       <blockquote className="my-4 bg-white text-red-600 text-xl font-black p-4 rounded-2xl shadow-inner border-2 border-red-200">
                         "{interpreter}, Please!"
                       </blockquote>
                       <p className="text-sm leading-relaxed text-red-100 max-w-xl">
-                        <strong className="text-white">【完全免费 & 10秒级接驳】</strong> {content.nameZh} {content.emergency} 应急调配中心不仅会立即定位您，还会在10秒内接入国家级免费电话口译服务。专业口译官将全程在三方通话中帮您完美翻译所有案情！
+                        {t('ea_strategy_desc2', { country: countryName, emergency: content.emergency })}
                       </p>
                     </div>
                   </div>
@@ -959,14 +978,14 @@ export default function EmergencyAidDemo() {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center space-x-2">
-                          <span className="text-xs font-black text-gray-400 uppercase tracking-widest">您的实时精准定位</span>
-                          <span className="text-[10px] text-ink bg-surface-soft px-1.5 py-0.2 rounded font-bold">已启用 GPS · {content.nameZh}定位</span>
+                          <span className="text-xs font-black text-gray-400 uppercase tracking-widest">{t('ea_loc_label')}</span>
+                          <span className="text-[10px] text-ink bg-surface-soft px-1.5 py-0.2 rounded font-bold">{t('ea_loc_gps', { country: countryName })}</span>
                         </div>
                         <h3 className="text-xl md:text-2xl font-black text-gray-900 mt-1">
                           {content.sampleAddress}
                         </h3>
                         <p className="text-xs text-red-600 font-extrabold mt-2.5 bg-red-50 inline-block px-3 py-1.5 rounded-lg border border-red-100">
-                          📢 电话接通后，请大声、清晰地将上方英文地址读给 {content.emergency} 接线员
+                          {t('ea_loc_readout', { emergency: content.emergency })}
                         </p>
                       </div>
                     </div>
@@ -975,12 +994,12 @@ export default function EmergencyAidDemo() {
                   {/* 4. Responsive Huge Call Button Panel */}
                   <div className="bg-gradient-to-br from-[#FE5D4C]/5 to-transparent rounded-3xl p-6 border border-red-100/60 flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="text-center md:text-left flex-1">
-                      <span className="text-xs font-black text-[#ff5a3c] uppercase tracking-wider block mb-1">{content.nameZh}官方紧急救援热线</span>
+                      <span className="text-xs font-black text-[#ff5a3c] uppercase tracking-wider block mb-1">{t('ea_hotline_label', { country: countryName })}</span>
                       <h4 className="text-2xl font-black text-[#1d1d1f]">
-                        一键快速紧急拨号
+                        {t('ea_quickdial')}
                       </h4>
                       <p className="text-xs text-gray-500 mt-1 max-w-sm border-l-2 border-red-200 pl-2.5">
-                        {content.nameZh}紧急救援电话（警察、救护、消防统一由 {content.emergency} 接通并人工分流。若您英文受限，请在接通后立即大声告知 <strong>“{interpreter}, Please！”</strong> ）。
+                        {t('ea_hotline_desc', { country: countryName, emergency: content.emergency, interpreter })}
                       </p>
                     </div>
                     <a
@@ -991,7 +1010,7 @@ export default function EmergencyAidDemo() {
                       <div className="absolute inset-0 rounded-full border-4 border-red-600/30 animate-pulse scale-105"></div>
                       <Phone size={36} className="mb-2" />
                       <span className="text-4xl font-black tracking-tight">{content.emergency}</span>
-                      <span className="text-[10px] uppercase font-bold tracking-widest mt-1 opacity-90 block">点击拨打</span>
+                      <span className="text-[10px] uppercase font-bold tracking-widest mt-1 opacity-90 block">{t('ea_dial_click')}</span>
                     </a>
                   </div>
 
@@ -1000,9 +1019,9 @@ export default function EmergencyAidDemo() {
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-2">
                         <BookOpen size={18} className="text-[#1d1d1f]" />
-                        <h4 className="text-sm font-black text-gray-900 uppercase tracking-wide">急救口译英文小抄（直接照读）</h4>
+                        <h4 className="text-sm font-black text-gray-900 uppercase tracking-wide">{t('ea_cheat_title')}</h4>
                       </div>
-                      <span className="text-[10px] text-gray-400 font-bold">点击一键复制</span>
+                      <span className="text-[10px] text-gray-400 font-bold">{t('ea_cheat_copy_hint')}</span>
                     </div>
 
                     {/* Pills */}
@@ -1019,7 +1038,7 @@ export default function EmergencyAidDemo() {
                           }`}
                         >
                           <span>{sheet.emoji}</span>
-                          <span className="truncate">{sheet.title}</span>
+                          <span className="truncate">{t(sheet.titleKey)}</span>
                         </button>
                       ))}
                     </div>
@@ -1030,21 +1049,21 @@ export default function EmergencyAidDemo() {
                         type="button"
                         onClick={() => handleCopy(EMERGENCY_CHEATSHEETS[activeCheatsheetIdx].english)}
                         className="absolute right-3 top-3 p-2 rounded-xl bg-white border border-gray-250 text-gray-500 hover:text-gray-900 transition-all shadow-sm active:scale-95 cursor-pointer flex items-center space-x-1"
-                        title="复制英文"
+                        title={t('ea_copy_english')}
                       >
                         {copied ? <Check size={14} className="text-ink" /> : <Copy size={14} />}
-                        <span className="text-[10px] font-bold">{copied ? '已复制' : '复制小抄'}</span>
+                        <span className="text-[10px] font-bold">{copied ? t('ea_copied') : t('ea_copy_sheet')}</span>
                       </button>
-                      
+
                       <span className="text-[10px] font-black text-[#ff5a3c] block mb-2 uppercase tracking-wide">
-                        {EMERGENCY_CHEATSHEETS[activeCheatsheetIdx].emoji} 接通电话后直接对着话筒念：
+                        {t('ea_cheat_read', { emoji: EMERGENCY_CHEATSHEETS[activeCheatsheetIdx].emoji })}
                       </span>
                       <blockquote className="text-lg md:text-xl font-black text-gray-900 leading-snug tracking-tight pr-10">
                         "{EMERGENCY_CHEATSHEETS[activeCheatsheetIdx].english}"
                       </blockquote>
                       <hr className="my-3 border-gray-200" />
                       <p className="text-xs text-gray-500 font-medium">
-                        💡 中文意思对照：{EMERGENCY_CHEATSHEETS[activeCheatsheetIdx].chinese}
+                        {t('ea_meaning_label')}{t(EMERGENCY_CHEATSHEETS[activeCheatsheetIdx].meaningKey)}
                       </p>
                     </div>
                   </div>
@@ -1058,56 +1077,56 @@ export default function EmergencyAidDemo() {
                   <div className="bg-white border border-red-100 rounded-3xl p-6 shadow-sm ring-2 ring-red-500/10 space-y-4">
                     <div className="flex items-center space-x-2 text-red-600">
                       <Sparkles size={18} className="animate-pulse" />
-                      <h3 className="text-sm font-black uppercase tracking-wider">🚨 AI 智能情境急救与求救决策端</h3>
+                      <h3 className="text-sm font-black uppercase tracking-wider">{t('ea_ai_decision_title')}</h3>
                     </div>
 
                     <p className="text-xs text-gray-500 leading-relaxed font-semibold">
-                      在{content.nameZh}遭遇突发险境时：直接点击以下预设或在输入框表达您的遭遇，AI 急救引擎将瞬间精算定制 {content.emergency} 对线直接朗读台词、最佳避险行动路线，并解答外放翻译给接线员的问题。
+                      {t('ea_ai_decision_desc', { country: countryName, emergency: content.emergency })}
                     </p>
 
                     {/* Pre-set quick tags */}
                     <div className="space-y-1.5 pt-1">
-                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block">一键加载高危险境：</span>
+                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block">{t('ea_load_scenarios')}</span>
                       <div className="grid grid-cols-2 gap-2">
                         <button
                           type="button"
                           onClick={() => {
-                            setCustomScenario("深夜有陌生人在外面强行砸门并撬锁试图闯入");
-                            handleGenerateEmergencyGuide("深夜有陌生人在外面强行砸门并撬锁试图闯入");
+                            setCustomScenario(t('ea_preset_intrusion_text'));
+                            handleGenerateEmergencyGuide(t('ea_preset_intrusion_text'));
                           }}
                           className="bg-gray-50 hover:bg-red-50 border border-gray-150 p-2 text-left rounded-xl text-[11px] font-extrabold text-gray-700 transition-all hover:text-red-700 active:scale-98 cursor-pointer"
                         >
-                          🏠 深夜住处砸门撬锁
+                          {t('ea_preset_intrusion_label')}
                         </button>
                         <button
                           type="button"
                           onClick={() => {
-                            setCustomScenario("刚才在街头被一个可疑高大男子尾随，他开始朝我跑过来想实施抢劫暴力袭击");
-                            handleGenerateEmergencyGuide("刚才在街头被一个可疑高大男子尾随，他开始朝我跑过来想实施抢劫暴力袭击");
+                            setCustomScenario(t('ea_preset_assault_text'));
+                            handleGenerateEmergencyGuide(t('ea_preset_assault_text'));
                           }}
                           className="bg-gray-50 hover:bg-red-50 border border-gray-150 p-2 text-left rounded-xl text-[11px] font-extrabold text-gray-700 transition-all hover:text-red-700 active:scale-98 cursor-pointer"
                         >
-                          🔪 街尾随行凶打劫
+                          {t('ea_preset_assault_label')}
                         </button>
                         <button
                           type="button"
                           onClick={() => {
-                            setCustomScenario("厨房油锅爆炸起火，烟感器刺耳狂鸣，大火蔓延油烟机浓烟封锁了走道安全梯");
-                            handleGenerateEmergencyGuide("厨房油锅爆炸起火，烟感器刺耳狂鸣，大火蔓延油烟机浓烟封锁了走道安全梯");
+                            setCustomScenario(t('ea_preset_fire_text'));
+                            handleGenerateEmergencyGuide(t('ea_preset_fire_text'));
                           }}
                           className="bg-gray-50 hover:bg-red-50 border border-gray-150 p-2 text-left rounded-xl text-[11px] font-extrabold text-gray-700 transition-all hover:text-red-700 active:scale-98 cursor-pointer"
                         >
-                          🔥 火灾爆发毒烟封堵
+                          {t('ea_preset_fire_label')}
                         </button>
                         <button
                           type="button"
                           onClick={() => {
-                            setCustomScenario("我朋友突发严重过敏，呼吸道水肿开始窒息，脸色惨白并浑身跌倒抽搐昏迷");
-                            handleGenerateEmergencyGuide("我朋友突发严重过敏，呼吸道水肿开始窒息，脸色惨白并浑身跌倒抽搐昏迷");
+                            setCustomScenario(t('ea_preset_medical_text'));
+                            handleGenerateEmergencyGuide(t('ea_preset_medical_text'));
                           }}
                           className="bg-gray-50 hover:bg-red-50 border border-gray-150 p-2 text-left rounded-xl text-[11px] font-extrabold text-gray-700 transition-all hover:text-red-700 active:scale-98 cursor-pointer"
                         >
-                          🚑 急性过敏窒息抽敏
+                          {t('ea_preset_medical_label')}
                         </button>
                       </div>
                     </div>
@@ -1117,7 +1136,7 @@ export default function EmergencyAidDemo() {
                       <textarea
                         value={customScenario}
                         onChange={(e) => setCustomScenario(e.target.value)}
-                        placeholder="您也可以在此任意打字输入您的紧急遭遇 (例如：一个黑衣陌生人一直死死尾随我、发生严重车祸有人伤重流血等)..."
+                        placeholder={t('ea_custom_placeholder')}
                         className="w-full text-xs bg-gray-50 border border-gray-200 rounded-2xl p-3 min-h-[85px] outline-none focus:ring-2 focus:ring-red-400 transition-all font-semibold text-gray-800 placeholder-gray-400"
                       />
                       <button
@@ -1129,12 +1148,12 @@ export default function EmergencyAidDemo() {
                         {isGeneratingCustom ? (
                           <>
                             <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                            <span>AI 智能生命安全专家正在精确设计对线方案...</span>
+                            <span>{t('ea_generating')}</span>
                           </>
                         ) : (
                           <>
                             <Sparkles size={14} />
-                            <span>使用文字生成专属保命避险方案</span>
+                            <span>{t('ea_generate_btn')}</span>
                           </>
                         )}
                       </button>
@@ -1151,7 +1170,7 @@ export default function EmergencyAidDemo() {
                         >
                           {/* Title */}
                           <div className="bg-red-50 px-3 py-1.5 rounded-lg border border-red-100 inline-block">
-                            <span className="text-xs font-black text-red-700">⚔️ 生命安全情境评估：{customOutputs.scenarioTitle}</span>
+                            <span className="text-xs font-black text-red-700">{t('ea_scenario_eval')}{customOutputs.scenarioTitle}</span>
                           </div>
 
                           {/* 000 Call Dialogue Card */}
@@ -1161,26 +1180,26 @@ export default function EmergencyAidDemo() {
                             <div className="flex items-center justify-between pb-1.5 border-b border-white/10">
                               <span className="text-[10px] font-black text-red-400 uppercase tracking-widest flex items-center gap-1">
                                 <Volume2 size={12} />
-                                000直念英文口抄 (Direct Call Script)
+                                {t('ea_call_script_label')}
                               </span>
                               <div className="flex items-center space-x-2">
                                 <button
                                   type="button"
                                   onClick={() => playTTS(customOutputs.englishTalk)}
                                   className={`p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-all text-xs flex items-center space-x-1 cursor-pointer ${ttsPlaying ? 'ring-2 ring-red-400' : ''}`}
-                                  title="英语大声朗读"
+                                  title={t('ea_read_aloud')}
                                 >
                                   <Volume2 size={12} className={ttsPlaying ? 'animate-bounce' : ''} />
-                                  <span className="text-[9px] font-bold">{ttsPlaying ? "播音中..." : "带发音朗读"}</span>
+                                  <span className="text-[9px] font-bold">{ttsPlaying ? t('ea_playing') : t('ea_read_pron')}</span>
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => handleCopy(customOutputs.englishTalk)}
                                   className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-all text-xs flex items-center space-x-1 cursor-pointer"
-                                  title="复制英文"
+                                  title={t('ea_copy_english')}
                                 >
                                   {copied ? <Check size={12} className="text-ink" /> : <Copy size={12} />}
-                                  <span className="text-[9px] font-bold">{copied ? "已复制" : "复制台词"}</span>
+                                  <span className="text-[9px] font-bold">{copied ? t('ea_copied') : t('ea_copy_script')}</span>
                                 </button>
                               </div>
                             </div>
@@ -1190,14 +1209,14 @@ export default function EmergencyAidDemo() {
                             </blockquote>
 
                             <p className="text-xs text-gray-400 font-semibold leading-relaxed border-t border-white/10 pt-2 flex items-start gap-1">
-                              <span>意思：</span>
+                              <span>{t('ea_meaning_short')}</span>
                               <span>{customOutputs.chineseTalk}</span>
                             </p>
                           </div>
 
                           {/* Tactical Actions */}
                           <div className="space-y-2 bg-amber-50/50 border border-amber-100 p-4 rounded-2xl">
-                            <span className="text-[10px] font-black text-[#ff5a3c] uppercase tracking-wide block">⚠️ 绝对最高优先级物理自救行动：</span>
+                            <span className="text-[10px] font-black text-[#ff5a3c] uppercase tracking-wide block">{t('ea_actions_label')}</span>
                             <ul className="text-xs text-amber-950 font-bold space-y-2 leading-relaxed">
                               {customOutputs.actions.map((act, index) => (
                                 <li key={index} className="flex items-start gap-1.5">
@@ -1217,14 +1236,14 @@ export default function EmergencyAidDemo() {
                           <div className="bg-red-50 border border-red-200 rounded-2xl p-4.5 space-y-2.5">
                             <div className="flex items-center space-x-2 text-red-700 font-black text-[11px] uppercase tracking-wider">
                               <ShieldAlert size={14} className="animate-pulse" />
-                              <span>⚠️ 特别解答：我打着电话，如果放这个翻译发音过去，对方能听得到吗？</span>
+                              <span>{t('ea_qa_title')}</span>
                             </div>
                             <p className="text-[11px] leading-relaxed font-bold text-gray-700">
-                              <strong>绝对听不到！一毫秒也传不过去。</strong>因为当你的手机正在和 {content.emergency} 电话进行实体通信对线时，系统的底层安全隐私级别会将麦克风（Microphone）实行独占加锁，防止恶意软件窃听或通道混响。这时候你网页上点击“真人朗读”播放发音，<strong>声音只会本机扬声器外放出来，对面的接线员是无法直接听见的。</strong>
+                              {t('ea_qa_answer', { emergency: content.emergency })}
                             </p>
                             <div className="pt-2 border-t border-red-150 text-[11px] text-gray-600 font-black space-y-1.5">
-                              <div>💡 <strong>黄金首选策略（最简单安全）</strong>：电话接通的第一秒，不管你的口语卡不卡壳，<strong>立即拼命对着话筒大喊三声："{interpreter}, Please!"</strong> 即可无障碍一键接入 {content.nameZh} 官方 24 小时全免费的电话口译服务，由第三方官方译员全程帮你无缝对线！</div>
-                              <div>💡 <strong>物理外放策略（在没有口译时的临时应急）</strong>：先将 {content.emergency} 电话切换为<strong>「免提 (Speakerphone)」外放模式</strong>，再用本设备的扬声器大声音量播放本指南台词发音，贴近话筒，通过声波在空气的传播让话筒物理录进去传达！</div>
+                              <div>{t('ea_qa_strategy1', { interpreter, country: countryName })}</div>
+                              <div>{t('ea_qa_strategy2', { emergency: content.emergency })}</div>
                             </div>
                           </div>
                         </motion.div>
@@ -1236,48 +1255,48 @@ export default function EmergencyAidDemo() {
                   <div className="bg-[#1d1d1f]/5 border border-[#1d1d1f]/15 rounded-3xl p-6 relative">
                     <div className="flex items-center space-x-2 text-[#1d1d1f] mb-3">
                       <Sparkles size={18} className="text-[#ff5a3c]" />
-                      <h3 className="text-sm font-black uppercase tracking-wider">评委交互演示：高危安全词汇熔断</h3>
+                      <h3 className="text-sm font-black uppercase tracking-wider">{t('ea_meltdown_title')}</h3>
                     </div>
-                    
+
                     <p className="text-xs text-gray-600 leading-relaxed mb-4 font-medium">
-                      留学生在极度慌意卡壳时，可直接呼出特定词汇。此模拟版允许通过按钮模拟对着麦克风说出高危词汇的效果，展现系统瞬间熔断切入特大自救板的能力。
+                      {t('ea_meltdown_desc')}
                     </p>
                     
                     <div className="bg-white border border-[#1d1d1f]/10 rounded-2xl p-4 space-y-3 shadow-sm">
                       <div className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">
-                        🛠️ 触发模拟高危词汇：
+                        {t('ea_trigger_sim')}
                       </div>
 
                       <button 
                         type="button"
-                        onClick={() => simulateEmergency("我遇到抢劫了！")}
+                        onClick={() => simulateEmergency(t('ea_sim_a_text'), 1)}
                         disabled={isListening}
                         className="w-full bg-red-50 hover:bg-red-100 border border-red-150 p-3 rounded-xl flex items-center justify-between text-left transition-all cursor-pointer active:scale-98"
                       >
                         <div className="flex items-center space-x-2.5">
                           <Volume2 size={16} className="text-red-600 shrink-0" />
                           <div>
-                            <p className="text-[10px] text-red-500 font-bold uppercase tracking-wider">场景模拟 A</p>
-                            <p className="text-xs font-black text-red-950">“我遇到抢劫了！”</p>
+                            <p className="text-[10px] text-red-500 font-bold uppercase tracking-wider">{t('ea_sim_a_label')}</p>
+                            <p className="text-xs font-black text-red-950">“{t('ea_sim_a_text')}”</p>
                           </div>
                         </div>
-                        <span className="text-[10px] bg-red-200 text-red-800 px-1.5 py-0.5 rounded font-black">点击触发</span>
+                        <span className="text-[10px] bg-red-200 text-red-800 px-1.5 py-0.5 rounded font-black">{t('ea_click_trigger')}</span>
                       </button>
 
                       <button 
                         type="button"
-                        onClick={() => simulateEmergency("我朋友突然晕倒了，呼吸非常困难！")}
+                        onClick={() => simulateEmergency(t('ea_sim_b_text'), 0)}
                         disabled={isListening}
                         className="w-full bg-amber-50 hover:bg-amber-100 border border-amber-150 p-3 rounded-xl flex items-center justify-between text-left transition-all cursor-pointer active:scale-98"
                       >
                         <div className="flex items-center space-x-2.5">
                           <Volume2 size={16} className="text-amber-700 shrink-0" />
                           <div>
-                            <p className="text-[10px] text-amber-500 font-bold uppercase tracking-wider">场景模拟 B</p>
-                            <p className="text-xs font-black text-amber-950">“我朋友晕倒了，呼吸很困难！”</p>
+                            <p className="text-[10px] text-amber-500 font-bold uppercase tracking-wider">{t('ea_sim_b_label')}</p>
+                            <p className="text-xs font-black text-amber-950">“{t('ea_sim_b_text')}”</p>
                           </div>
                         </div>
-                        <span className="text-[10px] bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded font-black">点击触发</span>
+                        <span className="text-[10px] bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded font-black">{t('ea_click_trigger')}</span>
                       </button>
                     </div>
 
@@ -1306,15 +1325,11 @@ export default function EmergencyAidDemo() {
                   <div className="border border-gray-150 rounded-3xl p-6 bg-white space-y-3 shadow-xs">
                     <h4 className="text-xs font-black text-gray-800 uppercase tracking-widest flex items-center gap-1.5">
                       <ShieldAlert size={14} className="text-[#10b981]" />
-                      <span>负责任 AI · 机制防线</span>
+                      <span>{t('ea_responsible_title')}</span>
                     </h4>
                     <ul className="text-xs text-gray-500 space-y-2 list-disc pl-4 leading-relaxed">
-                      <li>
-                        <strong>纯口译卡辅助：</strong> 语音熔断仅作前端视图切换。无论检测是错是对，绝不干扰用户自行通过任何方式呼叫 000 实体服务。
-                      </li>
-                      <li>
-                        <strong>零网络传输阻碍：</strong> 离线自建简单字典判识，没有云端延迟。让最关键的地址、求助句式和拨号盘在您眼前无限放大。
-                      </li>
+                      <li>{t('ea_responsible_1')}</li>
+                      <li>{t('ea_responsible_2')}</li>
                     </ul>
                   </div>
 
@@ -1339,7 +1354,7 @@ export default function EmergencyAidDemo() {
                  onClick={reset} 
                  className="text-white hover:bg-white/10 text-xs font-extrabold bg-white/15 px-4 py-2.5 rounded-xl transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
                >
-                 <span>✕ 返回常规模式</span>
+                 <span>{t('ea_back_normal')}</span>
                </button>
                <div className="flex items-center space-x-2 animate-pulse bg-white/15 px-3 py-1.5 rounded-xl">
                  <div className="w-2.5 h-2.5 rounded-full bg-white"></div>
@@ -1352,12 +1367,12 @@ export default function EmergencyAidDemo() {
                
                {/* Heavy contrast big text Current Location */}
                <div className="bg-black/20 border border-white/10 p-5 rounded-2xl w-full max-w-xl shadow-inner text-center">
-                 <p className="text-white/70 text-xs font-black uppercase tracking-widest mb-1.5">Your Current Location // 您的实时中英对照地址</p>
+                 <p className="text-white/70 text-xs font-black uppercase tracking-widest mb-1.5">{t('ea_loc_bilingual')}</p>
                  <h3 className="text-2xl md:text-3xl font-black tracking-tight leading-none text-white selection:bg-red-800">
                    {content.sampleAddress}
                  </h3>
                  <p className="text-xs text-white/90 mt-2 font-bold bg-white/10 inline-block px-3 py-1 rounded-md">
-                   请在电话拨通后，立刻大声将此英文地址高声读给接线员！
+                   {t('ea_loc_readout2')}
                  </p>
                </div>
 
@@ -1370,23 +1385,23 @@ export default function EmergencyAidDemo() {
                   <div className="absolute inset-0 rounded-full border-4 border-white/10 scale-125"></div>
                   <Phone size={56} className="mb-2" />
                   <span className="text-6xl font-black tracking-tighter">{content.emergency}</span>
-                  <span className="text-xs font-black tracking-widest mt-1.5 opacity-90">立即拨打 {content.emergency}</span>
+                  <span className="text-xs font-black tracking-widest mt-1.5 opacity-90">{t('ea_dial_now', { emergency: content.emergency })}</span>
                </a>
 
                {/* Super Heavy Survival Translation Cheat sheet */}
                <div className="bg-black/35 p-6 rounded-2xl w-full max-w-2xl text-center border border-white/5 relative">
-                 <span className="absolute left-4 top-4 text-xs font-black text-white/55 uppercase">SOS 口译卡</span>
-                 <p className="text-red-200 text-xs font-black mb-1.5 uppercase tracking-widest">直接对着对接人高声照读：</p>
+                 <span className="absolute left-4 top-4 text-xs font-black text-white/55 uppercase">{t('ea_sos_interpreter_card')}</span>
+                 <p className="text-red-200 text-xs font-black mb-1.5 uppercase tracking-widest">{t('ea_read_to_operator')}</p>
                  <p className="text-2.5xl md:text-4xl font-black tracking-tight leading-snug text-white">
                    "{EMERGENCY_CHEATSHEETS[activeCheatsheetIdx].english}"
                  </p>
                  <div className="mt-4 pt-3 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-white/75">
-                   <span>💡 对应中文：{EMERGENCY_CHEATSHEETS[activeCheatsheetIdx].chinese}</span>
+                   <span>{t('ea_meaning_zh2')}{t(EMERGENCY_CHEATSHEETS[activeCheatsheetIdx].meaningKey)}</span>
                    <button 
                      onClick={() => handleCopy(EMERGENCY_CHEATSHEETS[activeCheatsheetIdx].english)}
                      className="bg-white/15 text-white hover:bg-white/25 px-3 py-1.5 rounded-lg font-bold transition-all text-[11px]"
                    >
-                     {copied ? "已复制" : "复制英文小抄"}
+                     {copied ? t('ea_copied') : t('ea_copy_english_sheet')}
                    </button>
                  </div>
                </div>
@@ -1395,7 +1410,7 @@ export default function EmergencyAidDemo() {
 
             {/* Absolute bottom guard */}
             <p className="text-center text-white/50 text-[11px] font-black leading-relaxed max-w-lg mx-auto">
-              救援免责保证：本工具完全开源离线运行。系统仅作为视听辅助（帮你更快找到求救小抄与定位），AI对真实的直联生命通道000不进行拦截或决策，如需呼救请选直接拨打！
+              {t('ea_disclaimer')}
             </p>
           </motion.div>
         )}

@@ -1,13 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import { Users, MapPin, Sparkles, Loader2, Plus, X, Copy, Check, Dices, Utensils } from 'lucide-react';
 import { useLocale, getCountryContent } from '../lib/locale';
+import { useT } from '../lib/i18n';
 import GroundingSources, { Grounding } from './GroundingSources';
 
 type Participant = { id: number; name: string; address: string; taste: string };
 type Candidate = { name: string; cuisine: string; address: string; priceLevel: string; why: string; mapQuery: string };
 type Result = { midpointArea: string; reasoning: string; candidates: Candidate[]; isQuotaFallback?: boolean; _grounding?: Grounding | null };
-
-const TASTE_CHIPS = ['火锅', '川菜', '日料', '韩餐', '越南粉', '西餐', '清真', '清淡', '奶茶'];
 
 // Two well-known areas per country, so the demo works out-of-the-box and stays country-aware.
 const DEMO_SPOTS: Record<string, [string, string]> = {
@@ -24,14 +23,20 @@ function randomCode() {
 
 export default function MeetupPlanner() {
   const { country, region, language } = useLocale();
+  const t = useT();
   const content = getCountryContent(country);
   const spots = DEMO_SPOTS[country] || DEMO_SPOTS.AU;
 
+  const TASTE_CHIPS = [
+    t('mp_taste_hotpot'), t('mp_taste_sichuan'), t('mp_taste_japanese'), t('mp_taste_korean'),
+    t('mp_taste_pho'), t('mp_taste_western'), t('mp_taste_halal'), t('mp_taste_light'), t('mp_taste_milktea'),
+  ];
+
   const [joinCode] = useState(randomCode);
   const [codeCopied, setCodeCopied] = useState(false);
-  const [participants, setParticipants] = useState<Participant[]>([
-    { id: 1, name: '你', address: spots[0], taste: '火锅' },
-    { id: 2, name: '同学小李', address: spots[1], taste: '日料' },
+  const [participants, setParticipants] = useState<Participant[]>(() => [
+    { id: 1, name: t('mp_you'), address: spots[0], taste: t('mp_taste_hotpot') },
+    { id: 2, name: t('mp_classmate'), address: spots[1], taste: t('mp_taste_japanese') },
   ]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -45,7 +50,7 @@ export default function MeetupPlanner() {
   const update = (id: number, key: keyof Participant, val: string) =>
     setParticipants((prev) => prev.map((p) => (p.id === id ? { ...p, [key]: val } : p)));
   const addPerson = () =>
-    setParticipants((prev) => [...prev, { id: Date.now(), name: `朋友${prev.length + 1}`, address: '', taste: '' }]);
+    setParticipants((prev) => [...prev, { id: Date.now(), name: t('mp_friend_n', { n: prev.length + 1 }), address: '', taste: '' }]);
   const removePerson = (id: number) =>
     setParticipants((prev) => (prev.length > 2 ? prev.filter((p) => p.id !== id) : prev));
 
@@ -110,18 +115,18 @@ export default function MeetupPlanner() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
           <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-on-primary bg-primary rounded-full px-2.5 py-1 mb-2">
-            <Users size={12} /> 拼饭局 · Group Meal
+            <Users size={12} /> {t('mp_badge')}
           </div>
-          <h3 className="font-display text-2xl md:text-3xl font-extrabold text-ink tracking-tight">开一局拼饭,AI 帮大家定地方</h3>
-          <p className="text-sm text-muted mt-1">各填位置+口味 → Gemini 算公平中点、推荐真实餐厅 → 转盘一锤定音。</p>
+          <h3 className="font-display text-2xl md:text-3xl font-extrabold text-ink tracking-tight">{t('mp_title')}</h3>
+          <p className="text-sm text-muted mt-1">{t('mp_subtitle')}</p>
         </div>
         {/* Join code (Kahoot-style) */}
         <div className="shrink-0 text-center bg-surface-soft border border-hairline rounded-2xl px-4 py-3">
-          <div className="text-[10px] font-bold text-muted-soft uppercase tracking-wider">加入码</div>
+          <div className="text-[10px] font-bold text-muted-soft uppercase tracking-wider">{t('mp_join_code')}</div>
           <button onClick={copyCode} className="font-mono text-2xl font-black text-ink tracking-[0.2em] flex items-center gap-1.5">
             {joinCode} {codeCopied ? <Check size={15} className="text-success" /> : <Copy size={14} className="text-muted-soft" />}
           </button>
-          <div className="text-[10px] text-muted-soft mt-0.5">发给朋友,在 Serene 输入即可加入</div>
+          <div className="text-[10px] text-muted-soft mt-0.5">{t('mp_join_hint')}</div>
         </div>
       </div>
 
@@ -136,7 +141,7 @@ export default function MeetupPlanner() {
                 className="bg-transparent font-bold text-ink text-sm focus:outline-none w-32"
               />
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-muted-soft">{idx === 0 ? '👑 房主' : '已加入'}</span>
+                <span className="text-[10px] text-muted-soft">{idx === 0 ? t('mp_host') : t('mp_joined')}</span>
                 {participants.length > 2 && (
                   <button onClick={() => removePerson(p.id)} className="text-muted-soft hover:text-error"><X size={14} /></button>
                 )}
@@ -148,7 +153,7 @@ export default function MeetupPlanner() {
                 <input
                   value={p.address}
                   onChange={(e) => update(p.id, 'address', e.target.value)}
-                  placeholder="你大概在哪(区/街道)"
+                  placeholder={t('mp_addr_placeholder')}
                   className="bg-transparent text-xs text-body focus:outline-none w-full"
                 />
               </div>
@@ -157,7 +162,7 @@ export default function MeetupPlanner() {
                 <input
                   value={p.taste}
                   onChange={(e) => update(p.id, 'taste', e.target.value)}
-                  placeholder="想吃什么口味"
+                  placeholder={t('mp_taste_placeholder')}
                   className="bg-transparent text-xs text-body focus:outline-none w-full"
                 />
               </div>
@@ -177,29 +182,29 @@ export default function MeetupPlanner() {
 
       <div className="flex flex-wrap items-center gap-3 mb-2">
         <button onClick={addPerson} className="text-xs font-bold text-ink bg-surface-soft border border-hairline rounded-full px-3.5 py-2 hover:border-primary flex items-center gap-1">
-          <Plus size={14} /> 模拟好友加入
+          <Plus size={14} /> {t('mp_add_friend')}
         </button>
         <button
           onClick={compute}
           disabled={loading}
           className="cta-3d disabled:opacity-60 text-sm font-bold px-5 py-2.5 flex items-center gap-2"
         >
-          {loading ? <><Loader2 size={16} className="animate-spin" /> AI 算局中…</> : <><Sparkles size={16} /> AI 算中点 & 推荐餐厅</>}
+          {loading ? <><Loader2 size={16} className="animate-spin" /> {t('mp_computing')}</> : <><Sparkles size={16} /> {t('mp_compute_btn')}</>}
         </button>
       </div>
 
-      {error && <p className="text-xs text-error mt-2">算局失败,请确认每人都填了大致位置后重试。</p>}
+      {error && <p className="text-xs text-error mt-2">{t('mp_compute_fail')}</p>}
 
       {/* Result */}
       {result && (
         <div className="mt-6 pt-6 border-t border-hairline animate-in fade-in slide-in-from-bottom-3 duration-400">
           {result.isQuotaFallback && (
             <div className="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 mb-5 text-[11px] text-amber-800 leading-relaxed">
-              ⚠️ Google 接口当前繁忙（限流），以下为<strong>预置示例局</strong>（餐厅/中点为示例）。稍后点「AI 算中点」可获取基于你们真实地址的实时推荐。地图仍为真实 Google 地图。
+              {t('mp_fallback')}
             </div>
           )}
           <div className="bg-primary-soft border border-primary/20 rounded-2xl p-4 mb-5">
-            <div className="text-xs font-bold text-ink flex items-center gap-1.5"><MapPin size={14} className="text-primary" /> 公平中点：{result.midpointArea}</div>
+            <div className="text-xs font-bold text-ink flex items-center gap-1.5"><MapPin size={14} className="text-primary" /> {t('mp_fair_midpoint')}{result.midpointArea}</div>
             <p className="text-xs text-body mt-1 leading-relaxed">{result.reasoning}</p>
           </div>
 
@@ -219,11 +224,11 @@ export default function MeetupPlanner() {
                     }}
                   />
                   <div className="absolute inset-0 m-auto w-14 h-14 rounded-full bg-white shadow flex items-center justify-center text-[10px] font-black text-ink" style={{ top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }}>
-                    {candidates.length}家
+                    {t('mp_n_places', { n: candidates.length })}
                   </div>
                 </div>
                 <button onClick={spin} disabled={spinning} className="mt-4 cta-3d disabled:opacity-60 text-sm font-bold px-6 py-2.5 flex items-center gap-2">
-                  <Dices size={16} /> {spinning ? '转盘抽签中…' : '转盘一锤定音'}
+                  <Dices size={16} /> {spinning ? t('mp_spinning') : t('mp_spin_btn')}
                 </button>
               </div>
 
@@ -236,7 +241,7 @@ export default function MeetupPlanner() {
                         <span className="text-sm font-bold text-ink flex items-center gap-1.5">
                           <span className="w-4 h-4 rounded-full text-[9px] flex items-center justify-center text-white" style={{ background: ['#f1583a', '#e8a55a', '#5db8a6', '#b06a3a', '#d8462a', '#c2820a'][i % 6] }}>{i + 1}</span>
                           {c.name}
-                          {isChosen && <span className="text-[10px] font-black text-primary">· 今晚就它!</span>}
+                          {isChosen && <span className="text-[10px] font-black text-primary">{t('mp_tonight_pick')}</span>}
                         </span>
                         <span className="text-[10px] text-muted-soft shrink-0">{c.cuisine} · {c.priceLevel}</span>
                       </div>
@@ -251,7 +256,7 @@ export default function MeetupPlanner() {
             {/* Right: live Google Map */}
             <div className="flex flex-col">
               <div className="text-[10px] font-bold text-muted-soft uppercase tracking-wider mb-1.5">
-                {chosen != null ? `🗺️ ${candidates[chosen].name}` : '🗺️ 中点区域地图'}
+                {chosen != null ? `🗺️ ${candidates[chosen].name}` : t('mp_midpoint_map')}
               </div>
               <div className="flex-1 min-h-[300px] rounded-2xl overflow-hidden border border-hairline bg-surface-soft">
                 {mapQuery ? (
@@ -265,7 +270,7 @@ export default function MeetupPlanner() {
                   />
                 ) : null}
               </div>
-              <p className="text-[10px] text-muted-soft mt-1.5">实时 Google 地图 · 转盘选定后自动定位到餐厅</p>
+              <p className="text-[10px] text-muted-soft mt-1.5">{t('mp_map_caption')}</p>
             </div>
           </div>
 

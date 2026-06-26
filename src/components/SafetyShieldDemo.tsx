@@ -2,7 +2,8 @@ import React, { useState, useRef } from 'react';
 import { Camera, ShieldCheck, ArrowRight, ShieldAlert, FileText, CheckCircle2, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Markdown from 'react-markdown';
-import { useLocale } from '../lib/locale';
+import { useLocale, getCountryName } from '../lib/locale';
+import { useT, type StringKey } from '../lib/i18n';
 import GroundingSources from './GroundingSources';
 
 type AppState = 'upload' | 'analyzing' | 'result';
@@ -31,69 +32,22 @@ interface ScamResult {
   reassurance: string;
 }
 
-const SCAM_FLAG_GROUPS = [
-  {
-    category: "💰 金钱要求",
-    items: [
-      "对方要求你先转账/付押金/付定金",
-      "贵重物品却只让你付'运费/手续费/税费'",
-      "要求用礼品卡、加密货币或私下转账"
-    ]
-  },
-  {
-    category: "⏱️ 紧迫与稀缺",
-    items: [
-      "强调'只有这次机会''名额有限''今天不办就没了'",
-      "催你立刻决定，不给你时间考虑"
-    ]
-  },
-  {
-    category: "✨ 太美好与激动",
-    items: [
-      "承诺'很好的机会''稳赚''高回报''轻松赚钱'",
-      "你听了感到很激动/心动",
-      "声称不需要专业知识技能就能赚钱"
-    ]
-  },
-  {
-    category: "👥 社会认同造假",
-    items: [
-      "说'已经很多人买了/参加了''别人都赚到了'"
-    ]
-  },
-  {
-    category: "🚨 冒充权威/恐吓 (高危)",
-    items: [
-      "对方自称使馆/移民局/警方/海关/快递",
-      "威胁你'不配合就遣返/被捕/罚款/签证出问题'",
-      "要求你保密，不许告诉家人、朋友或老师"
-    ],
-    isFatal: true
-  },
-  {
-    category: "🔑 索取敏感信息 (高危)",
-    items: [
-      "索要银行卡号、验证码、密码、护照信息",
-      "要求屏幕共享或安装指定 App"
-    ],
-    isFatal: true
-  },
-  {
-    category: "🛡️ 可信度伪装",
-    items: [
-      "仅凭一个网站/公众号/链接就让你相信对方正规"
-    ]
-  },
-  {
-    category: "🍀 敏感领域承诺",
-    items: [
-      "涉及'包治大病''养老高回报投资''保录取/包毕业'等"
-    ]
-  }
+// Category labels and items are stored as i18n keys (resolved via t() at render).
+// selectedFlags stores the item keys, so selection survives language switches.
+const SCAM_FLAG_GROUPS: { emoji: string; categoryKey: StringKey; itemKeys: StringKey[]; isFatal?: boolean }[] = [
+  { emoji: "💰", categoryKey: "ss_fg_money", itemKeys: ["ss_fi_money1", "ss_fi_money2", "ss_fi_money3"] },
+  { emoji: "⏱️", categoryKey: "ss_fg_urgency", itemKeys: ["ss_fi_urg1", "ss_fi_urg2"] },
+  { emoji: "✨", categoryKey: "ss_fg_toogood", itemKeys: ["ss_fi_tg1", "ss_fi_tg2", "ss_fi_tg3"] },
+  { emoji: "👥", categoryKey: "ss_fg_social", itemKeys: ["ss_fi_soc1"] },
+  { emoji: "🚨", categoryKey: "ss_fg_authority", itemKeys: ["ss_fi_auth1", "ss_fi_auth2", "ss_fi_auth3"], isFatal: true },
+  { emoji: "🔑", categoryKey: "ss_fg_sensitive", itemKeys: ["ss_fi_sens1", "ss_fi_sens2"], isFatal: true },
+  { emoji: "🛡️", categoryKey: "ss_fg_trust", itemKeys: ["ss_fi_trust1"] },
+  { emoji: "🍀", categoryKey: "ss_fg_promise", itemKeys: ["ss_fi_prom1"] },
 ];
 
 export default function SafetyShieldDemo() {
   const { country, language, region } = useLocale();
+  const t = useT();
   const [activeTab, setActiveTab] = useState<SubmoduleType>('valuation');
   const [appState, setAppState] = useState<AppState>('upload');
 
@@ -106,7 +60,7 @@ export default function SafetyShieldDemo() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // --- States for scam check module ---
-  const [selectedFlags, setSelectedFlags] = useState<string[]>([]);
+  const [selectedFlags, setSelectedFlags] = useState<StringKey[]>([]);
   const [scamText, setScamText] = useState('');
   const [scamFile, setScamFile] = useState<File | null>(null);
   const [scamFilePreview, setScamFilePreview] = useState<string | null>(null);
@@ -130,7 +84,7 @@ export default function SafetyShieldDemo() {
     }
   };
 
-  const toggleFlag = (flag: string) => {
+  const toggleFlag = (flag: StringKey) => {
     setSelectedFlags(prev =>
       prev.includes(flag) ? prev.filter(f => f !== flag) : [...prev, flag]
     );
@@ -160,14 +114,14 @@ export default function SafetyShieldDemo() {
       setAppState('result');
     } catch (err) {
       console.error(err);
-      alert('防坑诊断失败，请重试');
+      alert(t('ss_diag_fail'));
       setAppState('upload');
     }
   };
 
   const submitScamCheck = async () => {
     if (selectedFlags.length === 0 && !scamText.trim() && !scamFile) {
-      alert('请至少勾选任意红旗项、填写可疑段落或上传聊天截图才能诊断哦');
+      alert(t('ss_scam_need'));
       return;
     }
     setAppState('analyzing');
@@ -176,7 +130,7 @@ export default function SafetyShieldDemo() {
       const formData = new FormData();
       if (scamFile) formData.append('image', scamFile);
       if (scamText.trim()) formData.append('scamText', scamText);
-      formData.append('flags', JSON.stringify(selectedFlags));
+      formData.append('flags', JSON.stringify(selectedFlags.map(k => t(k))));
       formData.append('country', country);
       formData.append('language', language);
       formData.append('region', region);
@@ -193,7 +147,7 @@ export default function SafetyShieldDemo() {
       setAppState('result');
     } catch (err) {
       console.error(err);
-      alert('反诈会诊失败，请重试');
+      alert(t('ss_scam_fail'));
       setAppState('upload');
     }
   };
@@ -237,7 +191,7 @@ export default function SafetyShieldDemo() {
       ctx.fillText('Owner is in UK, send Western Union', 50, 180);
       ctx.fillText('first to secure keys and contract.', 50, 220);
       
-      setTextInfo('房东说他目前在英国工作，无法带我实地看房。他要求我先通过西联汇款（Western Union）给他打 1000 澳币押金锁房，之后把钥匙和正规合同邮寄给我。但在CBD繁华地段每周只有 $200，是不是有点不寻常？');
+      setTextInfo(t('ss_sample_rent_text'));
     } else {
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(20, 20, 560, 400);
@@ -248,7 +202,7 @@ export default function SafetyShieldDemo() {
       ctx.fillText('Good condition. Cash or Transfer.', 50, 120);
       ctx.fillText('Pick up only.', 50, 160);
       
-      setTextInfo('在Facebook Marketplace上看到一架九成新微波炉，卖家要价 80 刀自提。这二手价格划算吗？不知道澳洲全新基础款大概什么行情？');
+      setTextInfo(t('ss_sample_item_text'));
     }
 
     canvas.toBlob((blob) => {
@@ -275,32 +229,32 @@ export default function SafetyShieldDemo() {
           bg: 'bg-[#FFF4F2]', 
           border: 'border-[#FEE6E3]', 
           text: 'text-[#D84C3E]', 
-          icon: <ShieldAlert size={24} />, 
-          label: '极高风险 / 骗局高发' 
+          icon: <ShieldAlert size={24} />,
+          label: t('ss_risk_red')
         };
       case 'yellow': 
         return { 
           bg: 'bg-[#FFF9F0]', 
           border: 'border-[#FBEAC8]', 
           text: 'text-[#D48806]', 
-          icon: <ShieldAlert size={24} />, 
-          label: '中度嫌疑 / 溢价可能' 
+          icon: <ShieldAlert size={24} />,
+          label: t('ss_risk_yellow')
         };
       case 'green': 
         return { 
           bg: 'bg-[#F2FBF5]', 
           border: 'border-[#E0F4E8]', 
           text: 'text-[#1d1d1f]', 
-          icon: <ShieldCheck size={24} />, 
-          label: '相对安全 / 正规合理' 
+          icon: <ShieldCheck size={24} />,
+          label: t('ss_risk_green')
         };
       default: 
         return { 
           bg: 'bg-gray-50', 
           border: 'border-gray-200', 
           text: 'text-gray-500', 
-          icon: <ShieldCheck size={24} />, 
-          label: '暂无异常' 
+          icon: <ShieldCheck size={24} />,
+          label: t('ss_risk_none')
         };
     }
   };
@@ -316,9 +270,9 @@ export default function SafetyShieldDemo() {
           <p className="text-gray-500 text-sm font-bold tracking-widest uppercase font-mono">SAFETY SHIELD</p>
         </div>
         <h2 className="text-3xl md:text-4xl font-extrabold text-[#1d1d1f] leading-tight font-display">
-          防诈防坑安全盾
+          {t('ss_title')}
         </h2>
-        <p className="text-[#3C4D43] text-sm mt-1">海外新移民的全能排雷盾牌。扫房源租房套路、估算二手物价，深度反诈安心自检。</p>
+        <p className="text-[#3C4D43] text-sm mt-1">{t('ss_subtitle')}</p>
       </div>
 
       <div className="flex flex-col relative z-10 w-full">
@@ -336,7 +290,7 @@ export default function SafetyShieldDemo() {
                     : 'text-gray-500 hover:text-gray-900'
                 }`}
               >
-                🏠 房源与好物估值
+                {t('ss_tab_valuation')}
               </button>
               <button
                 onClick={() => setActiveTab('scamCheck')}
@@ -346,7 +300,7 @@ export default function SafetyShieldDemo() {
                     : 'text-gray-500 hover:text-gray-900'
                 }`}
               >
-                🛡️ 反诈自检
+                {t('ss_tab_scam')}
               </button>
             </div>
           )}
@@ -361,7 +315,7 @@ export default function SafetyShieldDemo() {
                 exit={{ opacity: 0, y: -10 }}
                 className="flex-1 flex flex-col justify-center"
               >
-                <div className="text-sm font-bold text-gray-500 mb-4 font-display">第一步：上传估价线索 (截屏或具体描述)</div>
+                <div className="text-sm font-bold text-gray-500 mb-4 font-display">{t('ss_step1')}</div>
                 
                 <div className="flex flex-col md:flex-row gap-4 mb-6 flex-1">
                   {/* Image Upload Box */}
@@ -377,8 +331,8 @@ export default function SafetyShieldDemo() {
                         <div className="w-14 h-14 bg-white shadow-sm border border-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-105 transition-transform animate-pulse">
                           <Camera className="text-gray-400 group-hover:text-[#ff5a3c] transition-colors" size={24} />
                         </div>
-                        <p className="text-gray-600 text-sm font-medium">拖入或上传聊天截图 / 租房广告 / 二手机报价单</p>
-                        <p className="text-gray-400 text-xs mt-1">支持常见图片格式（如 WhatsApp，Marketplace 截图等）</p>
+                        <p className="text-gray-600 text-sm font-medium">{t('ss_drop_hint')}</p>
+                        <p className="text-gray-400 text-xs mt-1">{t('ss_drop_formats')}</p>
                       </div>
                     )}
                   </div>
@@ -388,24 +342,24 @@ export default function SafetyShieldDemo() {
                     <div className="flex items-center justify-between text-gray-400 mb-2">
                       <div className="flex items-center space-x-2">
                         <FileText size={16} />
-                        <span className="text-xs font-bold uppercase tracking-wider font-mono">补充背景描述 / 对方说辞</span>
+                        <span className="text-xs font-bold uppercase tracking-wider font-mono">{t('ss_bg_desc')}</span>
                       </div>
                     </div>
                     <textarea 
                       className="flex-1 w-full bg-transparent resize-none focus:outline-none text-sm text-gray-700 min-h-[80px]"
-                      placeholder="例：“房东叫我先电汇订金锁看房钥匙，说定金可以全额退款合理吗？” 或 “微波炉要 $80 同城去提，Kmart 全新的怎么卖？”..."
+                      placeholder={t('ss_valuation_ph')}
                       value={textInfo}
                       onChange={e => setTextInfo(e.target.value)}
                     ></textarea>
                     
                     <div className="mt-4 pt-4 border-t border-gray-100">
-                      <div className="text-[10px] font-bold text-gray-400 mb-2 font-mono">一键快速载入经典案例：</div>
+                      <div className="text-[10px] font-bold text-gray-400 mb-2 font-mono">{t('ss_load_classic')}</div>
                       <div className="flex flex-col gap-2">
                         <button onClick={() => loadExample('rent')} className="text-xs text-left bg-gray-50 hover:bg-[#ff5a3c]/10 text-gray-600 hover:text-[#1d1d1f] p-2.5 rounded-xl transition-colors truncate border border-gray-100 font-medium">
-                          🏠 “房东在英国，让西联打定金...” (租房骗局)
+                          {t('ss_sample_rent_label')}
                         </button>
                         <button onClick={() => loadExample('item')} className="text-xs text-left bg-gray-50 hover:bg-[#ff5a3c]/10 text-gray-600 hover:text-[#1d1d1f] p-2.5 rounded-xl transition-colors truncate border border-gray-100 font-medium">
-                          📺 “二手微波炉 Marketplace 喊价 $80 划算吗？”
+                          {t('ss_sample_item_label')}
                         </button>
                       </div>
                     </div>
@@ -417,7 +371,7 @@ export default function SafetyShieldDemo() {
                   disabled={!file && !textInfo.trim()}
                   className={`w-full py-4 rounded-xl font-bold flex justify-center items-center space-x-2 transition-all ${file || textInfo.trim() ? 'bg-[#1d1d1f] hover:bg-[#254839] text-[#ff5a3c] shadow-lg active:scale-95' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
                 >
-                  <span>全网大数据比对与防坑诊断</span>
+                  <span>{t('ss_diagnose')}</span>
                   <ArrowRight size={18} />
                 </button>
               </motion.div>
@@ -433,7 +387,7 @@ export default function SafetyShieldDemo() {
                 className="flex-1 flex flex-col justify-center"
               >
                 <div className="text-sm font-bold text-gray-500 mb-4 font-display">
-                  请勾选您当前遇到的可疑特征（支持多选，若命中致命红旗，AI 将强力介入预警）：
+                  {t('ss_checklist_header')}
                 </div>
 
                 {/* Grid of group checklists */}
@@ -448,16 +402,16 @@ export default function SafetyShieldDemo() {
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <h4 className="text-xs font-bold text-gray-700 tracking-wide">{group.category}</h4>
+                        <h4 className="text-xs font-bold text-gray-700 tracking-wide">{group.emoji} {t(group.categoryKey)}</h4>
                         {group.isFatal && (
                           <span className="bg-[#D84C3E] text-white text-[9px] px-1.5 py-0.5 rounded-md font-bold tracking-widest uppercase">
-                            致命红旗
+                            {t('ss_fatal')}
                           </span>
                         )}
                       </div>
                       <div className="space-y-1.5">
-                        {group.items.map((item, itemIdx) => {
-                          const isChecked = selectedFlags.includes(item);
+                        {group.itemKeys.map((itemKey, itemIdx) => {
+                          const isChecked = selectedFlags.includes(itemKey);
                           return (
                             <label 
                               key={itemIdx}
@@ -470,10 +424,10 @@ export default function SafetyShieldDemo() {
                               <input 
                                 type="checkbox"
                                 checked={isChecked}
-                                onChange={() => toggleFlag(item)}
+                                onChange={() => toggleFlag(itemKey)}
                                 className="mt-0.5 rounded border-stone-300 text-[#1d1d1f] focus:ring-[#1d1d1f] accent-[#1d1d1f]"
                               />
-                              <span className="leading-snug">{item}</span>
+                              <span className="leading-snug">{t(itemKey)}</span>
                             </label>
                           );
                         })}
@@ -496,8 +450,8 @@ export default function SafetyShieldDemo() {
                       ) : (
                         <div className="text-center p-2">
                           <Camera className="text-gray-400 group-hover:text-[#ff5a3c] transition-colors mx-auto mb-2" size={20} />
-                          <p className="text-gray-600 text-[11px] font-semibold">上传短信/微信/WhatsApp聊天截屏</p>
-                          <p className="text-gray-400 text-[10px] mt-0.5">可直接识图中高危话术字眼</p>
+                          <p className="text-gray-600 text-[11px] font-semibold">{t('ss_upload_chat')}</p>
+                          <p className="text-gray-400 text-[10px] mt-0.5">{t('ss_img_hint')}</p>
                         </div>
                       )}
                     </div>
@@ -507,11 +461,11 @@ export default function SafetyShieldDemo() {
                   <div className="flex-1 border border-gray-200 rounded-2xl bg-white p-4 focus-within:border-[#ff5a3c] focus-within:ring-2 ring-[#ff5a3c]/10 transition-all flex flex-col min-h-[140px]">
                     <div className="flex items-center space-x-1.5 text-gray-400 mb-1.5">
                       <FileText size={14} />
-                      <span className="text-[10px] font-bold uppercase tracking-wider font-mono">粘贴可疑文字信息 / 电话大意</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider font-mono">{t('ss_paste_text')}</span>
                     </div>
                     <textarea 
                       className="flex-1 w-full bg-transparent resize-none focus:outline-none text-xs text-gray-700 min-h-[70px]"
-                      placeholder="如果对方向你索要汇款，或是自称澳洲邮政（AusPost）、中国大使馆、海关，请在此粘贴对方的信息或致电的核心要求..."
+                      placeholder={t('ss_scam_paste_ph')}
                       value={scamText}
                       onChange={e => setScamText(e.target.value)}
                     ></textarea>
@@ -527,7 +481,7 @@ export default function SafetyShieldDemo() {
                       : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                   }`}
                 >
-                  <span>🚀 启动国际反诈 AI 深度会诊</span>
+                  <span>{t('ss_scam_submit')}</span>
                   <ArrowRight size={18} />
                 </button>
               </motion.div>
@@ -545,12 +499,12 @@ export default function SafetyShieldDemo() {
               >
                 <div className="w-16 h-16 border-4 border-[#ff5a3c]/20 border-t-[#ff5a3c] rounded-full animate-spin mb-6"></div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2 font-display">
-                  {activeTab === 'scamCheck' ? '反诈安全官 AI 正在深度会诊' : '防诈安全盾 正在深度研判'}
+                  {activeTab === 'scamCheck' ? t('ss_analyzing_scam') : t('ss_analyzing_val')}
                 </h3>
                 <p className="text-[#3C4D43] text-sm leading-relaxed max-w-sm">
-                  {activeTab === 'scamCheck' 
-                    ? '正在调用 Google Search 联动澳洲诈骗预防监察网 (Scamwatch) 的最新通报，深度判定当前情况是否属于高频已知骗局...'
-                    : '正在调用实时智能技术，查询 Kmart、IKEA、Target 等本地连锁零售店的相关对标物价，全面规避溢价圈套中...'
+                  {activeTab === 'scamCheck'
+                    ? t('ss_analyzing_scam_desc')
+                    : t('ss_analyzing_val_desc')
                   }
                 </p>
               </motion.div>
@@ -566,7 +520,7 @@ export default function SafetyShieldDemo() {
               >
                 <div className="flex justify-between items-start mb-6">
                   <button onClick={reset} className="text-xs font-bold text-gray-400 hover:text-gray-900 flex items-center space-x-1 border border-gray-100 hover:border-gray-300 py-1.5 px-3 rounded-lg bg-gray-50 transition-colors">
-                    <span>← 返回重新排雷</span>
+                    <span>← {t('ss_back_demine')}</span>
                   </button>
                   
                   {/* Risk Badge */}
@@ -588,7 +542,7 @@ export default function SafetyShieldDemo() {
                 {/* Red Flags / Specific Checks */}
                 {analysis.redFlags && analysis.redFlags.length > 0 && (
                   <div className="mb-6">
-                    <div className="text-xs font-bold text-gray-400 tracking-widest mb-3 uppercase font-mono">🔍 安全诊断细节：</div>
+                    <div className="text-xs font-bold text-gray-400 tracking-widest mb-3 uppercase font-mono">{t('ss_diag_detail')}</div>
                     <ul className="space-y-3">
                       {analysis.redFlags.map((flag, idx) => (
                         <li key={idx} className="flex items-start space-x-3 text-sm text-gray-700 bg-gray-50 p-4 rounded-2xl border border-gray-100">
@@ -606,16 +560,16 @@ export default function SafetyShieldDemo() {
                 {analysis.valueCheck?.wittyComparison && (
                   <div className="mt-4">
                     <div className="bg-[#1d1d1f] text-white p-6 rounded-2xl shadow-xl relative overflow-hidden">
-                      <div className="absolute top-0 right-0 bg-[#ff5a3c] text-[#1d1d1f] text-[10px] font-bold px-3 py-1 rounded-bl-xl tracking-wider font-mono">物价体感换算</div>
+                      <div className="absolute top-0 right-0 bg-[#ff5a3c] text-[#1d1d1f] text-[10px] font-bold px-3 py-1 rounded-bl-xl tracking-wider font-mono">{t('ss_price_feel')}</div>
                       
                       <div className="flex justify-between items-end mb-4">
                         <div>
-                          <div className="text-white/50 text-xs mb-1">估值对标折合约</div>
+                          <div className="text-white/50 text-xs mb-1">{t('ss_value_equiv')}</div>
                           <div className="text-2xl font-bold font-display">{analysis.valueCheck.rmbEquivalent || "￥-"}</div>
                         </div>
                         {analysis.valueCheck.localPrice && (
                           <div className="text-right">
-                            <div className="text-white/50 text-xs mb-1">澳洲实体零售参考价</div>
+                            <div className="text-white/50 text-xs mb-1">{getCountryName(country, language)} {t('ss_retail_label')}</div>
                             <div className="text-sm font-semibold text-[#ff5a3c] font-mono">{analysis.valueCheck.localPrice}</div>
                           </div>
                         )}
@@ -644,7 +598,7 @@ export default function SafetyShieldDemo() {
               >
                 <div className="flex justify-between items-start mb-6">
                   <button onClick={reset} className="text-xs font-bold text-gray-400 hover:text-gray-900 flex items-center space-x-1 border border-gray-100 hover:border-gray-300 py-1.5 px-3 rounded-lg bg-gray-50 transition-colors">
-                    <span>← 返回重新评估</span>
+                    <span>← {t('ss_back_reassess')}</span>
                   </button>
                   
                   {/* Risk Badge */}
@@ -662,7 +616,7 @@ export default function SafetyShieldDemo() {
                     </span>
                     <div>
                       <div className={`text-xs font-bold uppercase tracking-widest font-mono ${getRiskUI(scamAnalysis.riskLevel).text}`}>
-                        系统评估报告 ｜ RISK INTENSITY
+                        {t('ss_risk_report')}
                       </div>
                       <div className="text-lg font-bold text-gray-900 mt-1 leading-snug font-display">
                         {scamAnalysis.scamProbability}
@@ -683,7 +637,7 @@ export default function SafetyShieldDemo() {
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
                           <span className="text-[26px] font-extrabold leading-none" style={{ color: col }}>{pct}%</span>
-                          <span className="text-[10px] font-bold text-gray-400 mt-1">诈骗概率</span>
+                          <span className="text-[10px] font-bold text-gray-400 mt-1">{t('ss_scam_prob')}</span>
                         </div>
                       </div>
                     );
@@ -699,7 +653,7 @@ export default function SafetyShieldDemo() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                   {/* Danger explanations */}
                   <div className="flex flex-col">
-                    <div className="text-xs font-bold text-gray-400 tracking-widest mb-3 uppercase font-mono">⛔️ 欺诈深度揭露 (套路剖析)：</div>
+                    <div className="text-xs font-bold text-gray-400 tracking-widest mb-3 uppercase font-mono">{t('ss_fraud_reveal')}</div>
                     <div className="space-y-3 flex-1">
                       {scamAnalysis.whyDangerous.map((why, idx) => (
                         <div key={idx} className="flex items-start space-x-2.5 text-xs md:text-sm text-gray-750 bg-stone-50 p-4 rounded-2xl border border-stone-200/50 leading-relaxed font-normal">
@@ -712,7 +666,7 @@ export default function SafetyShieldDemo() {
 
                   {/* Actions checklist */}
                   <div className="flex flex-col">
-                    <div className="text-xs font-bold text-gray-400 tracking-widest mb-3 uppercase font-mono">💡 避坑专家安全指令：</div>
+                    <div className="text-xs font-bold text-gray-400 tracking-widest mb-3 uppercase font-mono">{t('ss_expert_cmd')}</div>
                     <div className="space-y-3 flex-1">
                       {scamAnalysis.whatToDo.map((action, idx) => (
                         <div key={idx} className="flex items-start space-x-3 text-xs md:text-sm text-gray-800 bg-[#FFFCE6]/40 p-4 rounded-2xl border border-[#FFF9CC]/80 leading-relaxed">
@@ -728,7 +682,7 @@ export default function SafetyShieldDemo() {
                 <div className="bg-[#1d1d1f] text-white p-5 rounded-3xl border border-[#234335] mt-6 relative overflow-hidden shadow-md">
                   <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-[#ff5a3c]/10 rounded-full blur-2xl pointer-events-none"></div>
                   <div className="text-xs font-bold text-[#ff5a3c] mb-1 px-2.5 py-0.5 bg-white/15 rounded-md inline-block uppercase tracking-wider font-mono">
-                    🌟 留学生心理安抚线长
+                    {t('ss_psych_line')}
                   </div>
                   <p className="text-xs md:text-sm text-stone-100 font-normal leading-relaxed mt-2 pl-1">
                     {scamAnalysis.reassurance}

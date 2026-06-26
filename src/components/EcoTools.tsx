@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Camera, Languages, ArrowRightLeft, Loader2, Copy, Check } from 'lucide-react';
 import { useLocale, getCountryContent } from '../lib/locale';
+import { useT } from '../lib/i18n';
 import GroundingSources, { Grounding } from './GroundingSources';
 
 // Likely "home" currency by the user's chosen language (immigrant source).
@@ -18,6 +19,7 @@ type PhotoResult = {
 
 export default function EcoTools() {
   const { country, language } = useLocale();
+  const t = useT();
   const content = getCountryContent(country);
 
   // --- Photo translate ---
@@ -110,9 +112,9 @@ export default function EcoTools() {
       <div className="bg-white border border-hairline rounded-3xl p-6 flex flex-col">
         <div className="flex items-center gap-2 mb-1">
           <span className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center"><Languages size={18} /></span>
-          <h3 className="font-display text-xl text-ink">拍照翻译</h3>
+          <h3 className="font-display text-xl text-ink">{t('et_photo_title')}</h3>
         </div>
-        <p className="text-xs text-muted mb-4">拍下看不懂的路牌、菜单、信件或屏幕，Gemini 立刻识别并翻译成你的母语。</p>
+        <p className="text-xs text-muted mb-4">{t('et_photo_desc')}</p>
 
         <input type="file" accept="image/*" ref={fileInputRef} onChange={onPick} className="hidden" />
         <button
@@ -124,7 +126,7 @@ export default function EcoTools() {
           ) : (
             <span className="flex flex-col items-center text-muted-soft">
               <Camera size={28} className="mb-2" />
-              <span className="text-xs font-medium">点击拍照 / 上传图片</span>
+              <span className="text-xs font-medium">{t('et_photo_pick')}</span>
             </span>
           )}
         </button>
@@ -134,30 +136,30 @@ export default function EcoTools() {
           disabled={!file || translating}
           className={`w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${file && !translating ? 'bg-primary hover:bg-primary-active text-on-primary' : 'bg-surface-strong text-muted-soft cursor-not-allowed'}`}
         >
-          {translating ? <><Loader2 size={16} className="animate-spin" /> 识别翻译中…</> : <>翻译这张图</>}
+          {translating ? <><Loader2 size={16} className="animate-spin" /> {t('et_photo_translating')}</> : <>{t('et_photo_translate_btn')}</>}
         </button>
 
-        {photoError && <p className="text-xs text-error mt-3">翻译失败，请换一张更清晰的图片重试。</p>}
+        {photoError && <p className="text-xs text-error mt-3">{t('et_photo_fail')}</p>}
 
         {photoResult && (
           <div className="mt-4 space-y-3 animate-in fade-in duration-300">
             {photoResult.detectedLanguage && (
               <span className="inline-block text-[11px] font-semibold text-muted bg-surface-soft border border-hairline rounded-full px-2.5 py-1">
-                识别语言：{photoResult.detectedLanguage}
+                {t('et_photo_detected')}{photoResult.detectedLanguage}
               </span>
             )}
             {photoResult.originalText && (
               <div>
-                <div className="text-[10px] font-bold text-muted-soft uppercase tracking-wider mb-1">原文</div>
+                <div className="text-[10px] font-bold text-muted-soft uppercase tracking-wider mb-1">{t('et_photo_original')}</div>
                 <p className="text-xs text-body bg-surface-soft rounded-xl p-3 leading-relaxed whitespace-pre-wrap">{photoResult.originalText}</p>
               </div>
             )}
             {photoResult.translation && (
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <div className="text-[10px] font-bold text-primary uppercase tracking-wider">译文</div>
+                  <div className="text-[10px] font-bold text-primary uppercase tracking-wider">{t('et_photo_translation')}</div>
                   <button onClick={copyTranslation} className="text-[10px] font-bold text-muted hover:text-ink flex items-center gap-1">
-                    {copied ? <><Check size={12} /> 已复制</> : <><Copy size={12} /> 复制</>}
+                    {copied ? <><Check size={12} /> {t('et_copied')}</> : <><Copy size={12} /> {t('et_copy')}</>}
                   </button>
                 </div>
                 <p className="text-sm text-ink bg-primary/5 border border-primary/15 rounded-xl p-3 leading-relaxed whitespace-pre-wrap">{photoResult.translation}</p>
@@ -174,11 +176,11 @@ export default function EcoTools() {
       <div className="bg-white border border-hairline rounded-3xl p-6 flex flex-col">
         <div className="flex items-center gap-2 mb-1">
           <span className="w-8 h-8 rounded-xl bg-accent-teal/15 text-accent-teal flex items-center justify-center"><ArrowRightLeft size={18} /></span>
-          <h3 className="font-display text-xl text-ink">实时汇率换算</h3>
+          <h3 className="font-display text-xl text-ink">{t('et_fx_title')}</h3>
         </div>
-        <p className="text-xs text-muted mb-4">Gemini 联网查询当前牌价（非记忆），帮你秒算到手价、避免被坑。</p>
+        <p className="text-xs text-muted mb-4">{t('et_fx_desc')}</p>
 
-        <label className="text-[10px] font-bold text-muted-soft uppercase tracking-wider mb-1.5">金额</label>
+        <label className="text-[10px] font-bold text-muted-soft uppercase tracking-wider mb-1.5">{t('et_fx_amount')}</label>
         <input
           type="number"
           value={amount}
@@ -188,16 +190,16 @@ export default function EcoTools() {
 
         <div className="flex items-end gap-2 mb-4">
           <div className="flex-1">
-            <label className="text-[10px] font-bold text-muted-soft uppercase tracking-wider mb-1.5 block">从</label>
+            <label className="text-[10px] font-bold text-muted-soft uppercase tracking-wider mb-1.5 block">{t('et_fx_from')}</label>
             <select value={fromCcy} onChange={(e) => { setFromCcy(e.target.value); setRate(null); }} className="w-full bg-surface-soft border border-hairline rounded-xl px-3 py-2.5 text-sm font-semibold text-ink cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/40">
               {CCY_OPTIONS.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
-          <button onClick={swap} title="互换" className="mb-1 w-10 h-10 shrink-0 rounded-xl bg-surface-soft border border-hairline text-muted hover:text-primary hover:border-primary flex items-center justify-center">
+          <button onClick={swap} title={t('et_fx_swap')} className="mb-1 w-10 h-10 shrink-0 rounded-xl bg-surface-soft border border-hairline text-muted hover:text-primary hover:border-primary flex items-center justify-center">
             <ArrowRightLeft size={16} />
           </button>
           <div className="flex-1">
-            <label className="text-[10px] font-bold text-muted-soft uppercase tracking-wider mb-1.5 block">到</label>
+            <label className="text-[10px] font-bold text-muted-soft uppercase tracking-wider mb-1.5 block">{t('et_fx_to')}</label>
             <select value={toCcy} onChange={(e) => { setToCcy(e.target.value); setRate(null); }} className="w-full bg-surface-soft border border-hairline rounded-xl px-3 py-2.5 text-sm font-semibold text-ink cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/40">
               {CCY_OPTIONS.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
@@ -209,10 +211,10 @@ export default function EcoTools() {
           disabled={fxLoading}
           className={`w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${!fxLoading ? 'bg-ink hover:bg-black text-on-dark' : 'bg-surface-strong text-muted-soft cursor-not-allowed'}`}
         >
-          {fxLoading ? <><Loader2 size={16} className="animate-spin" /> 查询实时牌价…</> : <>查询实时汇率</>}
+          {fxLoading ? <><Loader2 size={16} className="animate-spin" /> {t('et_fx_querying')}</> : <>{t('et_fx_query_btn')}</>}
         </button>
 
-        {fxError && <p className="text-xs text-error mt-3">汇率查询失败，请稍后重试。</p>}
+        {fxError && <p className="text-xs text-error mt-3">{t('et_fx_fail')}</p>}
 
         {converted != null && (
           <div className="mt-4 bg-surface-soft border border-hairline rounded-2xl p-5 text-center animate-in fade-in duration-300">
@@ -220,9 +222,9 @@ export default function EcoTools() {
               {converted.toLocaleString(undefined, { maximumFractionDigits: 2 })} <span className="text-lg text-muted">{toCcy}</span>
             </div>
             <div className="text-xs text-muted mt-1.5">
-              {amount} {fromCcy} ≈ 上述金额　·　1 {fromCcy} = {rate?.toLocaleString(undefined, { maximumFractionDigits: 4 })} {toCcy}
+              {amount} {fromCcy} ≈ {t('et_fx_above_amount')}　·　1 {fromCcy} = {rate?.toLocaleString(undefined, { maximumFractionDigits: 4 })} {toCcy}
             </div>
-            {asOf && <div className="text-[10px] text-muted-soft mt-1">🔎 实时来源更新：{asOf}</div>}
+            {asOf && <div className="text-[10px] text-muted-soft mt-1">🔎 {t('et_fx_as_of')}{asOf}</div>}
           </div>
         )}
 
