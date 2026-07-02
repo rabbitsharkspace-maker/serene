@@ -3,6 +3,7 @@ import { Mic, Phone, MapPin, AlertCircle, Volume2, ShieldAlert, BookOpen, Sparkl
 import { motion, AnimatePresence } from 'motion/react';
 import { useLocale, getCountryContent, getCountryName, getInterpreterName } from '../lib/locale';
 import { useT, type StringKey } from '../lib/i18n';
+import FallbackNotice from './FallbackNotice';
 
 interface CheatsheetType {
   titleKey: StringKey;
@@ -232,6 +233,7 @@ export default function EmergencyAidDemo() {
     chineseTalk: string;
     actions: string[];
     tisTips: string;
+    isQuotaFallback?: boolean;
   } | null>(null);
   const [ttsPlaying, setTtsPlaying] = useState(false);
 
@@ -255,6 +257,7 @@ export default function EmergencyAidDemo() {
           chineseTalk: data.chineseTalk,
           actions: data.actions || [],
           tisTips: data.tisTips,
+          isQuotaFallback: !!data.isQuotaFallback,
         });
       } else {
         throw new Error(data.error || "Generation error");
@@ -265,16 +268,17 @@ export default function EmergencyAidDemo() {
       const s = scenarioText.toLowerCase();
       let fallback = {
         scenarioTitle: t('ea_fb_title'),
-        englishTalk: `I am in danger! Please send immediate rescue to ${content.sampleAddress}. I need a ${interpreter} interpreter!`,
+        englishTalk: `I am in danger! Please send immediate rescue to [your address]. I need a ${interpreter} interpreter!`,
         chineseTalk: t('ea_fb_meaning'),
         actions: [t('ea_fb_act1'), t('ea_fb_act2'), t('ea_fb_act3')],
-        tisTips: t('ea_fb_tips')
+        tisTips: t('ea_fb_tips'),
+        isQuotaFallback: true
       };
       
       if (s.includes("撬门") || s.includes("闯入") || s.includes("砸门") || s.includes("小偷") || s.includes("强行") || s.includes("入室")) {
         fallback.scenarioTitle = "住宅遭到暴力侵入安全威胁 (Home Intrusion)";
-        fallback.englishTalk = "Help! Someone is breaking into my room right now! There is an active intruder! I need police. Address: 123 Swanston St, Melbourne.";
-        fallback.chineseTalk = "抓人！有人正强行砸门撬锁闯入我的房间！现场有现行入侵者！我需要警察。地址：123 Swanston St, Melbourne。";
+        fallback.englishTalk = "Help! Someone is breaking into my room right now! There is an active intruder! I need police. Address: [your address].";
+        fallback.chineseTalk = "抓人！有人正强行砸门撬锁闯入我的房间！现场有现行入侵者！我需要警察。地址：【你的地址】。";
         fallback.actions = [
           "一、在入侵者还在防盗门外砸门时，立刻反锁房门并搬椅子、重物柜物理堵死门框！",
           "二、迅速关闭房灯，寻找结实掩体（床底或衣柜处），蹲身防守屏息静候！",
@@ -282,8 +286,8 @@ export default function EmergencyAidDemo() {
         ];
       } else if (s.includes("抢") || s.includes("打人") || s.includes("殴打") || s.includes("暴力") || s.includes("尾随") || s.includes("跟踪")) {
         fallback.scenarioTitle = "遭受当街斗殴 / 袭击 / 跟踪尾随 (Assault & Robbery)";
-        fallback.englishTalk = "I was just assaulted and followed on the street by a suspect. I need immediate police support at 123 Swanston St.";
-        fallback.chineseTalk = "我刚刚在街头遭到了人身尾随追踪和暴力打人袭击，我需要警察立即到场。定位在：123 Swanston St 附近。";
+        fallback.englishTalk = "I was just assaulted and followed on the street by a suspect. I need immediate police support at [your address].";
+        fallback.chineseTalk = "我刚刚在街头遭到了人身尾随追踪和暴力打人袭击，我需要警察立即到场。定位在：【你的地址】附近。";
         fallback.actions = [
           "一、立刻快步撤退向有公共监控、安保或路人密集的明亮正规商店（如7-11或中餐馆）！",
           "二、若面临财物胁迫，切记生命安全永远第一，顺势丢出钱包吸引罪犯目标，折身反跑！",
@@ -291,8 +295,8 @@ export default function EmergencyAidDemo() {
         ];
       } else if (s.includes("火") || s.includes("烟") || s.includes("爆炸") || s.includes("燃烧") || s.includes("起火")) {
         fallback.scenarioTitle = "住宅引发火灾 / 绝火断道 / 浓烟逃生 (Active Fire)";
-        fallback.englishTalk = "A fire broke out at my apartment, there is thick smoke trapped! Send a fire brigade. I am at 123 Swanston St.";
-        fallback.chineseTalk = "我的套房里现在引发了大火并产生了浓重毒烟，请火速派遣消防局救援队！我目前在 123 Swanston St。";
+        fallback.englishTalk = "A fire broke out at my apartment, there is thick smoke trapped! Send a fire brigade. I am at [your address].";
+        fallback.chineseTalk = "我的套房里现在引发了大火并产生了浓重毒烟，请火速派遣消防局救援队！我目前在【你的地址】。";
         fallback.actions = [
           "一、如果走道全是黑烟，立刻拨下毛巾床单一股脑全部浸冷水湿捂口鼻，压低身子、猫腰匍匐贴地逃生！",
           "二、手心贴门板测温，若发现楼下门把手已经发烫烫手，切莫开门！",
@@ -300,8 +304,8 @@ export default function EmergencyAidDemo() {
         ];
       } else if (s.includes("晕") || s.includes("窒息") || s.includes("过敏") || s.includes("病") || s.includes("血") || s.includes("伤") || s.includes("痛")) {
         fallback.scenarioTitle = "急性严重爆发伤病 / 休克晕厥 / 呼吸急停 (Medical Trauma)";
-        fallback.englishTalk = "Emergency! Someone has collapsed and has severe breathing difficulty. Please send ambulance to 123 Swanston St, Melbourne.";
-        fallback.chineseTalk = "紧急情况！这里有人突然晕厥跌倒，大口残重呼吸困难！请急速调派救护车到 123 Swanston St, Melbourne。";
+        fallback.englishTalk = "Emergency! Someone has collapsed and has severe breathing difficulty. Please send ambulance to [your address].";
+        fallback.chineseTalk = "紧急情况！这里有人突然晕厥跌倒，大口残重呼吸困难！请急速调派救护车到【你的地址】。";
         fallback.actions = [
           "一、检查呼吸。如果病人尚存气但意识全无，立刻使其保持「侧卧复原体位」保持通调气道！",
           "二、排查急性过敏，寻找 EpiPen 自助注射大腿侧！",
@@ -1168,6 +1172,8 @@ export default function EmergencyAidDemo() {
                           exit={{ opacity: 0 }}
                           className="space-y-4 pt-3 border-t border-gray-100"
                         >
+                          {customOutputs.isQuotaFallback && <FallbackNotice />}
+
                           {/* Title */}
                           <div className="bg-red-50 px-3 py-1.5 rounded-lg border border-red-100 inline-block">
                             <span className="text-xs font-black text-red-700">{t('ea_scenario_eval')}{customOutputs.scenarioTitle}</span>
