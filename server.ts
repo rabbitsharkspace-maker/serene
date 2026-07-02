@@ -10,7 +10,7 @@ const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json());
 
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
 let ai: GoogleGenAI | null = null;
 function getAI() {
@@ -149,7 +149,7 @@ const PRESET_BILL_ANALYSES: Record<string, any> = {
     ],
     englishDraft: {
       intention: "以温和礼貌的语气陈述自己是首次在该区域停车，由于现场限时树枝繁茂遮挡了标志导致未能看清，请求市政厅念在过去3年良好驾驶记录的份上，酌情给予‘警告’以代替罚款。",
-      recipientEmail: "parking@brentmoor.vic.gov.au",
+      recipientEmail: "",
       subject: "Request for Review of Infringement Notice - Objection of Temporary Parking",
       body: `Dear Authorized Officer,
 
@@ -205,7 +205,7 @@ Yours sincerely,
     ],
     englishDraft: {
       intention: "承认因未及时适应海外学业以及严重的身体/精神亚健康（附上医生证明文件），导致上学期成绩不合规。态度诚恳悔过，同时附带了详细的新学期重振计划（Study Plan），坚决请求学校再给予一次在留校察看期（Academic Probation）自证的机会。",
-      recipientEmail: "appeals@westhaven.edu.au",
+      recipientEmail: "",
       subject: "Show Cause Appeal Submission - Detailed Study Plan & Mitigating Circumstances",
       body: `Dear Academic Progress Committee,
 
@@ -262,7 +262,7 @@ Yours sincerely,
     ],
     englishDraft: {
       intention: "依据维州《住宅租赁法 RTA》相关条款，有理有据地指出：地毯无明显顽固污渍，轻微磨损和墙体挂痕在法律框架下属于合理的日常使用旧痕范围，中介需全额返还押金，否则将前往 RTBA 自主发起退租索回并诉诸 VCAT 仲裁。",
-      recipientEmail: "bonds@horizonresidential.com.au",
+      recipientEmail: "",
       subject: "Objection to proposed bond deduction - 4/85 Bourke Street",
       body: `Dear Property Manager,
 
@@ -314,7 +314,7 @@ Yours sincerely,
     ],
     englishDraft: {
       intention: "解释重复率较高主要是对引用规则（Referencing Rules）理解有偏，绝对无主观故意抄袭。表明自己已经整理好了完整的本地草稿痕迹和研究进化线，恳请出席听证会当面说明，并希望能准许只扣减部分成效分、或修改降级。",
-      recipientEmail: "integrity@westhaven.edu.au",
+      recipientEmail: "",
       subject: "Response to Academic Integrity Allegation - ECON101 Assignment 2",
       body: `Dear Academic Integrity Committee,
 
@@ -354,7 +354,7 @@ Yours sincerely,
     ],
     englishDraft: {
       intention: "态度谦和、极其诚恳并真挚地向物业管理和受惊邻里道歉。解释当时是为了给朋友庆祝生日导致无意中声音变大，并做出坚决承诺——以后会在晚上10点前停音或者戴着耳机，消除吵闹，配合Strata安静规则。",
-      recipientEmail: "strata@meridianmanagement.com.au",
+      recipientEmail: "",
       subject: "Response to Noise Warning Letter - Unit 4B, 88 Flinders Lane",
       body: `Dear Meridian Strata Management,
 
@@ -393,7 +393,7 @@ Yours sincerely,
     ],
     englishDraft: {
       intention: "在不承认无信誉违规的基础上陈述由于严重的近期生活变化和特殊财政压力（Hardship），申请加入人道困难资助计划（Hardship Program）。依照各州民生水电公共条例，提出将 $258.30 账单延长到下月，或免去 late fee 后拆成 6 期分期支付。",
-      recipientEmail: "hardship@coastalenergy.com.au",
+      recipientEmail: "",
       subject: "Request for Payment Extension & Hardship Support - Account 9876 543 210",
       body: `Dear Coastal Billing Department,
 
@@ -470,7 +470,7 @@ const GENERAL_BILL_FALLBACK = {
   ],
   englishDraft: {
     intention: "申请延迟、复议与细节对账的留学生通用抗辩信。以礼貌且谦虚的态度陈述自己是努力适应海外生活的国际学生，主张一事一议（Case-by-case review），请求豁免误解造成的滞纳开支。",
-    recipientEmail: "support@service-issuer.gov.au",
+    recipientEmail: "",
     subject: "Urgent Query & Request for Review - Support Assistance Requested",
     body: `Dear Disputes Department Team,
 
@@ -911,7 +911,7 @@ Yours faithfully,
     actionPlan: actionPoints,
     englishDraft: {
       intention: draftIntention,
-      recipientEmail: "support@service-issuer.edu.au",
+      recipientEmail: "",
       subject: emailSubject,
       body: emailBody,
       chineseTranslation: draftChinese
@@ -1294,7 +1294,7 @@ function formatPresetToNewSchema(preset: any, key: string): any {
     actionPlan: preset.actionPlan || (requiredActions ? requiredActions.map(a => a.step) : []),
     englishDraft: preset.englishDraft || {
       intention: "延迟与复审细节对账",
-      recipientEmail: "support@service-issuer.edu.au",
+      recipientEmail: "",
       subject: "Formal Statement & Query for Case Review",
       body: "Draft email...",
       chineseTranslation: "草稿邮件..."
@@ -1483,6 +1483,7 @@ RULES FOR GROUNDING:
 - Cite ONLY official, verified ${country.demonym} sources (government portals, the relevant official Act, accredited universities, ${country.authorities}).
 - Do NOT make up any URLs. If you cannot find a verified link for a required action or user right, leave the url/sourceUrl as an empty string. Only output real, verified links from your Google Search tool results!
 
+Return ONLY one raw JSON object parseable by JSON.parse — no markdown code fences, no preface, no trailing chatter.
 Please output a JSON response matching this schema:
 {
   "documentType": "string (e.g. tenancy_bond_claim, coe_termination, parking_fine, academic_integrity, noise_complaint, utility_arrears)",
@@ -1547,86 +1548,11 @@ Please output a JSON response matching this schema:
         },
       ],
       config: {
-        tools: [{ googleSearch: {} }],
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            documentType: { type: Type.STRING },
-            issuer: {
-              type: Type.OBJECT,
-              properties: {
-                name: { type: Type.STRING },
-                isOfficial: { type: Type.BOOLEAN }
-              },
-              required: ["name", "isOfficial"]
-            },
-            summaryPlain: { type: Type.STRING },
-            deadline: {
-              type: Type.OBJECT,
-              properties: {
-                date: { type: Type.STRING },
-                time: { type: Type.STRING },
-                businessDaysLeft: { type: Type.NUMBER }
-              },
-              required: ["date", "time", "businessDaysLeft"]
-            },
-            amount: {
-              type: Type.OBJECT,
-              properties: {
-                value: { type: Type.NUMBER },
-                currency: { type: Type.STRING }
-              },
-              required: ["value", "currency"]
-            },
-            consequenceIfIgnored: { type: Type.STRING },
-            requiredActions: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  step: { type: Type.STRING },
-                  officialChannel: { type: Type.STRING },
-                  url: { type: Type.STRING }
-                },
-                required: ["step", "officialChannel", "url"]
-              }
-            },
-            userRights: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  claim: { type: Type.STRING },
-                  legalBasis: { type: Type.STRING },
-                  sourceUrl: { type: Type.STRING }
-                },
-                required: ["claim", "legalBasis", "sourceUrl"]
-              }
-            },
-            riskLevel: { type: Type.STRING },
-            confidence: { type: Type.STRING },
-            needsHumanConfirmation: { type: Type.BOOLEAN },
-            disclaimer: { type: Type.STRING },
-            painConversion: { type: Type.STRING },
-            englishDraft: {
-              type: Type.OBJECT,
-              properties: {
-                intention: { type: Type.STRING },
-                recipientEmail: { type: Type.STRING },
-                subject: { type: Type.STRING },
-                body: { type: Type.STRING },
-                chineseTranslation: { type: Type.STRING }
-              },
-              required: ["intention", "recipientEmail", "subject", "body", "chineseTranslation"]
-            }
-          },
-          required: [
-            "documentType", "issuer", "summaryPlain", "deadline", "amount",
-            "consequenceIfIgnored", "requiredActions", "userRights", "riskLevel",
-            "confidence", "needsHumanConfirmation", "disclaimer", "painConversion", "englishDraft"
-          ]
-        }
+        // The Gemini API rejects googleSearch combined with responseMimeType/responseSchema
+        // ("Tool use with a response mime type: 'application/json' is unsupported"), so the
+        // JSON shape is enforced via the prompt and parsed robustly below, like the other
+        // Search-grounded endpoints.
+        tools: [{ googleSearch: {} }]
       }
     }) as any;
 
@@ -1634,9 +1560,11 @@ Please output a JSON response matching this schema:
     if (!text) {
       throw new Error("Empty response from AI");
     }
-    
-    // Strip markdown code block if present
-    text = text.replace(/^```json\s*/, '').replace(/```\s*$/, '').trim();
+
+    // Robust: pull the JSON object out even if the model wraps it in fences or prose.
+    const jsonStart = text.indexOf('{');
+    const jsonEnd = text.lastIndexOf('}');
+    if (jsonStart !== -1 && jsonEnd > jsonStart) text = text.slice(jsonStart, jsonEnd + 1);
 
     const result = JSON.parse(text);
     result._grounding = extractGrounding(response);
@@ -1739,7 +1667,7 @@ Output JSON (DO NOT WRAP IN MARKDOWN BLOCK, JUST RAW JSON):
   } catch (error: any) {
     console.warn("Gemini shield analysis failed, activating robust fallback:", error?.message || error);
     const dynamicFallback = generateDynamicOfflineShield(textInfo || "");
-    return res.json(dynamicFallback);
+    return res.json({ ...dynamicFallback, isQuotaFallback: true });
   }
 });
 
@@ -1829,7 +1757,7 @@ Expected JSON format:
   } catch (error: any) {
     console.warn("Gemini scamcheck analysis failed, activating fallback:", error?.message || error);
     const dynamicFallback = generateDynamicOfflineScamCheck(flagsArray, scamText);
-    return res.json(dynamicFallback);
+    return res.json({ ...dynamicFallback, isQuotaFallback: true });
   }
 });
 
@@ -2003,7 +1931,7 @@ JSON shape:
   } catch (error: any) {
     console.warn("Gemini check-price failed, falling back gracefully:", error?.message || error);
     const dynamicCheckPrice = generateDynamicOfflineCheckPrice(title, price, description);
-    return res.json(dynamicCheckPrice);
+    return res.json({ ...dynamicCheckPrice, isQuotaFallback: true });
   }
 });
 
@@ -2075,7 +2003,7 @@ Return JSON (never wrap in markdown):
   } catch (error: any) {
     console.warn("Gemini match-companion failed, fallback active:", error?.message || error);
     const dynamicCompanion = generateDynamicOfflineMatchCompanion(description, companions);
-    return res.json(dynamicCompanion);
+    return res.json({ ...dynamicCompanion, isQuotaFallback: true });
   }
 });
 
@@ -2193,7 +2121,7 @@ Required JSON Output schema:
       recommendation: "整体来看，中介提出的扣款项目违背了您依法享有的‘合理折旧与磨损（Fair Wear and Tear）’法定权力！建议采取强硬且专业的法律话术回击，并辅以单方面向 RTBA 提交全额退押金申请（RTBA Claim），直接掌握主动权。",
       englishDraft: {
         intention: "引用租赁协议合理磨损条款与 RTA 指南，拒绝一切不合理清洗扣除主张。",
-        recipientEmail: "claims@rentagent.vic.gov.au",
+        recipientEmail: "",
         subject: "Formal Objection to Proposed Bond Deductions",
         body: `Dear Horizons Property Manager,
 
@@ -2313,7 +2241,7 @@ Return JSON, never wrapped in markdown:
   } catch (error: any) {
     console.warn("Gemini budget-recipe failed, fallback active:", error?.message || error);
     const dynamicBudgetRecipe = generateDynamicOfflineBudgetRecipe(originalname);
-    return res.json(dynamicBudgetRecipe);
+    return res.json({ ...dynamicBudgetRecipe, isQuotaFallback: true });
   }
 });
 
@@ -2377,8 +2305,8 @@ Return JSON, no markdown code blocks:
     const s = req.body.scenario ? req.body.scenario.toLowerCase() : "";
     let fallback = {
       scenarioTitle: "突发急迫危机 (Custom Emergency Contact)",
-      englishTalk: "I am in danger! Please send immediate rescue to 123 Swanston St, Melbourne. I need a Chinese interpreter!",
-      chineseTalk: "我正处于危险中！请立刻派救助力量到 123 Swanston St, Melbourne。我需要中文翻译接驳！",
+      englishTalk: "I am in danger! Please send immediate rescue to [your address]. I need a Chinese interpreter!",
+      chineseTalk: "我正处于危险中！请立刻派救助力量到【你的地址】。我需要中文翻译接驳！",
       actions: [
         "一、保持绝对冷静，迅速退后到有门锁或重物硬物的安全掩体区域，避免正面激怒或对抗袭击。",
         "二、保护好头部及致命器官，配合歹徒交出金钱等财物，生命是无价大局，切莫激动！",
@@ -2390,8 +2318,8 @@ Return JSON, no markdown code blocks:
     if (s.includes("撬门") || s.includes("闯入") || s.includes("砸门") || s.includes("小偷") || s.includes("强行") || s.includes("入室")) {
       fallback = {
         scenarioTitle: "住宅遭到暴力侵入安全威胁 (Home Intrusion)",
-        englishTalk: "Help! Someone is breaking into my room right now! There is an active intruder! I need police. Address: 123 Swanston St, Melbourne.",
-        chineseTalk: "抓人！有人正强行砸门撬锁闯入我的房间！现场有现行入侵者！我需要警察。地址：123 Swanston St, Melbourne。",
+        englishTalk: "Help! Someone is breaking into my room right now! There is an active intruder! I need police. Address: [your address].",
+        chineseTalk: "抓人！有人正强行砸门撬锁闯入我的房间！现场有现行入侵者！我需要警察。地址：【你的地址】。",
         actions: [
           "一、在入侵者还在防盗门外敲砸时，立刻反锁房门并搬箱子、重衣柜、椅子物理推拉死卡！",
           "二、迅速熄灭手电和手机不必要强光，保持在阴暗、有实体掩体（床底、衣柜内）蹲低伏地自卫！",
@@ -2402,8 +2330,8 @@ Return JSON, no markdown code blocks:
     } else if (s.includes("抢") || s.includes("打人") || s.includes("殴打") || s.includes("暴力") || s.includes("尾随") || s.includes("跟踪")) {
       fallback = {
         scenarioTitle: "遭受当街斗殴 / 袭击 / 跟踪尾随 (Assault & Robbery)",
-        englishTalk: "I was just assaulted and followed on the street by a suspect. I need immediate police support at 123 Swanston St.",
-        chineseTalk: "我刚刚在街头遭到了人身尾随追踪和暴力打人袭击，我需要警察立即到场。定位在：123 Swanston St 附近。",
+        englishTalk: "I was just assaulted and followed on the street by a suspect. I need immediate police support at [your address].",
+        chineseTalk: "我刚刚在街头遭到了人身尾随追踪和暴力打人袭击，我需要警察立即到场。定位在：【你的地址】附近。",
         actions: [
           "一、坚决不要偏离主干道走昏暗无人的后街或暗巷，飞奔反跑逆行走入任何开业的7-11、大超市、酒店大堂或警署！",
           "二、如果歹徒拔刀持枪勒索：乖乖配合并双手高举平摊表示服从，将钱包等丢到地上趁其低头捡钱顺势折身跑路求生！",
@@ -2414,20 +2342,20 @@ Return JSON, no markdown code blocks:
     } else if (s.includes("火") || s.includes("烟") || s.includes("爆炸") || s.includes("燃烧") || s.includes("发热")) {
       fallback = {
         scenarioTitle: "住宅引发火灾 / 绝火断道 / 浓烟逃生 (Active Fire)",
-        englishTalk: "A fire broke out at my apartment, there is thick smoke trapped! Send a fire brigade. I am at 123 Swanston St.",
-        chineseTalk: "我的套房里现在引发了大火并产生了浓重毒烟，请火速派遣消防局救援队！我目前在 123 Swanston St。",
+        englishTalk: "A fire broke out at my apartment, there is thick smoke trapped! Send a fire brigade. I am at [your address].",
+        chineseTalk: "我的套房里现在引发了大火并产生了浓重毒烟，请火速派遣消防局救援队！我目前在【你的地址】。",
         actions: [
           "一、如果走道全是黑烟，立刻拔下毛巾床单一股脑全部浸冷水湿捂口鼻，压低身子、猫腰匍匐贴地逃生！",
           "二、手心贴门板测温，若发现楼下门把手已经发烫烫手，切莫开门！这代表外面已是一片恐怖火海，立刻用被褥死塞所有门缝阻绝热烟！",
           "三、快步撤退至通风顺风的露台或外窗，大声摇晃有色彩标志牌大呼呼叫，严禁自乱阵脚爬上跳楼或重返火场！"
         ],
-        tisTips: "⚠️ 口诀：000 连线后立刻高呼 'Fire! Send firefighters to Swanston Street!' 保障消防通道以最快马力排洪。"
+        tisTips: "⚠️ 口诀：000 连线后立刻高呼 'Fire! Send firefighters to [your address]!' 保障消防通道以最快马力排洪。"
       };
     } else if (s.includes("晕") || s.includes("窒息") || s.includes("过敏") || s.includes("病") || s.includes("血") || s.includes("伤") || s.includes("痛")) {
       fallback = {
         scenarioTitle: "急性严重爆发伤病 / 休克晕厥 / 呼吸急停 (Medical Trauma)",
-        englishTalk: "Emergency! Someone has collapsed and has severe breathing difficulty. Please send ambulance to 123 Swanston St, Melbourne.",
-        chineseTalk: "紧急情况！这里有人突然晕厥跌倒，大口残重呼吸困难！请急速调派救护车到 123 Swanston St, Melbourne。",
+        englishTalk: "Emergency! Someone has collapsed and has severe breathing difficulty. Please send ambulance to [your address].",
+        chineseTalk: "紧急情况！这里有人突然晕厥跌倒，大口残重呼吸困难！请急速调派救护车到【你的地址】。",
         actions: [
           "一、检查呼吸深度。如果病人尚存细气但意识全无，立刻使其保持「侧卧复原体位」保持通调气道以防胃里反流食卡主气管窒息！",
           "二、排查由于澳洲独特暴风雨花粉、花生或海鲜导致的「急性重症过敏」，大声询问旁人并寻找 EpiPen 自助注射大腿侧！",
@@ -2437,7 +2365,7 @@ Return JSON, no markdown code blocks:
       };
     }
 
-    return res.json(fallback);
+    return res.json({ ...fallback, isQuotaFallback: true });
   }
 });
 
@@ -2702,6 +2630,9 @@ async function startServer() {
 
   // Global error handler must be added after all other middlewares
   app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE") {
+      return res.status(413).json({ error: "File too large (max 10MB). Please upload a smaller photo." });
+    }
     console.error("Express Error:", err);
     res.status(err.status || 500).json({ error: err.message || "Internal Server Error" });
   });

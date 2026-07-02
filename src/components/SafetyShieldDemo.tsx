@@ -5,6 +5,7 @@ import Markdown from 'react-markdown';
 import { useLocale, getCountryName } from '../lib/locale';
 import { useT, type StringKey } from '../lib/i18n';
 import GroundingSources from './GroundingSources';
+import FallbackNotice from './FallbackNotice';
 
 type AppState = 'upload' | 'analyzing' | 'result';
 type SubmoduleType = 'valuation' | 'scamCheck';
@@ -21,6 +22,7 @@ interface ShieldResult {
   summary: string;
   redFlags: string[];
   valueCheck?: ShieldValueCheck;
+  isQuotaFallback?: boolean;
 }
 
 interface ScamResult {
@@ -30,6 +32,7 @@ interface ScamResult {
   whyDangerous: string[];
   whatToDo: string[];
   reassurance: string;
+  isQuotaFallback?: boolean;
 }
 
 // Category labels and items are stored as i18n keys (resolved via t() at render).
@@ -533,6 +536,8 @@ export default function SafetyShieldDemo() {
                 <h3 className="text-2xl font-bold text-[#1d1d1f] mb-4 font-display">{analysis.title}</h3>
 
                 {/* Summary block */}
+                {analysis.isQuotaFallback && <FallbackNotice className="mb-4" />}
+
                 <div className={`p-5 rounded-2xl mb-4 border ${getRiskUI(analysis.riskLevel).bg} ${getRiskUI(analysis.riskLevel).border}`}>
                   <div className="text-gray-900 font-medium leading-relaxed markdown-body text-sm">
                     <Markdown>{analysis.summary}</Markdown>
@@ -609,6 +614,8 @@ export default function SafetyShieldDemo() {
                 </div>
 
                 {/* Risk Level Highlight + Percentage */}
+                {scamAnalysis.isQuotaFallback && <FallbackNotice className="mb-6" />}
+
                 <div className={`p-6 rounded-2xl mb-6 border ${getRiskUI(scamAnalysis.riskLevel).bg} ${getRiskUI(scamAnalysis.riskLevel).border} flex flex-col md:flex-row items-start md:items-center justify-between gap-5`}>
                   <div className="flex items-center space-x-4">
                     <span className="p-3 bg-white rounded-2xl shadow-xs inline-block">
