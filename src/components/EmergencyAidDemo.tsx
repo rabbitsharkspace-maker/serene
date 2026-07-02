@@ -236,6 +236,9 @@ export default function EmergencyAidDemo() {
     isQuotaFallback?: boolean;
   } | null>(null);
   const [ttsPlaying, setTtsPlaying] = useState(false);
+  const [ttsLoading, setTtsLoading] = useState(false);
+  const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
+  const ttsCacheRef = useRef<Map<string, string>>(new Map());
 
   const handleGenerateEmergencyGuide = async (scenarioText: string) => {
     if (!scenarioText.trim()) return;
@@ -318,7 +321,44 @@ export default function EmergencyAidDemo() {
     }
   };
 
-  const playTTS = (text: string) => {
+  // Gemini TTS first (natural, urgent-but-composed delivery); falls back to the
+  // browser's on-device speechSynthesis if the API is unreachable or over quota.
+  const playTTS = async (text: string) => {
+    if (ttsLoading) return;
+    ttsAudioRef.current?.pause();
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    setTtsPlaying(false);
+    try {
+      let url = ttsCacheRef.current.get(text);
+      if (!url) {
+        setTtsLoading(true);
+        const resp = await fetch('/api/emergency-tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text }),
+        });
+        if (!resp.ok) throw new Error(`TTS API ${resp.status}`);
+        const blob = await resp.blob();
+        url = URL.createObjectURL(blob);
+        ttsCacheRef.current.set(text, url);
+      }
+      const audio = new Audio(url);
+      ttsAudioRef.current = audio;
+      audio.onplay = () => setTtsPlaying(true);
+      audio.onended = () => setTtsPlaying(false);
+      audio.onpause = () => setTtsPlaying(false);
+      await audio.play();
+    } catch (err) {
+      console.warn('Gemini TTS unavailable, falling back to browser speech:', err);
+      playBrowserTTS(text);
+    } finally {
+      setTtsLoading(false);
+    }
+  };
+
+  const playBrowserTTS = (text: string) => {
     try {
       if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
         window.speechSynthesis.cancel();
@@ -1196,7 +1236,7 @@ export default function EmergencyAidDemo() {
                                   title={t('ea_read_aloud')}
                                 >
                                   <Volume2 size={12} className={ttsPlaying ? 'animate-bounce' : ''} />
-                                  <span className="text-[9px] font-bold">{ttsPlaying ? t('ea_playing') : t('ea_read_pron')}</span>
+                                  <span className="text-[9px] font-bold">{ttsLoading ? t('ea_tts_loading') : ttsPlaying ? t('ea_playing') : t('ea_read_pron')}</span>
                                 </button>
                                 <button
                                   type="button"
