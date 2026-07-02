@@ -2372,6 +2372,62 @@ Return JSON, no markdown code blocks:
 // Country-aware tenancy emergency guide. The Australia data is high-fidelity and served
 // statically on the client; for other countries we generate a localized, Search-grounded
 // guide so the authorities, hotlines and statutes are correct for that jurisdiction.
+// Gemini TTS reads the emergency call script aloud: a panicked non-native speaker
+// may freeze mid-call, so the phone speaks the English script for them.
+// Gemini returns raw 24kHz 16-bit mono PCM; browsers need a WAV header to play it.
+function pcmToWav(pcm: Buffer, sampleRate = 24000): Buffer {
+  const header = Buffer.alloc(44);
+  header.write("RIFF", 0);
+  header.writeUInt32LE(36 + pcm.length, 4);
+  header.write("WAVE", 8);
+  header.write("fmt ", 12);
+  header.writeUInt32LE(16, 16);
+  header.writeUInt16LE(1, 20); // PCM format
+  header.writeUInt16LE(1, 22); // mono
+  header.writeUInt32LE(sampleRate, 24);
+  header.writeUInt32LE(sampleRate * 2, 28); // byte rate = rate * channels * 2
+  header.writeUInt16LE(2, 32); // block align
+  header.writeUInt16LE(16, 34); // bits per sample
+  header.write("data", 36);
+  header.writeUInt32LE(pcm.length, 40);
+  return Buffer.concat([header, pcm]);
+}
+
+app.post("/api/emergency-tts", async (req, res) => {
+  try {
+    const { text } = req.body || {};
+    if (!text || typeof text !== "string") {
+      return res.status(400).json({ error: "No text provided" });
+    }
+
+    const response = await generateWithRetry(getAI(), 'generateContent', {
+      model: "gemini-2.5-flash-preview-tts",
+      contents: [{
+        role: "user",
+        parts: [{ text: `Speak clearly and urgently, but composed — like someone reporting an emergency to an operator on the phone: ${text.slice(0, 600)}` }],
+      }],
+      config: {
+        responseModalities: ["AUDIO"],
+        speechConfig: {
+          voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } },
+        },
+      },
+    });
+
+    const audioB64 = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+    if (!audioB64) throw new Error("TTS returned no audio");
+
+    const wav = pcmToWav(Buffer.from(audioB64, "base64"));
+    res.setHeader("Content-Type", "audio/wav");
+    res.setHeader("Cache-Control", "no-store");
+    res.send(wav);
+  } catch (err: any) {
+    console.error("emergency-tts error:", err?.message || err);
+    // Client falls back to on-device speechSynthesis, so a plain error is fine here.
+    res.status(502).json({ error: "tts_unavailable" });
+  }
+});
+
 app.post("/api/tenancy-guide", async (req, res) => {
   try {
     const { situation } = req.body;

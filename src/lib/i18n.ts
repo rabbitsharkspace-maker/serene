@@ -605,6 +605,7 @@ const STRINGS = {
   ea_read_aloud: { zh: '英语大声朗读', es: 'Leer en voz alta en inglés', hi: 'अंग्रेज़ी ज़ोर से पढ़ें', vi: 'Đọc to bằng tiếng Anh', ar: 'اقرأ بالإنجليزية بصوت عالٍ' },
   ea_playing: { zh: '播音中...', es: 'Reproduciendo...', hi: 'चल रहा है...', vi: 'Đang phát...', ar: 'يُشغّل...' },
   ea_read_pron: { zh: '带发音朗读', es: 'Leer con pronunciación', hi: 'उच्चारण के साथ पढ़ें', vi: 'Đọc kèm phát âm', ar: 'اقرأ مع النطق' },
+  ea_tts_loading: { zh: '生成语音…', es: 'Generando voz…', hi: 'आवाज़ बन रही है…', vi: 'Đang tạo giọng nói…', ar: '…يُولَّد الصوت' },
   ea_copy_script: { zh: '复制台词', es: 'Copiar guion', hi: 'स्क्रिप्ट कॉपी', vi: 'Sao chép lời', ar: 'نسخ النص' },
   ea_meaning_short: { zh: '意思：', es: 'Significado:', hi: 'अर्थ:', vi: 'Nghĩa:', ar: 'المعنى:' },
   ea_actions_label: { zh: '⚠️ 绝对最高优先级物理自救行动：', es: '⚠️ Acciones de autoprotección de máxima prioridad:', hi: '⚠️ सर्वोच्च प्राथमिकता आत्मरक्षा कदम:', vi: '⚠️ Hành động tự bảo vệ ưu tiên cao nhất:', ar: '⚠️ إجراءات الحماية الذاتية ذات الأولوية القصوى:' },
