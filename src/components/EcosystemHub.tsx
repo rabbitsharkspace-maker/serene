@@ -7,6 +7,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { useLocale } from '../lib/locale';
 import { useT, type StringKey } from '../lib/i18n';
+import FallbackNotice from './FallbackNotice';
 import EcoTools from './EcoTools';
 import MeetupPlanner from './MeetupPlanner';
 import DaigouBoard from './DaigouBoard';
@@ -109,6 +110,51 @@ const buildDefaultGuides = (t: TFn): Guide[] => [
       { name: t('eh_g2_p1_name'), price: 19, desc: t('eh_g2_p1_desc') },
       { name: t('eh_g2_p2_name'), price: 29, desc: t('eh_g2_p2_desc') }
     ]
+  },
+  {
+    id: 'g-3',
+    name: t('eh_g3_name'),
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=120',
+    university: t('eh_uni_rmit'),
+    major: t('eh_g3_major'),
+    year: t('eh_year_ug34'),
+    rating: 4.7,
+    suburb: 'Melbourne CBD',
+    bio: t('eh_g3_bio'),
+    projects: [
+      { name: t('eh_g3_p1_name'), price: 45, desc: t('eh_g3_p1_desc') },
+      { name: t('eh_g3_p2_name'), price: 29, desc: t('eh_g3_p2_desc') }
+    ]
+  },
+  {
+    id: 'g-4',
+    name: t('eh_g4_name'),
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=120',
+    university: t('eh_uni_deakin'),
+    major: t('eh_g4_major'),
+    year: t('eh_year_grad'),
+    rating: 4.9,
+    suburb: 'Burwood',
+    bio: t('eh_g4_bio'),
+    projects: [
+      { name: t('eh_g4_p1_name'), price: 25, desc: t('eh_g4_p1_desc') },
+      { name: t('eh_g4_p2_name'), price: 49, desc: t('eh_g4_p2_desc') }
+    ]
+  },
+  {
+    id: 'g-5',
+    name: t('eh_g5_name'),
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=120',
+    university: t('eh_uni_unimelb'),
+    major: t('eh_g5_major'),
+    year: t('eh_year_pg1'),
+    rating: 5.0,
+    suburb: 'Parkville',
+    bio: t('eh_g5_bio'),
+    projects: [
+      { name: t('eh_g5_p1_name'), price: 35, desc: t('eh_g5_p1_desc') },
+      { name: t('eh_g5_p2_name'), price: 79, desc: t('eh_g5_p2_desc') }
+    ]
   }
 ];
 
@@ -144,6 +190,38 @@ const buildDefaultMeals = (t: TFn): MealPost[] => [
     maxSeats: 6,
     joinedCount: 5,
     image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&q=80&w=400'
+  },
+  {
+    id: 'm-3',
+    dishName: t('eh_m3_dish'),
+    chefName: t('eh_m3_chef'),
+    chefAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=120',
+    cuisine: t('eh_m3_cuisine'),
+    price: 16.5,
+    type: 'cooking',
+    description: t('eh_m3_desc'),
+    suburb: t('eh_m3_suburb'),
+    preciseAddress: 'Unit 3, 25 Carrington Rd, Box Hill VIC 3128',
+    isUnlocked: false,
+    maxSeats: 10,
+    joinedCount: 4,
+    image: 'https://images.unsplash.com/photo-1585032226651-759b368d7246?auto=format&fit=crop&q=80&w=400'
+  },
+  {
+    id: 'm-4',
+    dishName: t('eh_m4_dish'),
+    chefName: t('eh_m4_chef'),
+    chefAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=120',
+    cuisine: t('eh_m4_cuisine'),
+    price: 22,
+    type: 'sharing',
+    description: t('eh_m4_desc'),
+    suburb: t('eh_m4_suburb'),
+    preciseAddress: '12 Kingsway, Glen Waverley VIC 3150',
+    isUnlocked: false,
+    maxSeats: 8,
+    joinedCount: 6,
+    image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&q=80&w=400'
   }
 ];
 
@@ -173,6 +251,58 @@ const buildDefaultItems = (t: TFn): MarketplaceItem[] => [
     sellerAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=120',
     secureStatus: 'available',
     image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=400'
+  },
+  {
+    id: 'i-3',
+    title: t('eh_i3_title'),
+    price: 180,
+    condition: '90新',
+    description: t('eh_i3_desc'),
+    suburb: 'Clayton',
+    category: '生活用品',
+    sellerName: t('eh_i3_seller'),
+    sellerAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=120',
+    secureStatus: 'available',
+    image: 'https://images.unsplash.com/photo-1598550476439-6847785fcea6?auto=format&fit=crop&q=80&w=400'
+  },
+  {
+    id: 'i-4',
+    title: t('eh_i4_title'),
+    price: 20,
+    condition: '全新',
+    description: t('eh_i4_desc'),
+    suburb: 'Footscray',
+    category: '生活用品',
+    sellerName: t('eh_i4_seller'),
+    sellerAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=120',
+    secureStatus: 'available',
+    image: 'https://images.unsplash.com/photo-1526318896980-cf78c088247c?auto=format&fit=crop&q=80&w=400'
+  },
+  {
+    id: 'i-5',
+    title: t('eh_i5_title'),
+    price: 320,
+    condition: '90新',
+    description: t('eh_i5_desc'),
+    suburb: 'Melbourne CBD',
+    category: '数码',
+    sellerName: t('eh_i5_seller'),
+    sellerAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=120',
+    secureStatus: 'available',
+    image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&q=80&w=400'
+  },
+  {
+    id: 'i-6',
+    title: t('eh_i6_title'),
+    price: 95,
+    condition: '85新',
+    description: t('eh_i6_desc'),
+    suburb: 'Brunswick',
+    category: '其他',
+    sellerName: t('eh_i6_seller'),
+    sellerAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=120',
+    secureStatus: 'available',
+    image: 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&q=80&w=400'
   }
 ];
 
@@ -193,31 +323,31 @@ export default function EcosystemHub() {
 
   // Dynamic state loaded from local storage or pre-seeded defaults
   const [guides, setGuides] = useState<Guide[]>(() => {
-    const saved = localStorage.getItem('serene_eco_guides');
+    const saved = localStorage.getItem('serene_eco_guides_v2');
     return saved ? JSON.parse(saved) : buildDefaultGuides(t);
   });
 
   const [meals, setMeals] = useState<MealPost[]>(() => {
-    const saved = localStorage.getItem('serene_eco_meals');
+    const saved = localStorage.getItem('serene_eco_meals_v2');
     return saved ? JSON.parse(saved) : buildDefaultMeals(t);
   });
 
   const [marketItems, setMarketItems] = useState<MarketplaceItem[]>(() => {
-    const saved = localStorage.getItem('serene_eco_items');
+    const saved = localStorage.getItem('serene_eco_items_v2');
     return saved ? JSON.parse(saved) : buildDefaultItems(t);
   });
 
   // Save states to localstorage on change
   useEffect(() => {
-    localStorage.setItem('serene_eco_guides', JSON.stringify(guides));
+    localStorage.setItem('serene_eco_guides_v2', JSON.stringify(guides));
   }, [guides]);
 
   useEffect(() => {
-    localStorage.setItem('serene_eco_meals', JSON.stringify(meals));
+    localStorage.setItem('serene_eco_meals_v2', JSON.stringify(meals));
   }, [meals]);
 
   useEffect(() => {
-    localStorage.setItem('serene_eco_items', JSON.stringify(marketItems));
+    localStorage.setItem('serene_eco_items_v2', JSON.stringify(marketItems));
   }, [marketItems]);
 
   // Shopping Cart States
@@ -352,6 +482,7 @@ export default function EcosystemHub() {
     reasoning: string;
     painConversion: string;
     loading?: boolean;
+    isQuotaFallback?: boolean;
   }>>({});
 
   // 瞬时处境匹配 (Companion Instant Matching)
@@ -360,6 +491,7 @@ export default function EcosystemHub() {
   const [matchedGuideIds, setMatchedGuideIds] = useState<string[]>([]);
   const [matchReason, setMatchReason] = useState<string | null>(null);
   const [matchChecklist, setMatchChecklist] = useState<string[]>([]);
+  const [matchIsFallback, setMatchIsFallback] = useState(false);
 
   // 临期食材/小票菜谱 (Kitchen Budget Recipe)
   const [recipePreview, setRecipePreview] = useState<string | null>(null);
@@ -368,6 +500,7 @@ export default function EcosystemHub() {
     ingredients: string[];
     recipes: { name: string; steps: string[]; cost: string }[];
     savingComparison: string;
+    isQuotaFallback?: boolean;
   } | null>(null);
 
   // --- Ecosystem AI Handlers ---
@@ -420,6 +553,7 @@ export default function EcosystemHub() {
     setMatchedGuideIds([]);
     setMatchReason(null);
     setMatchChecklist([]);
+    setMatchIsFallback(false);
 
     try {
       const res = await fetch('/api/match-companion', {
@@ -447,6 +581,7 @@ export default function EcosystemHub() {
       setMatchedGuideIds(data.matchedGuideIds || []);
       setMatchReason(data.reason || '');
       setMatchChecklist(data.checklist || []);
+      setMatchIsFallback(!!data.isQuotaFallback);
       
       // Select the first matched guide automatically to focus details and guide student better!
       if (data.matchedGuideIds && data.matchedGuideIds.length > 0) {
@@ -469,6 +604,7 @@ export default function EcosystemHub() {
         t('eh_match_fb_2'),
         t('eh_match_fb_3')
       ]);
+      setMatchIsFallback(true);
       const found = guides.find(g => g.id === 'g-1');
       if (found) {
         setSelectedGuide(found);
@@ -516,7 +652,8 @@ export default function EcosystemHub() {
             cost: t('eh_rc_fb_r2_cost')
           }
         ],
-        savingComparison: t('eh_rc_fb_saving')
+        savingComparison: t('eh_rc_fb_saving'),
+        isQuotaFallback: true
       });
     } finally {
       setRecipeLoading(false);
@@ -1252,6 +1389,7 @@ export default function EcosystemHub() {
                           </div>
                         ) : recipeResult ? (
                           <div className="space-y-3 h-full overflow-y-auto max-h-[160px] text-xs leading-relaxed text-gray-700 pr-1 select-none font-semibold">
+                            {recipeResult.isQuotaFallback && <FallbackNotice />}
                             <div>
                               <span className="text-[9px] text-gray-400 font-extrabold uppercase block">{t('eh_recipe_ingredients_label')}</span>
                               <div className="flex flex-wrap gap-1 mt-1">
@@ -1902,6 +2040,7 @@ export default function EcosystemHub() {
                       <Shield size={14} className="text-amber-700 animate-pulse fill-amber-200" />
                       <span>{t('eh_gv_card_title')}</span>
                     </div>
+                    {matchIsFallback && <FallbackNotice />}
                     {matchReason && (
                       <p className="text-[10px] text-amber-950 leading-relaxed bg-white/75 p-2 rounded-xl border border-amber-200/80 font-bold font-medium">
                         <strong>{t('eh_gv_match_basis')}</strong>{matchReason}
@@ -2060,6 +2199,8 @@ export default function EcosystemHub() {
                         {verdictLabel(priceCheckResults[selectedItem.id].verdict)}
                       </span>
                     </div>
+
+                    {priceCheckResults[selectedItem.id].isQuotaFallback && <FallbackNotice className="mb-2" />}
 
                     <div className="text-[10px] bg-white/95 border border-gray-150 p-3.5 rounded-2xl space-y-2.5 leading-relaxed text-gray-700">
                       <div className="grid grid-cols-2 gap-2">
