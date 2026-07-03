@@ -2664,6 +2664,89 @@ WRITE ALL HUMAN-READABLE VALUES IN ${langName}. Return ONLY raw JSON (no markdow
   }
 });
 
+// "社区雷达" community radar: given the newcomer's city/school + interests, use Google Search
+// grounding to surface REAL local Facebook groups, student associations and upcoming events —
+// the stuff a newly-arrived student most wants but can't find in a strange country. Grounded so
+// every result is a real, clickable link (never invented) — see GroundingSources in the UI.
+app.post("/api/community-radar", async (req, res) => {
+  try {
+    const country = getCountry(req.body.country);
+    const langName = getLang(req.body.language);
+    const region = (req.body.region || "").trim();
+    const jurisdiction = region ? `${region}, ${country.name}` : country.name;
+    const school = (req.body.school || "").trim();
+    const interests = (req.body.interests || "").trim();
+    const timeframe = (req.body.timeframe || "").trim();
+    const who = school ? `a new international student at/near ${school} in ${jurisdiction}` : `a newly-arrived international student in ${jurisdiction}`;
+
+    const aiClient = getAI();
+    const prompt = `You are a local-community concierge for newly-arrived international students and migrants in ${jurisdiction}.
+The user is ${who}.${interests ? ` They are interested in: ${interests}.` : ""}${timeframe ? ` They care about the timeframe: ${timeframe}.` : ""}
+
+Use your Google Search tool to find REAL, currently-active local communities and happenings relevant to this user in ${jurisdiction}:
+1. Facebook / WeChat / Discord groups a newcomer would want (the university's Chinese Students & Scholars Association / CSSA, housing & second-hand groups, local Chinese-community groups, course/faculty groups).
+2. Upcoming or recurring EVENTS worth attending (student orientation, market days, culture/language exchange, free community events).
+3. Official student-support or council community pages.
+
+CRITICAL RULES:
+- Do NOT invent group names, URLs, dates or venues. Only return items you actually found via search. If unsure of a URL, return an empty string for it rather than guessing.
+- Prefer sources correct for ${jurisdiction} (groups/events differ by city and campus).
+- WRITE ALL HUMAN-READABLE VALUES IN ${langName} (keep proper names / group names in their original language).
+
+Return ONLY raw JSON (no markdown fences):
+{
+  "summary": "(in ${langName}) one warm sentence on what the newcomer can plug into locally right now",
+  "groups": [
+    { "name": "real group name", "platform": "Facebook | WeChat | Discord | Meetup | 官方", "url": "real URL or empty string", "who": "(in ${langName}) who it's for and why a newcomer should join", "safetyTip": "(in ${langName}) one practical caution, e.g. beware sublet-deposit scams in housing groups" }
+  ],
+  "events": [
+    { "name": "real event / recurring event name", "when": "(in ${langName}) date or cadence you found (or 'recurring' if unknown)", "where": "venue/area in ${jurisdiction}", "url": "real URL or empty string", "why": "(in ${langName}) why it's worth going for a new student" }
+  ]
+}`;
+
+    const response = await generateWithRetry(aiClient, 'generateContent', {
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: { tools: [{ googleSearch: {} }] },
+    }) as any;
+
+    let text = response.text || "";
+    const s = text.indexOf('{');
+    const e = text.lastIndexOf('}');
+    if (s !== -1 && e !== -1 && e > s) text = text.slice(s, e + 1);
+    const result = JSON.parse(text);
+    result._grounding = extractGrounding(response);
+    return res.json(result);
+  } catch (error: any) {
+    console.warn("community-radar failed:", error?.message || error);
+    // Clearly-labeled sample so a rate-limit never blanks the demo. AU/Melbourne-flavoured.
+    const isAU = String(req.body.country || 'AU').toUpperCase() === 'AU';
+    const c = getCountry(req.body.country);
+    const fallback = isAU ? {
+      summary: "墨尔本的留学生社群其实很活跃——先加同校学联和二手/租房群，再挑一两个本周的活动去认识人。",
+      groups: [
+        { name: "UniMelb CSSA 墨尔本大学中国学生学者联合会", platform: "官方", url: "", who: "同校中国留学生官方组织，迎新、讲座、组队报名活动的第一入口", safetyTip: "官方通知以学联公众号/官网为准，私信让你转账代缴的一律警惕" },
+        { name: "墨尔本租房/二手 Melbourne Rent & Second-hand", platform: "Facebook", url: "", who: "找房、转租、出二手家具最活跃的群，落地初期省钱刚需", safetyTip: "看房前不要付定金押金，警惕‘人在外地先转钱’的转租骗局" },
+        { name: "墨尔本留学生 WeChat 互助群", platform: "WeChat", url: "", who: "问路、拼车、拼饭、紧急求助的在地小圈子", safetyTip: "群里的代购/代付先小额验证，别一次性大额转账" },
+      ],
+      events: [
+        { name: "Queen Victoria Market 夜市 / 周末市集", platform: "官方", when: "每周（季节性夜市）", where: "Queen Victoria Market, Melbourne CBD", url: "", why: "低成本认识城市、买便宜生鲜，适合刚落地熟悉环境" },
+        { name: "大学 Orientation / Clubs Day 社团招新", platform: "官方", when: "每学期开学季", where: "各校主校区", url: "", why: "一次性接触所有社团，最快交到朋友、融入校园" },
+      ],
+    } : {
+      summary: `在 ${c.name} 先从同校学联和本地租房/二手群入手，再挑一个本周活动去认识人。`,
+      groups: [
+        { name: `${c.name} 中国学生学者联合会 (CSSA)`, platform: "官方", url: "", who: "同校官方留学生组织，迎新与活动第一入口", safetyTip: "以官方渠道通知为准，警惕私信转账要求" },
+        { name: `${c.name} 租房/二手互助群`, platform: "Facebook", url: "", who: "找房与二手交易最活跃的群", safetyTip: "看房前不付款，警惕异地转租骗局" },
+      ],
+      events: [
+        { name: "大学 Orientation 迎新周", platform: "官方", when: "每学期开学季", where: `各校主校区, ${c.name}`, url: "", why: "最快认识同学、了解校园资源" },
+      ],
+    };
+    return res.json({ ...fallback, isQuotaFallback: true });
+  }
+});
+
 async function startServer() {
   // API Catch-all: Ensure API requests never fall through to Vite's HTML fallback
   app.all("/api/*", (req, res) => {
