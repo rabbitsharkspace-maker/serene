@@ -108,6 +108,14 @@ npm run build
 npm run start
 ```
 
+### 6. 部署到 Google Cloud Run (Deploy)
+项目已内置 `Dockerfile`，可一键部署到 Google Cloud Run（服务器已监听 `0.0.0.0:$PORT`，与 Cloud Run 的 `8080` 端口天然兼容）：
+```bash
+gcloud run deploy serene --source . --region asia-southeast1 \
+  --allow-unauthenticated --set-env-vars GEMINI_API_KEY=<你的密钥>
+```
+（Render 部署仍可继续使用根目录的 `render.yaml`。）
+
 ---
 
 *“在陌生的南半球，有 Serene 在，避坑抗灾，底气常在。祝你留学顺利，平安学成归来！”🌟*
