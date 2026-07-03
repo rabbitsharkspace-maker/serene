@@ -11,6 +11,7 @@ import FallbackNotice from './FallbackNotice';
 import EcoTools from './EcoTools';
 import MeetupPlanner from './MeetupPlanner';
 import DaigouBoard from './DaigouBoard';
+import CommunityRadar from './CommunityRadar';
 
 // Interfaces
 interface Guide {
@@ -314,7 +315,7 @@ export default function EcosystemHub() {
   const verdictLabel = (v: string) => v === '划算' ? t('eh_verdict_deal') : v === '偏贵' ? t('eh_verdict_pricey') : t('eh_verdict_fair');
   const conditionLabel = (c: string) => c === '全新' ? t('eh_cond_short_new') : c === '90新' ? t('eh_cond_short_90') : c === '85新' ? t('eh_cond_short_85') : t('eh_cond_short_99');
 
-  const [activeTab, setActiveTab] = useState<'guides' | 'private_chef' | 'marketplace' | 'daigou' | 'tools'>('guides');
+  const [activeTab, setActiveTab] = useState<'guides' | 'private_chef' | 'marketplace' | 'daigou' | 'community' | 'tools'>('guides');
 
   // Multi-tab role toggling
   const [guideRole, setGuideRole] = useState<'student' | 'guide'>('student');
@@ -938,6 +939,14 @@ export default function EcosystemHub() {
           <span className="ml-0.5 text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full">{t('eh_concept_badge')}</span>
         </button>
         <button
+          onClick={() => { setActiveTab('community'); setSelectedGuide(null); setSelectedMeal(null); setSelectedItem(null); }}
+          className={`px-5 py-3 rounded-t-2xl font-black text-sm transition-all flex items-center gap-2 shrink-0 ${activeTab === 'community' ? 'border-b-4 border-[#1d1d1f] text-[#1d1d1f] bg-white bg-opacity-50' : 'text-gray-400 hover:text-gray-900'}`}
+        >
+          <span>📡</span>
+          <span>社区雷达</span>
+          <span className="ml-0.5 text-[9px] font-bold text-ink bg-surface-soft px-1.5 py-0.5 rounded-full">{t('eh_live_badge')}</span>
+        </button>
+        <button
           onClick={() => { setActiveTab('tools'); setSelectedGuide(null); setSelectedMeal(null); setSelectedItem(null); }}
           className={`px-5 py-3 rounded-t-2xl font-black text-sm transition-all flex items-center gap-2 shrink-0 ${activeTab === 'tools' ? 'border-b-4 border-[#1d1d1f] text-[#1d1d1f] bg-white bg-opacity-50' : 'text-gray-400 hover:text-gray-900'}`}
         >
@@ -947,7 +956,7 @@ export default function EcosystemHub() {
         </button>
       </div>
 
-      {activeTab !== 'tools' && (
+      {activeTab !== 'tools' && activeTab !== 'community' && (
         <div className="mb-6 flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3">
           <span className="text-base leading-none mt-0.5">🧪</span>
           <p className="text-[11px] text-amber-800 leading-relaxed font-medium">
@@ -963,6 +972,8 @@ export default function EcosystemHub() {
       )}
 
       {activeTab === 'daigou' && <DaigouBoard />}
+
+      {activeTab === 'community' && <CommunityRadar />}
 
       {/* Main Panel views */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
