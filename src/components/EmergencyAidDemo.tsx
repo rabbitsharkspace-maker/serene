@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useLocale, getCountryContent, getCountryName, getInterpreterName } from '../lib/locale';
 import { useT, type StringKey } from '../lib/i18n';
 import FallbackNotice from './FallbackNotice';
+import { generateEmergencyGuideOnDevice, onDeviceAIStatus } from '../lib/onDeviceAI';
 
 interface CheatsheetType {
   titleKey: StringKey;
@@ -234,16 +235,45 @@ export default function EmergencyAidDemo() {
     actions: string[];
     tisTips: string;
     isQuotaFallback?: boolean;
+    onDevice?: boolean;
   } | null>(null);
+  // Chrome Built-in AI (Gemini Nano) availability: powers offline, on-device generation.
+  const [onDeviceStatus, setOnDeviceStatus] = useState<string>('unavailable');
+  useEffect(() => { onDeviceAIStatus().then(setOnDeviceStatus).catch(() => {}); }, []);
   const [ttsPlaying, setTtsPlaying] = useState(false);
   const [ttsLoading, setTtsLoading] = useState(false);
   const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
   const ttsCacheRef = useRef<Map<string, string>>(new Map());
 
+  // Try Chrome Built-in AI (Gemini Nano) fully on-device — no network. Returns true if it
+  // produced a tailored plan (used offline-first, and as a fallback when the server is down).
+  const tryOnDeviceGuide = async (scenarioText: string): Promise<boolean> => {
+    const langName = language === 'zh' ? '中文' : language === 'en' ? 'English' : language;
+    const guide = await generateEmergencyGuideOnDevice(scenarioText, {
+      countryName,
+      emergencyNumber: content.emergency,
+      langName,
+      interpreterLang: interpreter,
+    });
+    if (!guide) return false;
+    setCustomOutputs({ ...guide, onDevice: true });
+    return true;
+  };
+
   const handleGenerateEmergencyGuide = async (scenarioText: string) => {
     if (!scenarioText.trim()) return;
     setIsGeneratingCustom(true);
     setCustomOutputs(null);
+
+    // Offline-first: an emergency kit is most needed with no signal. If the device is offline
+    // and Gemini Nano is ready, generate entirely on-device before even trying the network.
+    const isOffline = typeof navigator !== 'undefined' && navigator.onLine === false;
+    if (isOffline && onDeviceStatus === 'available') {
+      try {
+        if (await tryOnDeviceGuide(scenarioText)) { setIsGeneratingCustom(false); return; }
+      } catch (e) { console.warn('On-device emergency generation failed, trying network:', e); }
+    }
+
     try {
       const response = await fetch('/api/generate-emergency-guide', {
         method: 'POST',
@@ -267,6 +297,10 @@ export default function EmergencyAidDemo() {
       }
     } catch (err) {
       console.warn("Failed to generate emergency guide, applying fallback:", err);
+      // Before the static presets, try Gemini Nano on-device (works even fully offline).
+      try {
+        if (await tryOnDeviceGuide(scenarioText)) { setIsGeneratingCustom(false); return; }
+      } catch (e) { console.warn('On-device fallback failed, using static presets:', e); }
       // Fallback matching client-side
       const s = scenarioText.toLowerCase();
       let fallback = {
@@ -1201,6 +1235,14 @@ export default function EmergencyAidDemo() {
                           </>
                         )}
                       </button>
+                      {(onDeviceStatus === 'available' || onDeviceStatus === 'downloadable') && (
+                        <div className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 pt-0.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                          {onDeviceStatus === 'available'
+                            ? '本机已就绪：断网也能由端侧 Gemini Nano 本地生成'
+                            : '本浏览器支持端侧 AI：首次使用会下载离线模型'}
+                        </div>
+                      )}
                     </div>
 
                     {/* Outputs */}
@@ -1213,6 +1255,16 @@ export default function EmergencyAidDemo() {
                           className="space-y-4 pt-3 border-t border-gray-100"
                         >
                           {customOutputs.isQuotaFallback && <FallbackNotice />}
+
+                          {customOutputs.onDevice && (
+                            <div className="bg-emerald-50 border border-emerald-200 px-3.5 py-2.5 rounded-2xl flex items-start gap-2.5 shadow-sm">
+                              <span className="text-base leading-none shrink-0">📴</span>
+                              <p className="text-[10px] text-emerald-900 leading-relaxed font-semibold">
+                                <strong className="font-black">端侧离线生成 · On-device (Gemini Nano).</strong>{' '}
+                                本方案由 Chrome 内置 AI 在你的设备本地生成，全程无需联网、数据不出手机——断网时也能救命。
+                              </p>
+                            </div>
+                          )}
 
                           {/* Title */}
                           <div className="bg-red-50 px-3 py-1.5 rounded-lg border border-red-100 inline-block">
