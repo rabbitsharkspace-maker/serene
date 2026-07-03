@@ -90,23 +90,25 @@ describe('App shell (A5, A6 — navigation)', () => {
   });
 });
 
-describe('App header — global selectors (A1–A3)', () => {
-  it('renders country, language and region selects', () => {
+describe('App header — global selectors (A1–A3, Melbourne-first)', () => {
+  it('renders a fixed AU badge plus language and region selects', () => {
     renderApp();
-    expect(screen.getByTitle('目的国 Destination country')).toBeInTheDocument();
+    const countryBadge = screen.getByTitle('目的国 Destination country');
+    expect(countryBadge).toBeInTheDocument();
+    // Country is locked to AU: a static badge, not a <select>.
+    expect(countryBadge.tagName).not.toBe('SELECT');
+    expect(countryBadge).toHaveTextContent('澳大利亚');
     expect(screen.getByTitle('显示语言 Display language')).toBeInTheDocument();
-    // AU is the default and has regions, so the region select is shown.
     expect(screen.getByTitle('州/省 State or province')).toBeInTheDocument();
   });
 
-  it('switching country resets the region select back to the placeholder', async () => {
-    const user = userEvent.setup();
+  it('defaults the region select to VIC (Melbourne) and only offers AU states', () => {
     renderApp();
     const region = screen.getByTitle('州/省 State or province') as HTMLSelectElement;
-    await user.selectOptions(region, 'VIC');
     expect(region.value).toBe('VIC');
-    await user.selectOptions(screen.getByTitle('目的国 Destination country'), 'US');
-    // Region was invalidated; placeholder ('') is selected again.
-    expect((screen.getByTitle('州/省 State or province') as HTMLSelectElement).value).toBe('');
+    const codes = Array.from(region.options).map((o) => o.value).filter(Boolean);
+    expect(codes).toContain('VIC');
+    expect(codes).not.toContain('California');
+    expect(codes).not.toContain('Ontario');
   });
 });

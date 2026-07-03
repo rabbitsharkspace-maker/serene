@@ -72,7 +72,7 @@ describe('locale helpers (fallbacks)', () => {
 });
 
 describe('LocaleProvider behaviour (A1, A2, A4)', () => {
-  it('defaults to AU / zh / no region', () => {
+  it('defaults to AU / zh / VIC (Melbourne-first launch)', () => {
     render(
       <LocaleProvider>
         <LocaleProbe />
@@ -80,7 +80,7 @@ describe('LocaleProvider behaviour (A1, A2, A4)', () => {
     );
     expect(screen.getByTestId('country')).toHaveTextContent('AU');
     expect(screen.getByTestId('language')).toHaveTextContent('zh');
-    expect(screen.getByTestId('region')).toHaveTextContent('none');
+    expect(screen.getByTestId('region')).toHaveTextContent('VIC');
   });
 
   it('changing country clears the previously selected region (A4)', async () => {
@@ -110,14 +110,17 @@ describe('LocaleProvider behaviour (A1, A2, A4)', () => {
     expect(localStorage.getItem('serene_language')).toBe('es');
   });
 
-  it('rehydrates the persisted country on mount', () => {
+  it('AU_FOCUS overrides any persisted non-AU country on mount (Melbourne-first)', () => {
     localStorage.setItem('serene_country', 'CA');
+    localStorage.setItem('serene_region', 'Ontario');
     render(
       <LocaleProvider>
         <LocaleProbe />
       </LocaleProvider>
     );
-    expect(screen.getByTestId('country')).toHaveTextContent('CA');
+    // The multi-country architecture persists, but the shipped product locks to AU/VIC.
+    expect(screen.getByTestId('country')).toHaveTextContent('AU');
+    expect(screen.getByTestId('region')).toHaveTextContent('VIC');
   });
 
   it('useLocale outside a provider yields safe no-op defaults', () => {
