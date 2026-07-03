@@ -8,6 +8,7 @@ import Markdown from 'react-markdown';
 import { useLocale, getCountryContent, getDefaultVisa } from '../lib/locale';
 import { useT } from '../lib/i18n';
 import GroundingSources from './GroundingSources';
+import { googleCalendarUrl } from '../lib/calendar';
 
 type AppState = 'upload' | 'analyzing' | 'result' | 'sent';
 
@@ -690,6 +691,15 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
     const start = `${yearStr}T100000`;
     const end = `${yearStr}T110000`;
     
+    // Advance reminders so this is a real 提醒, not just a mark on the deadline day: the
+    // calendar app will alert the user 3 days and 1 day before the legal cut-off.
+    const alarm = (trigger: string, label: string) => [
+      'BEGIN:VALARM',
+      'ACTION:DISPLAY',
+      'TRIGGER:' + trigger,
+      'DESCRIPTION:' + label,
+      'END:VALARM',
+    ];
     const icsLines = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
@@ -701,6 +711,8 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
       'DTEND;TZID=Australia/Melbourne:' + end,
       'SUMMARY:' + title,
       'DESCRIPTION:' + details.replace(/\n/g, '\\n'),
+      ...alarm('-P3D', title + '（还剩 3 天）'),
+      ...alarm('-P1D', title + '（明天截止！）'),
       'END:VEVENT',
       'END:VCALENDAR'
     ].join('\r\n');
@@ -1317,6 +1329,23 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                >
                                  <Calendar size={14} />
                                  <span>一键载入法定抗辩日历事件 (.ics)</span>
+                               </button>
+
+                               <button
+                                 onClick={() => {
+                                   const dateStr = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+                                   const url = googleCalendarUrl({
+                                     title: '⚠️ 维州租务扣押争议 VCAT / RTBA 时效死线',
+                                     dueDate: dateStr,
+                                     details: `依据 14 天法定答复时限，若中介无理回绝，请立即单方面发起 RTBA 索赔！时效届满截止日期：${dateStr}`,
+                                     remindDaysBefore: 3,
+                                   });
+                                   if (url) window.open(url, '_blank', 'noopener');
+                                 }}
+                                 className="flex-1 bg-white hover:bg-neutral-50 text-[#1d1d1f] border-2 border-[#1d1d1f]/35 font-extrabold text-xs py-3 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer active:scale-95"
+                               >
+                                 <Calendar size={14} />
+                                 <span>加入 Google 日历（提前 3 天提醒）</span>
                                </button>
 
                                <button 
