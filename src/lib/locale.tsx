@@ -121,16 +121,27 @@ type LocaleState = {
 
 const LocaleContext = createContext<LocaleState | null>(null);
 
+// Melbourne-first launch: the product currently ships for Australia only. The multi-country
+// architecture stays intact (COUNTRY_CONTENT/REGIONS above) so other markets can be re-enabled
+// by flipping this flag — but the UI locks to AU and defaults to VIC (Melbourne).
+export const AU_FOCUS = true;
+
 export function LocaleProvider({ children }: { children: React.ReactNode }) {
-  const [country, setCountryState] = useState<string>(
-    () => localStorage.getItem('serene_country') || 'AU'
-  );
+  const [country, setCountryState] = useState<string>(() => {
+    if (AU_FOCUS) return 'AU';
+    return localStorage.getItem('serene_country') || 'AU';
+  });
   const [language, setLanguageState] = useState<string>(
     () => localStorage.getItem('serene_language') || 'zh'
   );
-  const [region, setRegionState] = useState<string>(
-    () => localStorage.getItem('serene_region') || ''
-  );
+  const [region, setRegionState] = useState<string>(() => {
+    const stored = localStorage.getItem('serene_region') || '';
+    if (AU_FOCUS) {
+      // A region persisted from another country (or none) falls back to VIC (Melbourne).
+      return REGIONS.AU.some((r) => r.code === stored) ? stored : 'VIC';
+    }
+    return stored;
+  });
 
   useEffect(() => { localStorage.setItem('serene_country', country); }, [country]);
   useEffect(() => { localStorage.setItem('serene_language', language); }, [language]);

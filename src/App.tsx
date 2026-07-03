@@ -10,13 +10,13 @@ import { Mail, Shield, AlertTriangle, Compass, LogIn, LogOut, Clock, Scale, List
 import { initAuth, googleSignIn, consumeRedirectResult, logout } from './lib/firebase';
 import { createGmailDraft } from './lib/gmail';
 import { User } from 'firebase/auth';
-import { useLocale, COUNTRIES, LANGUAGES, REGIONS, getCountryName } from './lib/locale';
+import { useLocale, LANGUAGES, REGIONS, getCountryName } from './lib/locale';
 import { useT } from './lib/i18n';
 
 type TabView = 'letter' | 'shield' | 'legalhub' | 'emergency' | 'roadmap' | 'history';
 
 export default function App() {
-  const { country, language, region, setCountry, setLanguage, setRegion } = useLocale();
+  const { country, language, region, setLanguage, setRegion } = useLocale();
   const t = useT();
   const regionOptions = REGIONS[country] || [];
   const [user, setUser] = useState<User | null>(null);
@@ -121,17 +121,17 @@ export default function App() {
           </span>
         </h1>
         <div className="flex items-center gap-2 md:gap-2.5 w-full sm:w-auto">
-          {/* Destination country + display language selectors — the "无界" controls */}
-          <select
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
+          {/* Melbourne-first: country is locked to AU (see AU_FOCUS in lib/locale.tsx);
+              the display-language selector stays — languages vary, the market doesn't (yet). */}
+          <span
             title={t('title_country')}
-            className="flex-1 sm:flex-none min-w-0 truncate text-xs md:text-sm font-medium text-body bg-surface-soft border border-hairline rounded-lg px-2.5 py-2 cursor-pointer hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+            className="flex-1 sm:flex-none min-w-0 truncate text-xs md:text-sm font-semibold text-body bg-surface-soft border border-hairline rounded-lg px-2.5 py-2 inline-flex items-center gap-1.5"
           >
-            {COUNTRIES.map((c) => (
-              <option key={c.code} value={c.code}>{c.flag} {getCountryName(c.code, language)}</option>
-            ))}
-          </select>
+            🇦🇺 {getCountryName('AU', language)}
+            <span className="text-[9px] font-black text-primary bg-primary/10 border border-primary/20 rounded-full px-1.5 py-0.5 whitespace-nowrap">
+              {language === 'zh' ? '墨尔本首发' : 'Melbourne'}
+            </span>
+          </span>
           {regionOptions.length > 0 && (
             <select
               value={region}

@@ -49,6 +49,8 @@ export default function CommunityRadar() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
+  // Google Maps embed query for the event the user tapped (null = map hidden).
+  const [mapQuery, setMapQuery] = useState<string | null>(null);
 
   const toggleInterest = (chip: string) =>
     setInterests((prev) => (prev.includes(chip) ? prev.filter((c) => c !== chip) : [...prev, chip]));
@@ -57,6 +59,7 @@ export default function CommunityRadar() {
     setLoading(true);
     setError(false);
     setResult(null);
+    setMapQuery(null);
     try {
       const res = await fetch('/api/community-radar', {
         method: 'POST',
@@ -233,9 +236,17 @@ export default function CommunityRadar() {
                     </div>
                     <p className="text-[11px] text-muted mt-1.5 leading-relaxed">{ev.why}</p>
                     <div className="flex items-center justify-between gap-2 mt-2">
-                      <span className="text-[10px] text-muted-soft flex items-center gap-1">
+                      <button
+                        onClick={() => setMapQuery(mapQuery === ev.where ? null : ev.where)}
+                        className={`text-[10px] flex items-center gap-1 rounded-full border px-2 py-1 transition-all ${
+                          mapQuery === ev.where
+                            ? 'bg-primary text-on-primary border-primary'
+                            : 'text-muted-soft border-hairline hover:border-primary hover:text-primary'
+                        }`}
+                        title="在 Google 地图中查看"
+                      >
                         <MapPin size={11} /> {ev.where}
-                      </span>
+                      </button>
                       {ev.url && (
                         <a
                           href={ev.url}
@@ -250,6 +261,23 @@ export default function CommunityRadar() {
                   </div>
                 ))}
               </div>
+
+              {/* Live Google Map for the tapped venue (same free embed as the 拼饭 planner) */}
+              {mapQuery && (
+                <div className="mt-3 animate-in fade-in duration-300">
+                  <div className="rounded-2xl overflow-hidden border border-hairline bg-surface-soft">
+                    <iframe
+                      title="community-event-map"
+                      src={`https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`}
+                      className="w-full"
+                      style={{ border: 0, height: 280 }}
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                    />
+                  </div>
+                  <p className="text-[10px] text-muted-soft mt-1.5">🗺️ Google Maps · 点击地点标签可收起</p>
+                </div>
+              )}
             </div>
           )}
 
