@@ -8,6 +8,14 @@ import { createServer as createViteServer } from "vite";
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
+// Model split (评委建议：识别用 Gemini、生成用 Gemma).
+// Perception/grounding tasks (vision OCR, Google-Search-grounded analysis) stay on Gemini;
+// lightweight pure-text GENERATION (e.g. the survival checklist) runs on Gemma, which has its
+// own free quota — so a burst of generations doesn't burn the shared Gemini limit. Gemma on the
+// API has no responseSchema/tools support, so those endpoints parse JSON from the raw text.
+const GEMINI_MODEL = "gemini-2.5-flash";
+const GEMMA_MODEL = process.env.GEMMA_MODEL || "gemma-4-26b-a4b-it";
+
 app.use(express.json());
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
@@ -1532,7 +1540,7 @@ Please output a JSON response matching this schema:
 }`;
 
     const response = await generateWithRetry(aiClient, 'generateContent', {
-      model: "gemini-2.5-flash",
+      model: GEMINI_MODEL,
       contents: [
         {
           role: "user",
@@ -1646,7 +1654,7 @@ Output JSON (DO NOT WRAP IN MARKDOWN BLOCK, JUST RAW JSON):
     }
 
     const response = await generateWithRetry(aiClient, 'generateContent', {
-      model: "gemini-2.5-flash",
+      model: GEMINI_MODEL,
       contents: [{ role: "user", parts }],
       config: {
         tools: [{ googleSearch: {} }]
@@ -1736,7 +1744,7 @@ Expected JSON format:
     }
 
     const response = await generateWithRetry(aiClient, 'generateContent', {
-      model: "gemini-2.5-flash",
+      model: GEMINI_MODEL,
       contents: [{ role: "user", parts }],
       config: {
         tools: [{ googleSearch: {} }]
@@ -1776,7 +1784,7 @@ app.post("/api/translate-stream", async (req, res) => {
     const prompt = `Translate the following English email draft into natural ${getLang(language)}. Only return the exact translated text, without any conversational descriptions, prefaces, or markdown blocks.\n\n${text}`;
     
     const responseStream = await generateWithRetry(aiClient, 'generateContentStream', {
-      model: "gemini-2.5-flash",
+      model: GEMINI_MODEL,
       contents: [{ role: "user", parts: [{ text: prompt }] }],
     }) as any;
 
@@ -1807,7 +1815,7 @@ app.post("/api/translate", async (req, res) => {
     const aiClient = getAI();
     const prompt = `Translate the following English email draft into natural ${getLang(language)}. Only return the exact translated text, without any conversational descriptions, prefaces, or markdown blocks.\n\n${text}`;
     const response = await generateWithRetry(aiClient, 'generateContent', {
-      model: "gemini-2.5-flash",
+      model: GEMINI_MODEL,
       contents: [{ role: "user", parts: [{ text: prompt }] }],
     }) as any;
     let translation = response.text || "";
@@ -1911,7 +1919,7 @@ JSON shape:
 }`;
 
     const response = await generateWithRetry(aiClient, 'generateContent', {
-      model: "gemini-2.5-flash",
+      model: GEMINI_MODEL,
       contents: prompt,
       config: {
         tools: [{ googleSearch: {} }]
@@ -1967,29 +1975,11 @@ Return JSON (never wrap in markdown):
   "checklist": ["item 1 in ${langName}", "item 2", "item 3"]
 }`;
 
+    // Pure-text generation → Gemma (no vision, no grounding). Gemma has no responseSchema on the
+    // API, so we ask for raw JSON in the prompt and strip any ```json fences before parsing.
     const response = await generateWithRetry(aiClient, 'generateContent', {
-      model: "gemini-2.5-flash",
+      model: GEMMA_MODEL,
       contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            matchedGuideIds: {
-              type: Type.ARRAY,
-              items: { type: Type.STRING },
-              description: "匹配出来的最合适向导ID数组 (如: g-1, g-2)"
-            },
-            reason: { type: Type.STRING, description: "真挚的匹配推荐理由说明" },
-            checklist: {
-              type: Type.ARRAY,
-              items: { type: Type.STRING },
-              description: "3至5条非常针对该处境的排雷、省钱或防宰生动行动条目"
-            }
-          },
-          required: ["matchedGuideIds", "reason", "checklist"]
-        }
-      }
     });
 
     let text = response.text;
@@ -1997,9 +1987,11 @@ Return JSON (never wrap in markdown):
       throw new Error("Empty response from matching engine");
     }
 
-    text = text.replace(/^```json\s*/, '').replace(/```\s*$/, '').trim();
+    const s = text.indexOf('{');
+    const e = text.lastIndexOf('}');
+    if (s !== -1 && e !== -1 && e > s) text = text.slice(s, e + 1);
     const result = JSON.parse(text);
-    return res.json(result);
+    return res.json({ ...result, _model: "gemma" });
   } catch (error: any) {
     console.warn("Gemini match-companion failed, fallback active:", error?.message || error);
     const dynamicCompanion = generateDynamicOfflineMatchCompanion(description, companions);
@@ -2085,7 +2077,7 @@ Required JSON Output schema:
     }
 
     const response = await generateWithRetry(aiClient, 'generateContent', {
-      model: "gemini-2.5-flash",
+      model: GEMINI_MODEL,
       contents: [{ role: "user", parts: contentsParts }],
       config: { tools: [{ googleSearch: {} }] },
     }) as any;
@@ -2178,7 +2170,7 @@ Return JSON, never wrapped in markdown:
 }`;
 
     const response = await generateWithRetry(aiClient, 'generateContent', {
-      model: "gemini-2.5-flash",
+      model: GEMINI_MODEL,
       contents: [
         {
           role: "user",
@@ -2276,7 +2268,7 @@ Return JSON, no markdown code blocks:
 }`;
 
     const response = await generateWithRetry(aiClient, 'generateContent', {
-      model: "gemini-2.5-flash",
+      model: GEMINI_MODEL,
       contents: [{ role: "user", parts: [{ text: prompt }] }],
       config: {
         responseMimeType: "application/json",
@@ -2455,7 +2447,7 @@ WRITE ALL HUMAN-READABLE VALUES IN ${langName}. Do NOT invent fake laws, agencie
 }`;
 
     const response = await generateWithRetry(aiClient, 'generateContent', {
-      model: "gemini-2.5-flash",
+      model: GEMINI_MODEL,
       contents: [{ role: "user", parts: [{ text: prompt }] }],
       config: { tools: [{ googleSearch: {} }] }
     }) as any;
@@ -2493,7 +2485,7 @@ Return ONLY raw JSON (NO markdown code fences):
   "note": "(optional, in ${langName}) one short helpful tip if this looks like an official / time-sensitive document; otherwise empty string"
 }`;
     const response = await generateWithRetry(aiClient, 'generateContent', {
-      model: "gemini-2.5-flash",
+      model: GEMINI_MODEL,
       contents: [{ role: "user", parts: [
         { text: prompt },
         { inlineData: { data: file.buffer.toString("base64"), mimeType: file.mimetype } },
@@ -2520,7 +2512,7 @@ app.post("/api/exchange-rate", async (req, res) => {
     const aiClient = getAI();
     const prompt = `Use your Google Search tool to find the CURRENT foreign-exchange rate right now. How many units of ${to} equal 1 ${from}? Use today's live mid-market rate, not memory. Return ONLY raw JSON (NO markdown fences): {"from":"${from}","to":"${to}","rate": <number: units of ${to} per 1 ${from}>, "asOf":"<the date/time of the rate you found>"}`;
     const response = await generateWithRetry(aiClient, 'generateContent', {
-      model: "gemini-2.5-flash",
+      model: GEMINI_MODEL,
       contents: prompt,
       config: { tools: [{ googleSearch: {} }] },
     }) as any;
@@ -2576,7 +2568,7 @@ Return ONLY raw JSON (no markdown fences):
 }`;
 
     const response = await generateWithRetry(aiClient, 'generateContent', {
-      model: "gemini-2.5-flash",
+      model: GEMINI_MODEL,
       contents: prompt,
       config: { tools: [{ googleSearch: {} }] },
     }) as any;
@@ -2624,7 +2616,7 @@ WRITE ALL HUMAN-READABLE VALUES IN ${langName}. Return ONLY raw JSON (no markdow
 }`;
 
     const response = await generateWithRetry(aiClient, 'generateContent', {
-      model: "gemini-2.5-flash",
+      model: GEMINI_MODEL,
       contents: prompt,
       config: { tools: [{ googleSearch: {} }] },
     }) as any;
@@ -2705,7 +2697,7 @@ Return ONLY raw JSON (no markdown fences):
 }`;
 
     const response = await generateWithRetry(aiClient, 'generateContent', {
-      model: "gemini-2.5-flash",
+      model: GEMINI_MODEL,
       contents: prompt,
       config: { tools: [{ googleSearch: {} }] },
     }) as any;
