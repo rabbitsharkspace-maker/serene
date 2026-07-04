@@ -67,7 +67,9 @@
 
 为了保证最严苛的账户资产安全：
 - **拒绝前端裸奔**：所有与 Google Gemini API、联网 Search 相关的秘钥配置和接口请求均**设计在 server-side node.js (Express) 后端服务器**，对浏览器端（Client）完全隐藏，从根本上防止了 API 密钥被恶意反编译和截获利用。
-- **用户数据严格隔离**：Firebase 数据库仅开放细粒度的属主读写权限，非本用户 UID 的任何数据库请求都将被底层 Firestore 规则阻断拒绝。
+- **个人敏感数据严格属主隔离**：涉及个人隐私的数据（申诉 `appeals`、用户档案 `userProfiles`、看板 `kanbanTasks`）在 `firestore.rules` 中按 UID 细粒度隔离——非本用户 UID 的任何读写请求都会被底层规则阻断拒绝。
+- **免登录拼饭局的分级放开与加固**：为了让好友“扫码即进”，`meetups`（拼饭局）是一个**刻意不需要登录**的独立集合，其中不含任何敏感数据（仅一顿饭的昵称、大致区域、口味偏好）。它不套用上面的属主隔离，而是单独加固：`list` 被禁止（无法枚举/爬取所有房间）、房间 `delete` 被禁止（陌生人无法清空活跃房间）、每一次写入都做字段与长度校验（无法灌入超大或任意结构的垃圾数据）；`get` 需要随机 6 位房间码（即文档 ID）才能读取。（如需彻底收紧，可在 Firebase 控制台开启 Anonymous Auth 后把该集合规则改为 `if request.auth != null`，客户端在写入被拒时会自动降级为本地模式，功能不受影响。）
+- **Firebase Web 配置为设计上可公开项**：`firebase-applet-config.json` 中的 `apiKey` 属于 Firebase 前端标识（本就需下发到浏览器），并非服务端密钥；真正的访问控制由上述 Firestore 规则承担，另建议在 GCP 侧为该 key 配置 HTTP referrer / API 限制。
 
 ---
 
