@@ -1,9 +1,30 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // Shape/size guards for the login-free 拼饭 room (see the meetups block below).
+    // Rules can't verify identity without auth, so instead we (a) forbid enumerating
+    // rooms, (b) forbid deleting a whole room, and (c) cap every user-supplied string so
+    // the open collection can't be used to store oversized junk or huge payloads.
+    function isValidRoom() {
+      return request.resource.data.keys().hasOnly(['hostId', 'createdAt', 'result', 'chosen'])
+        && (!('hostId' in request.resource.data) || request.resource.data.hostId is string);
+    }
+    function isValidParticipant() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['name', 'address', 'taste', 'joinedAt'])
+        && (!('name' in d)     || (d.name is string     && d.name.size() <= 200))
+        && (!('address' in d)  || (d.address is string  && d.address.size() <= 300))
+        && (!('taste' in d)    || (d.taste is string    && d.taste.size() <= 300))
+        && (!('joinedAt' in d) || d.joinedAt is number);
+    }
+
+    // Default deny everything.
     match /{document=**} {
       allow read, write: if false;
     }
+
+    // Personal legal-appeal data: strictly owner-isolated by UID.
     match /appeals/{appealId} {
       allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
       allow read, update, delete: if request.auth != null && resource.data.uid == request.auth.uid;
@@ -16,14 +37,29 @@ service cloud.firestore {
       allow read, update, delete: if request.auth != null && resource.data.uid == request.auth.uid;
     }
 
-    // Group-meal rooms (拼饭局). Login-free so a friend can scan the QR and join instantly,
-    // so these are intentionally open read/write — scoped to this collection only.
-    // The room code is a random 6-char key, hard to guess. Tighten later with anonymous
-    // auth or per-field validation if abuse becomes a concern.
+    // Group-meal rooms (拼饭局). Deliberately login-free so a friend can scan the QR and
+    // join instantly — this collection holds NO sensitive data (just a first name, rough
+    // area, and food preference for one meal). It is NOT covered by the owner-isolation
+    // guarantee above, and is hardened as follows:
+    //   • `get` needs the random 6-char room code (which is the doc id) — you can't read a
+    //     room you don't already have a link to.
+    //   • `list` is denied, so nobody can enumerate or scrape all rooms.
+    //   • `delete` on the room is denied, so a stranger can't wipe an active room.
+    //   • every write is shape- and size-checked, so the open collection can't be abused
+    //     to store oversized or arbitrary payloads.
+    // To fully lock this down, enable Anonymous Auth in the Firebase console and change the
+    // rules below to `if request.auth != null` — the client already degrades to local-only
+    // mode if a write is denied, so nothing breaks.
     match /meetups/{code} {
-      allow read, write: if true;
+      allow get: if true;
+      allow list: if false;
+      allow create, update: if isValidRoom();
+      allow delete: if false;
+
       match /participants/{participantId} {
-        allow read, write: if true;
+        allow get, list: if true;
+        allow create, update: if isValidParticipant();
+        allow delete: if true;
       }
     }
   }

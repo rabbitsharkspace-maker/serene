@@ -493,6 +493,9 @@ export default function EcosystemHub() {
   const [matchReason, setMatchReason] = useState<string | null>(null);
   const [matchChecklist, setMatchChecklist] = useState<string[]>([]);
   const [matchIsFallback, setMatchIsFallback] = useState(false);
+  // Which model actually answered ('gemma' on the live Gemini/Gemma split, null on fallback).
+  // Surfaced as a small badge so we can verify on stage that Gemma really ran — and show the split.
+  const [matchModel, setMatchModel] = useState<string | null>(null);
 
   // 临期食材/小票菜谱 (Kitchen Budget Recipe)
   const [recipePreview, setRecipePreview] = useState<string | null>(null);
@@ -555,6 +558,7 @@ export default function EcosystemHub() {
     setMatchReason(null);
     setMatchChecklist([]);
     setMatchIsFallback(false);
+    setMatchModel(null);
 
     try {
       const res = await fetch('/api/match-companion', {
@@ -583,7 +587,8 @@ export default function EcosystemHub() {
       setMatchReason(data.reason || '');
       setMatchChecklist(data.checklist || []);
       setMatchIsFallback(!!data.isQuotaFallback);
-      
+      setMatchModel(data.isQuotaFallback ? null : (data._model ?? null));
+
       // Select the first matched guide automatically to focus details and guide student better!
       if (data.matchedGuideIds && data.matchedGuideIds.length > 0) {
         const found = guides.find(g => g.id === data.matchedGuideIds[0]);
@@ -2050,6 +2055,15 @@ export default function EcosystemHub() {
                     <div className="flex items-center gap-1.5 text-amber-900 font-black text-xs">
                       <Shield size={14} className="text-amber-700 animate-pulse fill-amber-200" />
                       <span>{t('eh_gv_card_title')}</span>
+                      {matchModel === 'gemma' && !matchIsFallback && (
+                        <span
+                          title="Generated on-device split: Gemma handled this pure-text generation (Gemini handles vision + grounding)."
+                          className="ml-auto shrink-0 inline-flex items-center gap-1 text-[8px] font-black uppercase tracking-wide text-emerald-800 bg-emerald-100 border border-emerald-300 px-1.5 py-0.5 rounded-full"
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                          Gemma
+                        </span>
+                      )}
                     </div>
                     {matchIsFallback && <FallbackNotice />}
                     {matchReason && (
