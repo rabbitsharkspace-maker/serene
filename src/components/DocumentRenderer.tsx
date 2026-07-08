@@ -2,7 +2,8 @@ import React from 'react';
 
 export function renderDocumentHTML(
   type: 'fine' | 'coe' | 'bond' | 'plagiarism' | 'noise' | 'utility',
-  isMini: boolean
+  isMini: boolean,
+  isAnonymized: boolean = false
 ) {
   const p = isMini ? 'p-2 sm:p-3' : 'p-6 md:p-10';
   const textBase = isMini ? 'text-[8.5px] leading-snug' : 'text-xs md:text-sm leading-relaxed';
@@ -11,6 +12,19 @@ export function renderDocumentHTML(
   const titleBanner = isMini ? 'py-0.5 text-[7.5px]' : 'py-2.5 text-[10.5px]';
   const spacing = isMini ? 'mb-1' : 'mb-4';
   const borderB = isMini ? 'pb-1 mb-1.5 border-b' : 'pb-3 mb-4 border-b-2';
+
+  // Redaction renderer
+  const redact = (text: string, category: string) => {
+    if (!isAnonymized) return text;
+    return (
+      <span 
+        className="bg-neutral-950 text-white font-mono rounded px-1.5 py-0.5 font-bold border border-neutral-900 select-none animate-pulse inline-block"
+        title={`🛡️ ${category} 已由隐私脱敏盾打码`}
+      >
+        [REDACTED_{category}]
+      </span>
+    );
+  };
   
   if (type === 'bond') {
     return (
@@ -31,8 +45,8 @@ export function renderDocumentHTML(
         <div className={`grid grid-cols-1 sm:grid-cols-2 gap-2 ${spacing} ${textSub}`}>
           <div>
             <div className="font-bold text-gray-400 uppercase tracking-wider mb-0.5">Tenant Details:</div>
-            <strong className="text-gray-800">Alex Thompson</strong><br/>
-            4/85 Bourke Street, Melbourne VIC 3000
+            <strong className="text-gray-800">{redact('Alex Thompson', 'NAME')}</strong><br/>
+            {redact('4/85 Bourke Street, Melbourne VIC 3000', 'ADDRESS')}
           </div>
           <div className="sm:text-right">
             <div className="font-bold text-gray-400 uppercase tracking-wider mb-0.5">Notice Reference:</div>
@@ -47,9 +61,9 @@ export function renderDocumentHTML(
           Notice of Intention to Claim Rental Bond
         </div>
 
-        <p className={spacing}>Dear Alex Thompson,</p>
+        <p className={spacing}>Dear {redact('Alex Thompson', 'NAME')},</p>
         <p className={spacing}>
-          We write to you in relation to your tenancy at <strong>4/85 Bourke Street, Melbourne VIC 3000</strong>, which finished on 26 June 2026. Following the final exit inspection done at the premises, Horizon Residential VIC intends to claim a deduction of <strong className="text-red-700 font-bold">$420.00 AUD</strong> from your total bond amount of $2,100.00 AUD.
+          We write to you in relation to your tenancy at <strong>{redact('4/85 Bourke Street, Melbourne VIC 3000', 'ADDRESS')}</strong>, which finished on 26 June 2026. Following the final exit inspection done at the premises, Horizon Residential VIC intends to claim a deduction of <strong className="text-red-700 font-bold">$420.00 AUD</strong> from your total bond amount of $2,100.00 AUD.
         </p>
 
         {/* Table */}
@@ -94,13 +108,13 @@ export function renderDocumentHTML(
         </p>
 
         <div className={`bg-amber-50 border border-amber-200 border-l-4 border-amber-500 rounded p-2.5 text-amber-955 leading-normal ${spacing}`}>
-          <strong className="text-red-750 font-bold uppercase text-[7.5px] sm:text-[9px]">Critical Deadline and Consequence of Inaction:</strong><br/>
+          <strong className="text-red-755 font-bold uppercase text-[7.5px] sm:text-[9px]">Critical Deadline and Consequence of Inaction:</strong><br/>
           You must respond to this office in writing or initiate a dispute channel by no later than <strong className="text-red-700">5:00 PM on 14 July 2026</strong>. If you fail to respond or dispute by this deadline, Horizon Residential VIC will proceed with the automatic release of the reduced bond.
         </div>
 
         <div className="flex justify-between items-end mt-4 pt-2 border-t text-[8px] sm:text-[10px]">
           <div>
-            <p className="text-gray-400 text-[6.5px] sm:text-[8px] leading-tight">Yours sincerely,<br/><strong className="text-gray-800">Evelyn Reed</strong><br/>Property Manager</p>
+            <p className="text-gray-400 text-[6.5px] sm:text-[8px] leading-tight text-left">Yours sincerely,<br/><strong className="text-gray-800">Evelyn Reed</strong><br/>Property Manager</p>
           </div>
           <div className="text-[6.5px] sm:text-[8px] text-gray-400 font-mono text-right italic max-w-[50%]">
             Complies with Victorian Residential Tenancies Act 1997.
@@ -132,13 +146,13 @@ export function renderDocumentHTML(
         <div className={`grid grid-cols-1 sm:grid-cols-2 gap-2 ${spacing} ${textSub}`}>
           <div>
             <div className="font-bold text-gray-400 uppercase tracking-wider mb-0.5">Vehicle / Infringement Details:</div>
-            <strong>Vehicle Reg:</strong> ABC-123<br/>
+            <strong>Vehicle Reg:</strong> {redact('ABC-123', 'VEHICLE_REGO')}<br/>
             <strong>Make/Model:</strong> Red Toyota Corolla sedan<br/>
-            <strong>Location:</strong> Flinders Lane, Melbourne
+            <strong>Location:</strong> {redact('Flinders Lane, Melbourne', 'ADDRESS')}
           </div>
           <div className="sm:text-right">
             <div className="font-bold text-gray-400 uppercase tracking-wider mb-0.5">Notice Metadata:</div>
-            <strong>Notice No:</strong> INF0432198<br/>
+            <strong>Notice No:</strong> {redact('INF0432198', 'FINE_ID')}<br/>
             <strong>Date of Issue:</strong> 5 April 2026<br/>
             <strong>Time:</strong> 3 April 2026 at 7:32 AM
           </div>
@@ -186,7 +200,7 @@ export function renderDocumentHTML(
           <div>
             <strong className="text-[#1d1d1f] uppercase text-[7.5px] sm:text-[8.5px] tracking-wider block mb-1">Payment Channels:</strong>
             <ul className="space-y-0.5 leading-tight text-gray-600 font-mono">
-              <li><strong>BPay:</strong> Biller: 30129 | Ref: 98127391782</li>
+              <li><strong>BPay:</strong> Biller: 30129 | Ref: {redact('98127391782', 'PAYMENT_REF')}</li>
               <li><strong>Online:</strong> paymentportal.brentmoor.vic.gov.au</li>
               <li><strong>Phone:</strong> 1300 982 112</li>
             </ul>
@@ -201,7 +215,7 @@ export function renderDocumentHTML(
 
         <div className="flex justify-between items-end mt-4 pt-2 border-t text-[8px] sm:text-[10px]">
           <div>
-            <p className="text-gray-400 text-[6.5px] sm:text-[8px] leading-tight font-sans">Issued by:<br/><span className="text-gray-700 font-semibold">Authorised Enforcement Officer</span><br/>City of Brentmoor Rangers Unit</p>
+            <p className="text-gray-400 text-[6.5px] sm:text-[8px] leading-tight font-sans text-left">Issued by:<br/><span className="text-gray-700 font-semibold">Authorised Enforcement Officer</span><br/>City of Brentmoor Rangers Unit</p>
           </div>
           <div className="text-[6.5px] sm:text-[8px] text-gray-400 font-mono text-right">
             *INF0432198*
@@ -230,8 +244,8 @@ export function renderDocumentHTML(
         <div className={`grid grid-cols-1 sm:grid-cols-2 gap-2 ${spacing} ${textSub}`}>
           <div>
             <div className="font-bold text-neutral-400 uppercase tracking-widest mb-0.5">Student Details:</div>
-            <strong className="text-gray-800">Li Wei Chen</strong><br/>
-            <strong>Student ID:</strong> 10987654<br/>
+            <strong className="text-gray-800">{redact('Li Wei Chen', 'NAME')}</strong><br/>
+            <strong>Student ID:</strong> {redact('10987654', 'STUDENT_ID')}<br/>
             <strong>Course:</strong> Master of Applied Data Analytics
           </div>
           <div className="sm:text-right">
@@ -247,7 +261,7 @@ export function renderDocumentHTML(
           Outcome of Course Academic Progress Committee
         </div>
 
-        <p className={spacing}>Dear Li Wei Chen,</p>
+        <p className={spacing}>Dear {redact('Li Wei Chen', 'NAME')},</p>
         <p className={spacing}>
           The Course Academic Progress Committee (CAPC) met on 18 June 2026 to review your academic progression following Semester 1 results. The CAPC noted that despite support arrangements in place, you failed all enrolled units in Semester 1 2026.
         </p>
@@ -268,17 +282,17 @@ export function renderDocumentHTML(
           <strong className="text-red-800 font-black flex items-center gap-1 uppercase tracking-wide text-[7.5px] sm:text-[9.5px] mb-1">
             ⚠️ Visa & Confirmation of Enrolment (CoE) Status:
           </strong>
-          <p className="mb-1 font-sans">
+          <p className="mb-1 font-sans text-left">
             Please be informed that termination of your enrolment will result in the <strong>cancellations of your Confirmation of Enrolment (CoE)</strong>, which will be reported to the Department of Home Affairs (DHA).
           </p>
-          <p className="font-bold font-sans">
+          <p className="font-bold font-sans text-left">
             A cancelled CoE constitutes a breach of Student Visa Subclass 500 conditions, and your visa may be subject to cancellation.
           </p>
         </div>
 
         <div className="flex justify-between items-end mt-4 pt-2 border-t text-[8px] sm:text-[10px]">
           <div>
-            <p className="text-gray-400 text-[6.5px] sm:text-[8px] leading-tight">Yours sincerely,<br/><strong className="text-gray-800">Dr. Elara Vance</strong><br/>Chair, CAPC Committee</p>
+            <p className="text-gray-400 text-[6.5px] sm:text-[8px] leading-tight text-left">Yours sincerely,<br/><strong className="text-gray-800">Dr. Elara Vance</strong><br/>Chair, CAPC Committee</p>
           </div>
           <div className="text-[6.5px] sm:text-[8px] text-gray-450 font-mono text-right max-w-[50%]">
             Westhaven Student Progress Unit
@@ -307,13 +321,13 @@ export function renderDocumentHTML(
         <div className={`grid grid-cols-1 sm:grid-cols-2 gap-2 ${spacing} ${textSub}`}>
           <div>
             <div className="font-bold text-neutral-400 uppercase tracking-wider mb-0.5">Student & Course Details:</div>
-            <strong className="text-gray-800">Sarah Chen</strong><br/>
-            <strong>Student ID:</strong> 10987654<br/>
+            <strong className="text-gray-800">{redact('Sarah Chen', 'NAME')}</strong><br/>
+            <strong>Student ID:</strong> {redact('10987654', 'STUDENT_ID')}<br/>
             <strong>Course Unit:</strong> ECON101 Introduction to Economics
           </div>
           <div className="sm:text-right">
             <div className="font-bold text-neutral-400 uppercase tracking-wider mb-0.5">Case Registry:</div>
-            <strong>Reference No:</strong> AIO-2026-PL-492<br/>
+            <strong>Reference No:</strong> {redact('AIO-2026-PL-492', 'CASE_REF')}<br/>
             <strong>Allegation Date:</strong> 21 June 2026<br/>
             <strong>Assignment Name:</strong> Case Study 2: Market Dynamics
           </div>
@@ -324,7 +338,7 @@ export function renderDocumentHTML(
           Notification of Academic Integrity Allegation
         </div>
 
-        <p className={spacing}>Dear Sarah Chen,</p>
+        <p className={spacing}>Dear {redact('Sarah Chen', 'NAME')},</p>
         <p className={spacing}>
           The Academic Integrity Office has received an official referral from your Course Coordinator concerning your assignment submission <strong>"Case Study 2: Market Dynamics"</strong> for ECON101. An initial review detected a <strong>48% duplication similarity rate</strong> with external publications, online repositories, and other academic papers.
         </p>
@@ -356,7 +370,7 @@ export function renderDocumentHTML(
 
         <div className="flex justify-between items-end mt-4 pt-2 border-t text-[8px] sm:text-[10px]">
           <div>
-            <p className="text-gray-400 text-[6.5px] sm:text-[8px] leading-tight font-sans">Yours sincerely,<br/><strong className="text-gray-800">Prof. Alistair Croft</strong><br/>Chair, Integrity Committee</p>
+            <p className="text-gray-400 text-[6.5px] sm:text-[8px] leading-tight font-sans text-left">Yours sincerely,<br/><strong className="text-gray-800">Prof. Alistair Croft</strong><br/>Chair, Integrity Committee</p>
           </div>
           <div className="text-[6.5px] sm:text-[8px] text-gray-450 font-mono text-right max-w-[50%]">
             AIO Registry Melbourne
@@ -386,7 +400,7 @@ export function renderDocumentHTML(
           <div>
             <div className="font-bold text-neutral-400 uppercase tracking-wider mb-0.5">Recipient Details:</div>
             <strong>The Occupier</strong><br/>
-            Apartment 4B, 88 Flinders Lane<br/>
+            {redact('Apartment 4B, 88 Flinders Lane', 'ADDRESS')}<br/>
             Melbourne VIC 3000
           </div>
           <div className="sm:text-right">
@@ -404,7 +418,7 @@ export function renderDocumentHTML(
 
         <p className={spacing}>To the Occupier,</p>
         <p className={spacing}>
-          We act on behalf of the Owners Corporation Plan No. PS 123456 representing the property at 88 Flinders Lane. We have received multiple complaints regarding excessive noise emanating from <strong>Apartment 4B</strong>.
+          We act on behalf of the Owners Corporation Plan No. PS 123456 representing the property at 88 Flinders Lane. We have received multiple complaints regarding excessive noise emanating from <strong>{redact('Apartment 4B', 'ADDRESS')}</strong>.
         </p>
         <p className={spacing}>
           Over the past four weeks, specific disturbances were documented after <strong>10:00 PM</strong>, including shouting and loud party music. This directly breaches strata model bylaws.
@@ -427,9 +441,9 @@ export function renderDocumentHTML(
 
         <div className="flex justify-between items-end mt-4 pt-2 border-t text-[8px] sm:text-[10px]">
           <div>
-            <p className="text-gray-400 text-[6.5px] sm:text-[8px] leading-tight font-sans">Yours sincerely,<br/><strong className="text-gray-800">Oliver Vance</strong><br/>Property Manager</p>
+            <p className="text-gray-400 text-[6.5px] sm:text-[8px] leading-tight font-sans text-left">Yours sincerely,<br/><strong className="text-gray-800">Oliver Vance</strong><br/>Property Manager</p>
           </div>
-          <div className="text-[6.5px] sm:text-[8px] text-gray-400 font-mono text-right max-w-[50%]">
+          <div className="text-[6.5px] sm:text-[8px] text-gray-450 font-mono text-right max-w-[50%]">
             Strata Compliance Registry VIC
           </div>
         </div>
@@ -456,12 +470,12 @@ export function renderDocumentHTML(
         <div className={`grid grid-cols-1 sm:grid-cols-2 gap-2 ${spacing} ${textSub}`}>
           <div>
             <div className="font-bold text-neutral-400 uppercase tracking-wider mb-0.5">Customer & Address:</div>
-            <strong className="text-gray-800">Mrs. Eleanor Vance</strong><br/>
-            14 Flinders Lane, Melbourne VIC 3000
+            <strong className="text-gray-800">{redact('Mrs. Eleanor Vance', 'NAME')}</strong><br/>
+            {redact('14 Flinders Lane, Melbourne VIC 3000', 'ADDRESS')}
           </div>
           <div className="sm:text-right">
             <div className="font-bold text-neutral-400 uppercase tracking-wider mb-0.5">Account & Invoice:</div>
-            <strong>Account No:</strong> 9876 543 210<br/>
+            <strong>Account No:</strong> {redact('9876 543 210', 'ACCOUNT_NO')}<br/>
             <strong>Notice Date:</strong> 22 June 2026<br/>
             <strong>Original Due Date:</strong> 1 June 2026
           </div>
@@ -472,7 +486,7 @@ export function renderDocumentHTML(
           ⚠️ URGENT — SERVICE DISCONNECTION WARNING
         </div>
 
-        <p className={spacing}>Dear Mrs. Eleanor Vance,</p>
+        <p className={spacing}>Dear {redact('Mrs. Eleanor Vance', 'NAME')},</p>
         <p className={spacing}>
           Our database indicates that payments for your electricity & water account are overdue. Despite prior notifications, the outstanding balance remains unpaid.
         </p>
@@ -526,7 +540,7 @@ export function renderDocumentHTML(
         <div className={`bg-gray-50 border border-gray-150 p-2.5 rounded-lg ${spacing} ${textSub}`}>
           <strong className="text-gray-700 uppercase text-[7.5px] sm:text-[8.5px] tracking-wider block mb-1">Payment Instructions:</strong>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 font-mono text-gray-600 break-words leading-tight">
-            <span><strong>BPay:</strong> Biller: 1102 | Ref: 98765432104</span>
+            <span><strong>BPay:</strong> Biller: 1102 | Ref: {redact('98765432104', 'PAYMENT_REF')}</span>
             <span><strong>Online:</strong> coastalenergy.com.au/pay</span>
             <span><strong>Phone:</strong> 1300 882 110</span>
           </div>
@@ -534,9 +548,9 @@ export function renderDocumentHTML(
 
         <div className="flex justify-between items-end mt-4 pt-2 border-t text-[8px] sm:text-[10px]">
           <div>
-            <p className="text-gray-400 text-[6.5px] sm:text-[8px] leading-tight">By: <strong className="text-gray-800">Coastal Billing Operations</strong><br/>Accounts Disconnection Department</p>
+            <p className="text-gray-400 text-[6.5px] sm:text-[8px] leading-tight text-left">By: <strong className="text-gray-800">Coastal Billing Operations</strong><br/>Accounts Disconnection Department</p>
           </div>
-          <div className="text-[6.5px] sm:text-[8px] text-gray-400 font-mono text-right">
+          <div className="text-[6.5px] sm:text-[8px] text-gray-450 font-mono text-right">
             *9876543210*
           </div>
         </div>

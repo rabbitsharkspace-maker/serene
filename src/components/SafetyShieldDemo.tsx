@@ -6,6 +6,7 @@ import { useLocale, getCountryName } from '../lib/locale';
 import { useT, type StringKey } from '../lib/i18n';
 import GroundingSources from './GroundingSources';
 import FallbackNotice from './FallbackNotice';
+import { showToast } from '../lib/toast';
 
 type AppState = 'upload' | 'analyzing' | 'result';
 type SubmoduleType = 'valuation' | 'scamCheck';
@@ -23,6 +24,10 @@ interface ShieldResult {
   redFlags: string[];
   valueCheck?: ShieldValueCheck;
   isQuotaFallback?: boolean;
+  safetyLevel?: 'safe' | 'warning' | 'danger';
+  riskAnalysis?: string;
+  lawReferences?: string[];
+  urgentActions?: string[];
 }
 
 interface ScamResult {
@@ -117,14 +122,14 @@ export default function SafetyShieldDemo() {
       setAppState('result');
     } catch (err) {
       console.error(err);
-      alert(t('ss_diag_fail'));
+      showToast(t('ss_diag_fail'), 'error');
       setAppState('upload');
     }
   };
 
   const submitScamCheck = async () => {
     if (selectedFlags.length === 0 && !scamText.trim() && !scamFile) {
-      alert(t('ss_scam_need'));
+      showToast(t('ss_scam_need'), 'info');
       return;
     }
     setAppState('analyzing');
@@ -150,7 +155,7 @@ export default function SafetyShieldDemo() {
       setAppState('result');
     } catch (err) {
       console.error(err);
-      alert(t('ss_scam_fail'));
+      showToast(t('ss_scam_fail'), 'error');
       setAppState('upload');
     }
   };
@@ -543,6 +548,69 @@ export default function SafetyShieldDemo() {
                     <Markdown>{analysis.summary}</Markdown>
                   </div>
                 </div>
+
+                {/* Custom Structured Fields for Safety Shield */}
+                {(analysis.safetyLevel || analysis.riskAnalysis || (analysis.lawReferences && analysis.lawReferences.length > 0) || (analysis.urgentActions && analysis.urgentActions.length > 0)) && (
+                  <div className="mb-6 flex flex-col gap-5 font-sans text-left">
+                    {/* Safety Level and Risk Analysis Card */}
+                    {(analysis.safetyLevel || analysis.riskAnalysis) && (
+                      <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs flex flex-col gap-3">
+                        <div className="flex items-center gap-2">
+                          <span className={`text-[10px] font-black tracking-wider px-2.5 py-0.5 rounded-full uppercase ${
+                            analysis.safetyLevel === 'danger' ? 'bg-red-100 text-red-800' : 
+                            analysis.safetyLevel === 'warning' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
+                          }`}>
+                            🛡️ 安全级别: {
+                              analysis.safetyLevel === 'danger' ? 'DANGER / 极其危险' : 
+                              analysis.safetyLevel === 'warning' ? 'WARNING / 潜在隐患' : 'SAFE / 安全合规'
+                            }
+                          </span>
+                        </div>
+                        {analysis.riskAnalysis && (
+                          <div className="text-xs text-gray-600 leading-relaxed font-sans">
+                            <strong className="text-gray-900 block mb-1 font-bold">🧠 深度安全漏洞研判:</strong>
+                            <p>{analysis.riskAnalysis}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Law References List */}
+                    {analysis.lawReferences && analysis.lawReferences.length > 0 && (
+                      <div className="bg-blue-50/30 p-5 rounded-2xl border border-blue-100/60 flex flex-col gap-2">
+                        <h4 className="text-xs font-black text-blue-900 uppercase tracking-widest flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                          <span>维权及法理参考依据 ({analysis.lawReferences.length})</span>
+                        </h4>
+                        <ul className="space-y-1.5 list-disc list-inside">
+                          {analysis.lawReferences.map((ref, idx) => (
+                            <li key={idx} className="text-xs text-blue-950 font-medium">
+                              {ref}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Urgent Actions Checklist */}
+                    {analysis.urgentActions && analysis.urgentActions.length > 0 && (
+                      <div className="bg-amber-50/30 p-5 rounded-2xl border border-amber-100/60 flex flex-col gap-2">
+                        <h4 className="text-xs font-black text-amber-900 uppercase tracking-widest flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                          <span>紧急防御阻断操作 ({analysis.urgentActions.length})</span>
+                        </h4>
+                        <ul className="space-y-1.5">
+                          {analysis.urgentActions.map((act, idx) => (
+                            <li key={idx} className="text-xs text-amber-950 flex items-start gap-2">
+                              <span className="text-amber-600 mt-0.5 shrink-0">🚨</span>
+                              <span>{act}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Red Flags / Specific Checks */}
                 {analysis.redFlags && analysis.redFlags.length > 0 && (

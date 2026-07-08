@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Mail, ArrowRight, Clock, Search, ExternalLink, ListTodo, Plus, Trash2, Calendar, AlertCircle, CheckCircle, CheckSquare, Square, ThumbsUp } from 'lucide-react';
 import { loadAllTasks, toggleTaskStatus, deleteTask, KanbanTask } from '../lib/kanbanService';
 import { useT } from '../lib/i18n';
+import { showToast } from '../lib/toast';
 import Markdown from 'react-markdown';
 
 interface HistoryItem {
@@ -121,12 +122,12 @@ export default function HistoryView() {
   const handleAddAllToGoogleCalendar = () => {
     const pendingTasks = tasks.filter(t => t.status === 'todo');
     if (pendingTasks.length === 0) {
-      alert(t('hv_no_sync'));
+      showToast(t('hv_no_sync'), 'info');
       return;
     }
     
     // Advise user we will open bookmarks
-    alert(t('hv_open_cal_notice').replace('{n}', String(pendingTasks.length)));
+    showToast(t('hv_open_cal_notice').replace('{n}', String(pendingTasks.length)), 'success');
     
     pendingTasks.forEach(task => {
       handleAddToGoogleCalendar(task);
