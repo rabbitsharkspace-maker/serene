@@ -5,7 +5,10 @@ import EmergencyAidDemo from './components/EmergencyAidDemo';
 import EcosystemHub from './components/EcosystemHub';
 import HistoryView from './components/HistoryView';
 import LegalHubDemo from './components/LegalHubDemo';
-import { Mail, Shield, AlertTriangle, Compass, LogIn, LogOut, Clock, Scale, ListTodo } from 'lucide-react';
+import HearingMock from './components/HearingMock';
+import ToastContainer from './components/ToastContainer';
+import { showToast } from './lib/toast';
+import { Mail, Shield, AlertTriangle, Compass, LogIn, LogOut, Clock, Scale, ListTodo, Mic } from 'lucide-react';
 
 import { initAuth, googleSignIn, consumeRedirectResult, logout } from './lib/firebase';
 import { createGmailDraft } from './lib/gmail';
@@ -13,7 +16,7 @@ import { User } from 'firebase/auth';
 import { useLocale, LANGUAGES, REGIONS, getCountryName } from './lib/locale';
 import { useT } from './lib/i18n';
 
-type TabView = 'letter' | 'shield' | 'legalhub' | 'emergency' | 'roadmap' | 'history';
+type TabView = 'letter' | 'shield' | 'legalhub' | 'emergency' | 'roadmap' | 'history' | 'hearing';
 
 export default function App() {
   const { country, language, region, setLanguage, setRegion } = useLocale();
@@ -52,9 +55,9 @@ export default function App() {
         try {
           const d = JSON.parse(pending);
           await createGmailDraft(res.accessToken, d.recipient, d.subject, d.body);
-          alert('✅ 草稿已存进你的 Gmail！打开 Gmail 的「草稿」即可查看并发送。');
+          showToast('✅ 草稿已存进你的 Gmail！打开 Gmail 的「草稿」即可查看并发送。', 'success');
         } catch (e: any) {
-          alert('草稿创建失败：' + (e?.message || e));
+          showToast('草稿创建失败：' + (e?.message || e), 'error');
         }
       }
     });
@@ -103,6 +106,7 @@ export default function App() {
     { id: 'letter', label: t('nav_letter'), icon: <Mail size={24} /> },
     { id: 'shield', label: t('nav_shield'), icon: <Shield size={24} /> },
     { id: 'legalhub', label: t('nav_legalhub'), icon: <Scale size={24} /> },
+    { id: 'hearing', label: t('nav_hearing'), icon: <Mic size={24} /> },
     { id: 'history', label: t('nav_history'), icon: <ListTodo size={24} /> },
     { id: 'emergency', label: t('nav_emergency'), icon: <AlertTriangle size={24} /> },
     { id: 'roadmap', label: t('nav_roadmap'), icon: <Compass size={24} /> }
@@ -110,6 +114,7 @@ export default function App() {
 
   return (
     <div className="min-h-[100dvh] flex flex-col bg-canvas font-sans text-body overflow-hidden pb-16 md:pb-0 md:pl-20 relative">
+      <ToastContainer />
 
       {/* Top App Bar */}
       <header className="bg-canvas/85 backdrop-blur-md border-b border-hairline flex flex-wrap items-center justify-between gap-y-2 px-4 md:px-6 py-3 md:py-3.5 z-20 sticky top-0 w-full">
@@ -195,6 +200,11 @@ export default function App() {
             {activeTab === 'roadmap' && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 mt-8">
                 <EcosystemHub />
+              </div>
+            )}
+            {activeTab === 'hearing' && (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <HearingMock />
               </div>
             )}
          </div>

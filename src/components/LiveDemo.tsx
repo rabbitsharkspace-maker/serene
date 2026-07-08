@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, Send, CheckCircle2, ArrowRight, Mail, AlignLeft, ExternalLink, Info, X, Eye, FileText, Globe, Calendar, Settings, Smile, UserCheck, Plus, Trash2 } from 'lucide-react';
+import { Camera, Send, CheckCircle2, ArrowRight, Mail, AlignLeft, ExternalLink, Info, X, Eye, FileText, Globe, Calendar, Settings, Smile, UserCheck, Plus, Trash2, Shield, BellRing, LogIn, LogOut } from 'lucide-react';
 import { renderDocumentHTML } from './DocumentRenderer';
 import { User } from 'firebase/auth';
 import { db } from '../lib/firebase';
 import { saveExtractedTasks, KanbanTask } from '../lib/kanbanService';
+import { showToast } from '../lib/toast';
 import Markdown from 'react-markdown';
 import { useLocale, getCountryContent, getDefaultVisa } from '../lib/locale';
 import { useT } from '../lib/i18n';
@@ -52,10 +53,17 @@ interface AnalysisResult {
     sourceUrl: string;
   }[];
   riskLevel?: 'low' | 'medium' | 'high' | string;
-  confidence?: 'low' | 'medium' | 'high' | string;
+  confidence?: 'low' | 'medium' | 'high' | string | number;
   needsHumanConfirmation?: boolean;
   disclaimer?: string;
   isQuotaFallback?: boolean;
+  status?: 'clean' | 'risky';
+  violations?: {
+    clause: string;
+    description: string;
+    penaltyRisk: string;
+    solution: string;
+  }[];
 }
 
 const CASE_GUIDES: Record<string, {
@@ -172,6 +180,17 @@ const CASE_GUIDES: Record<string, {
   }
 };
 
+// Normalize confidence into a 0-100 percentage: the live Gemini path returns a number,
+// while fallback/legacy payloads may carry 'high' / 'medium' / 'low' strings.
+function confidencePct(c: unknown): number {
+  if (typeof c === 'number' && isFinite(c)) return Math.round(c <= 1 ? c * 100 : c);
+  if (c === 'high') return 95;
+  if (c === 'medium') return 75;
+  if (c === 'low') return 50;
+  const n = parseFloat(String(c));
+  return isFinite(n) ? Math.round(n) : 90;
+}
+
 interface LiveDemoProps {
   user: User | null;
   accessToken: string | null;
@@ -246,6 +265,38 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
     loadProfile();
   }, [user]);
 
+  useEffect(() => {
+    // Setup real-time SSE stream for push notification callbacks (FCM fallback/sim)
+    const eventSource = new EventSource("/api/fcm-notifications");
+    
+    eventSource.onmessage = (event) => {
+      try {
+        const payload = JSON.parse(event.data);
+        console.log("[FCM Push Received]", payload);
+        
+        // Show HTML5 browser Notification if granted
+        if (Notification.permission === "granted") {
+          new Notification(payload.title, {
+            body: payload.body
+          });
+        }
+        
+        // Always show in-app toast for perfect visible clarity during jury testing!
+        showToast(`🔔 ${payload.title}\n${payload.body}`, 'info');
+      } catch (err) {
+        console.error("Failed to parse incoming push notification payload:", err);
+      }
+    };
+    
+    eventSource.onerror = (e) => {
+      console.warn("[FCM SSE] EventSource disconnected, retrying in background...", e);
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, []);
+
   const handleSaveProfile = async () => {
     setIsSavingProfile(true);
     setProfileSaveSuccess(false);
@@ -284,6 +335,37 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
   const [activeCase, setActiveCase] = useState<'fine' | 'coe' | 'bond' | 'plagiarism' | 'noise' | 'utility' | null>(null);
   const [showDocModal, setShowDocModal] = useState(false);
   const [kanbanTasks, setKanbanTasks] = useState<{ id: string; step: string; status: 'todo' | 'done'; channel?: string; url?: string }[]>([]);
+  
+  // Offline Privacy Shield states
+  const [privacyShieldActive, setPrivacyShieldActive] = useState(true);
+  const [isScanningPII, setIsScanningPII] = useState(false);
+  const [scanProgress, setScanProgress] = useState(0);
+  // Starts 'idle' — the shield only reports anything after a document is actually loaded.
+  const [shieldStatus, setShieldStatus] = useState<'idle' | 'scanning' | 'secured'>('idle');
+
+  useEffect(() => {
+    if ((activeCase || filePreview) && privacyShieldActive) {
+      setIsScanningPII(true);
+      setShieldStatus('scanning');
+      setScanProgress(0);
+      const interval = setInterval(() => {
+        setScanProgress(p => {
+          if (p >= 100) {
+            clearInterval(interval);
+            setIsScanningPII(false);
+            setShieldStatus('secured');
+            return 100;
+          }
+          return p + 20;
+        });
+      }, 150);
+      return () => clearInterval(interval);
+    } else if (!privacyShieldActive) {
+      setShieldStatus('idle');
+      setIsScanningPII(false);
+      setScanProgress(0);
+    }
+  }, [activeCase, filePreview, privacyShieldActive]);
   
   // Cross mode states
   const [crossFileA, setCrossFileA] = useState<File | null>(null);
@@ -329,6 +411,10 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
     setKanbanTasks(prev => prev.map(t => t.id === id ? { ...t, status: t.status === 'todo' ? 'done' : 'todo' } : t));
   };
 
+  // The canvas image actually sent to Gemini mirrors the SAME facts as the on-screen
+  // HTML document (renderDocumentHTML) and the CASE_GUIDES sidebar — issuer, amounts,
+  // reference numbers and deadlines must all match, so the live AI analysis never
+  // contradicts what the user sees as the "original letter".
   const loadExample = async (type: 'fine' | 'coe' | 'bond' | 'plagiarism' | 'noise' | 'utility') => {
     setActiveCase(type);
     const canvas = document.createElement('canvas');
@@ -336,89 +422,161 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
     canvas.height = 800;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    
+
+    const DOC_FACTS: Record<string, { bar: string; org: string; orgSub: string; title: string; lines: string[] }> = {
+      fine: {
+        bar: '#1d1d1f',
+        org: 'CITY OF BRENTMOOR',
+        orgSub: 'Municipal Corporation VIC · PO Box 15, Brentmoor VIC 3108',
+        title: 'PARKING INFRINGEMENT NOTICE',
+        lines: [
+          'Notice No: INF0432198    Date of Issue: 5 April 2026',
+          'Vehicle Reg: ABC-123 (Red Toyota Corolla sedan)',
+          'Location: Flinders Lane, Melbourne VIC 3000',
+          '',
+          'Offence Code 204: Stopped in a Clearway / resident',
+          'permit zone during restricted hours (Road Safety Act 1986).',
+          '',
+          'TOTAL AMOUNT OUTSTANDING: $85.00 AUD',
+          'Payment is required no later than 1 May 2026.',
+          'Failure to pay will result in referral to Fines Victoria.',
+          '',
+          'You may request an internal review of this notice in',
+          'writing within 28 days, stating compassionate factors.',
+        ],
+      },
+      coe: {
+        bar: '#ff5a3c',
+        org: 'WESTHAVEN UNIVERSITY',
+        orgSub: 'Academic Progress Office, Melbourne · CRICOS 00123G',
+        title: 'OUTCOME OF ACADEMIC PROGRESS COMMITTEE',
+        lines: [
+          'Student: Li Wei Chen    Student ID: 10987654',
+          'Course: Master of Applied Data Analytics',
+          'Notice Date: 18 June 2026    Ref: CAPC-2026-T1-881',
+          '',
+          'The CAPC noted that you failed all enrolled units in',
+          'Semester 1 2026. The Committee has decided to',
+          'TERMINATE your enrolment, effective 22 June 2026.',
+          '',
+          'Your Confirmation of Enrolment (CoE) will be cancelled',
+          'and reported to the Department of Home Affairs; your',
+          'Student Visa (Subclass 500) may be subject to cancellation.',
+          '',
+          'Right of appeal: a formal written appeal must be',
+          'submitted within 20 business days,',
+          'by 5:00 PM on 20 July 2026.',
+        ],
+      },
+      bond: {
+        bar: '#3B82F6',
+        org: 'HORIZON RESIDENTIAL VIC',
+        orgSub: 'Suite 401, 123 Flinders Lane, Melbourne VIC 3000',
+        title: 'NOTICE OF INTENTION TO CLAIM RENTAL BOND',
+        lines: [
+          'Tenant: Alex Thompson',
+          'Premises: 4/85 Bourke Street, Melbourne VIC 3000',
+          'Date: 30 June 2026    Ref: HZN-2026-8839',
+          'Total bond held: $2,100.00 AUD',
+          '',
+          'Proposed deductions:',
+          '  1. Carpet steam cleaning ............. $180.00',
+          '  2. Kitchen tile de-greasing .......... $90.00',
+          '  3. Living-room wall repair ........... $150.00',
+          'TOTAL PROPOSED CLAIM DEDUCTION: $420.00 AUD',
+          '',
+          'If you disagree, respond in writing or dispute via',
+          'Consumer Affairs Victoria no later than',
+          '5:00 PM on 14 July 2026.',
+        ],
+      },
+      plagiarism: {
+        bar: '#EF4444',
+        org: 'WESTHAVEN UNIVERSITY',
+        orgSub: 'Academic Integrity Office, Melbourne',
+        title: 'ACADEMIC INTEGRITY ALLEGATION',
+        lines: [
+          'Student: Sarah Chen    Student ID: 10987654',
+          'Unit: ECON101 Introduction to Economics',
+          'Reference No: AIO-2026-PL-492    Date: 21 June 2026',
+          '',
+          'Your submission "Case Study 2: Market Dynamics"',
+          'returned a 48% duplication similarity rate with',
+          'external publications and other academic papers.',
+          '',
+          'Mandatory interview: 3 July 2026, 10:00 AM,',
+          'Room 4.12, Melbourne campus.',
+          'Confirm attendance by 5:00 PM on 28 June 2026.',
+          '',
+          'Potential penalties: zero marks for the assignment,',
+          'unit fail grade, or suspension.',
+        ],
+      },
+      noise: {
+        bar: '#10B981',
+        org: 'MERIDIAN STRATA',
+        orgSub: 'Strata & Owners Corporation VIC · Plan No. PS 123456',
+        title: 'NOISE COMPLAINT & BREACH NOTICE',
+        lines: [
+          'To: The Occupier, Apartment 4B,',
+          '88 Flinders Lane, Melbourne VIC 3000',
+          'Date: 22 June 2026    Ref: BN/220626/110',
+          '',
+          'Multiple complaints document excessive noise after',
+          '10:00 PM over the past four weeks, including shouting',
+          'and loud party music, in breach of strata model bylaws.',
+          '',
+          'If further violations occur, the Owners Corporation',
+          'will apply to VCAT; fines may reach $1,000.00 AUD.',
+          '',
+          'Respond in writing within 14 days (by 6 July 2026)',
+          'to compliance@meridianstrata.com.au.',
+        ],
+      },
+      utility: {
+        bar: '#F59E0B',
+        org: 'COASTAL ENERGY & WATER',
+        orgSub: 'Public Civil Utility Services VIC · 200 Spencer Street',
+        title: 'URGENT: SERVICE DISCONNECTION WARNING',
+        lines: [
+          'Customer: Mrs. Eleanor Vance',
+          'Account No: 9876 543 210    Notice Date: 22 June 2026',
+          '',
+          'Original usage bill (due 1 June) ........ $245.80',
+          'Overdue administration late fee ......... $12.50',
+          'GRAND TOTAL OVERDUE BALANCE: $258.30 AUD',
+          '',
+          'The outstanding amount must be cleared no later than',
+          '1 July 2026 to avoid disconnection of electricity',
+          'and water services.',
+          '',
+          'Hardship Program: call 1800 882 110 for payment plans.',
+          'National Debt Helpline (free): 1800 007 007.',
+        ],
+      },
+    };
+
+    const facts = DOC_FACTS[type];
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, 600, 800);
-    ctx.fillStyle = '#000000';
-    ctx.font = '24px sans-serif';
-    
-    if (type === 'fine') {
-      ctx.fillStyle = '#1d1d1f';
-      ctx.fillRect(0, 0, 600, 15); // visual bar
-      ctx.fillStyle = '#000000';
-      ctx.fillText('CITY COUNCIL', 50, 100);
-      ctx.font = 'bold 32px sans-serif';
-      ctx.fillText('INFRINGEMENT NOTICE', 50, 150);
-      ctx.font = '24px sans-serif';
-      ctx.fillText('Date: 21 Nov 2023', 50, 220);
-      ctx.fillText('AMOUNT DUE: $385.00', 50, 270);
-      ctx.fillText('OFFENCE: Parking in permit zone', 50, 320);
-      ctx.fillText('Please pay within 14 days to avoid penalty.', 50, 420);
-    } else if (type === 'coe') {
-      ctx.fillStyle = '#ff5a3c';
-      ctx.fillRect(0, 0, 600, 15); // visual bar
-      ctx.fillStyle = '#000000';
-      ctx.fillText('UNIVERSITY ADMINISTRATION', 50, 100);
-      ctx.font = 'bold 32px sans-serif';
-      ctx.fillText('INTENTION TO CANCEL ENROLMENT', 50, 150);
-      ctx.font = '24px sans-serif';
-      ctx.fillText('Dear Student,', 50, 250);
-      ctx.fillText('Due to unsatisfactory academic progress,', 50, 300);
-      ctx.fillText('your CoE will be cancelled in 20 days.', 50, 350);
-      ctx.fillText('You have the right to appeal.', 50, 400);
-    } else if (type === 'bond') {
-      ctx.fillStyle = '#3B82F6';
-      ctx.fillRect(0, 0, 600, 15); // visual bar
-      ctx.fillStyle = '#000000';
-      ctx.fillText('EXCEL REAL ESTATE SERVICES', 50, 100);
-      ctx.font = 'bold 32px sans-serif';
-      ctx.fillText('NOTICE OF BOND CLAIM', 50, 150);
-      ctx.font = '24px sans-serif';
-      ctx.fillText('Bond Reference: BX-9921', 50, 220);
-      ctx.fillText('DEDUCTION CLAIMED: $650.00', 50, 270);
-      ctx.fillText('Reason: Professional steam cleaning of carpet required', 50, 320);
-      ctx.fillText('along with minor repairs to living room walls.', 50, 370);
-      ctx.fillText('Please respond in 7 days or we will lodge.', 50, 470);
-    } else if (type === 'plagiarism') {
-      ctx.fillStyle = '#EF4444';
-      ctx.fillRect(0, 0, 600, 15); // visual bar
-      ctx.fillStyle = '#000000';
-      ctx.fillText('FACULTY OF SCIENCE & TECHNOLOGY', 50, 100);
-      ctx.font = 'bold 32px sans-serif';
-      ctx.fillText('ACADEMIC INTEGRITY INQUIRY', 50, 150);
-      ctx.font = '24px sans-serif';
-      ctx.fillText('Dear student,', 50, 220);
-      ctx.fillText('An allegation of plagiarism has been made regarding', 50, 270);
-      ctx.fillText('your COMP3300 Assignment 2 submission.', 50, 320);
-      ctx.fillText('A similarity index of 48% was detected.', 50, 370);
-      ctx.fillText('You must submit a response or attend a hearing.', 50, 420);
-    } else if (type === 'noise') {
-      ctx.fillStyle = '#10B981';
-      ctx.fillRect(0, 0, 600, 15); // visual bar
-      ctx.fillStyle = '#000000';
-      ctx.fillText('CITY ENVIRONMENTAL PROTECTION AGENCY', 50, 100);
-      ctx.font = 'bold 32px sans-serif';
-      ctx.fillText('OFFICIAL WARNING: NOISE DISTURBANCE', 50, 150);
-      ctx.font = '24px sans-serif';
-      ctx.fillText('To Resident at Flat 4C / 12 Barkly St', 50, 220);
-      ctx.fillText('We have received verified community complaints regarding', 50, 270);
-      ctx.fillText('excessive music and loud bass sounds after 11:30 PM.', 50, 320);
-      ctx.fillText('Further breaches may result in $500 penalty notices.', 50, 370);
-    } else if (type === 'utility') {
-      ctx.fillStyle = '#F59E0B';
-      ctx.fillRect(0, 0, 600, 15); // visual bar
-      ctx.fillStyle = '#000000';
-      ctx.fillText('ORIGIN ENERGY SERVICES', 50, 100);
-      ctx.font = 'bold 32px sans-serif';
-      ctx.fillText('OVERDUE PAYMENT & DISCONNECTION WARNING', 50, 150);
-      ctx.font = '24px sans-serif';
-      ctx.fillText('Account Number: 1002-3994', 50, 220);
-      ctx.fillText('TOTAL OUTSTANDING: $421.50', 50, 270);
-      ctx.fillText('Due Date: 12 Dec 2023', 50, 320);
-      ctx.fillText('If you are experiencing hardship, please contact', 50, 370);
-      ctx.fillText('our support team immediately to request extension.', 50, 420);
+    ctx.fillStyle = facts.bar;
+    ctx.fillRect(0, 0, 600, 14);
+    ctx.fillStyle = '#111111';
+    ctx.font = 'bold 26px sans-serif';
+    ctx.fillText(facts.org, 40, 72);
+    ctx.fillStyle = '#555555';
+    ctx.font = '13px sans-serif';
+    ctx.fillText(facts.orgSub, 40, 98);
+    ctx.fillStyle = '#111111';
+    ctx.font = 'bold 22px sans-serif';
+    ctx.fillText(facts.title, 40, 148);
+    ctx.font = '17px sans-serif';
+    let y = 196;
+    for (const line of facts.lines) {
+      if (line) ctx.fillText(line, 40, y);
+      y += 30;
     }
-    
+
     canvas.toBlob((blob) => {
       if (blob) {
          const file = new File([blob], `${type}.png`, { type: 'image/png' });
@@ -439,6 +597,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
         if (activeCase) {
           formData.append('activeCase', activeCase);
         }
+        formData.append('isAnonymized', privacyShieldActive && shieldStatus === 'secured' ? 'true' : 'false');
         
         // Append user profile for personalized memory context
         formData.append('visaType', profileVisaType || getDefaultVisa(country, language));
@@ -517,13 +676,13 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
         localStorage.setItem('serene_draft_history', JSON.stringify(history));
       } catch (err) {
         console.error(err);
-        alert('解析失败，请重试');
+        showToast('解析失败，请重试', 'error');
         setAppState('upload');
       }
     } else {
       // CROSS MODE CO-OBJECTION
       if (!crossFileA && !crossFileB && !activeCrossPreset) {
-        alert("请上传租房合同及扣款声明，或者载入高能大招演示。");
+        showToast("请上传租房合同及扣款声明，或者载入高能大招演示。", 'info');
         return;
       }
       setAppState('analyzing');
@@ -565,8 +724,10 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
         setCurrentAgentStep(5);
         await new Promise(resolve => setTimeout(resolve, 600));
         
-        setCrossAnalysis(data);
-        
+        // Normalize before storing: the result page renders disputableItems.length/.map/.reduce
+        // directly, so a live response missing the field must not white-screen the page.
+        setCrossAnalysis({ ...data, disputableItems: Array.isArray(data.disputableItems) ? data.disputableItems : [] });
+
         // Also map some draft fields so standard email modal can function
         setDraftBody(data.englishDraft.body);
         setRecipient(data.englishDraft.recipientEmail || 'claims@horizonresidential.com.au');
@@ -600,7 +761,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
         setAppState('result');
       } catch (err) {
         console.error(err);
-        alert('交叉核验对线审查失败，请重试');
+        showToast('交叉核验对线审查失败，请重试', 'error');
         setAppState('upload');
       }
     }
@@ -845,7 +1006,22 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                             )}
                           </p>
                           <div className="flex items-center gap-2">
-                            <button 
+                            {user ? (
+                              <button
+                                onClick={onLogout}
+                                className="text-xs bg-white text-gray-600 hover:text-gray-900 border border-gray-200 hover:border-gray-300 px-4 py-2.5 rounded-xl font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                              >
+                                <LogOut size={13}/> 退出登录
+                              </button>
+                            ) : (
+                              <button
+                                onClick={onLogin}
+                                className="text-xs bg-white text-[#1d1d1f] border border-gray-200 hover:border-gray-400 px-4 py-2.5 rounded-xl font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                              >
+                                <LogIn size={13}/> Google 登录并同步云端
+                              </button>
+                            )}
+                            <button
                               onClick={handleSaveProfile}
                               disabled={isSavingProfile}
                               className="text-xs bg-[#ff5a3c] text-white hover:bg-amber-600 disabled:opacity-50 px-5 py-2.5 rounded-xl font-bold transition-all shadow-sm flex items-center gap-1 cursor-pointer"
@@ -886,7 +1062,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                            {/* Render High definition document directly in container if a preset is selected! */}
                            {activeCase ? (
                              <div className="w-full h-[380px] overflow-y-auto custom-scrollbar p-1 select-none flex justify-center bg-gray-50/50 rounded-xl">
-                               {renderDocumentHTML(activeCase, true)}
+                               {renderDocumentHTML(activeCase, true, privacyShieldActive && shieldStatus === 'secured')}
                              </div>
                            ) : (
                              filePreview ? (
@@ -900,6 +1076,17 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                  <p className="text-white/30 text-[10px] mt-1 px-4 leading-normal">{t('lo_upload_hint2')}</p>
                                 </div>
                              )
+                           )}
+
+                           {/* Laser line scanning overlay */}
+                           {isScanningPII && (
+                             <div className="absolute inset-0 bg-[#2dd4bf]/5 z-20 pointer-events-none flex flex-col items-center justify-center backdrop-blur-[0.5px]">
+                               <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-teal-400 to-transparent shadow-[0_0_12px_#2dd4bf]" style={{ top: `${scanProgress}%`, transition: 'top 0.15s ease-out' }} />
+                               <div className="bg-teal-950/90 border border-teal-500/30 text-teal-300 font-mono text-[9px] px-2.5 py-1 rounded-md shadow-md flex items-center gap-1.5 animate-pulse uppercase tracking-wider">
+                                 <span className="w-1.5 h-1.5 bg-teal-400 rounded-full animate-ping" />
+                                 <span>Privacy Pre-Scan: {scanProgress}%</span>
+                               </div>
+                             </div>
                            )}
                         </div>
                         
@@ -925,6 +1112,89 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                               </button>
                             )
                           )}
+                        </div>
+
+                        {/* Offline Privacy Shield Controller Card */}
+                        <div className="mt-4 bg-surface-card border border-hairline rounded-2xl p-4 shadow-sm transition-all">
+                          <div className="flex items-center justify-between pb-3.5 border-b border-gray-100">
+                            <div className="flex items-center gap-2">
+                              <Shield size={16} className={privacyShieldActive ? "text-teal-500" : "text-gray-400"} />
+                              <span className="text-xs font-black text-gray-900 tracking-wide">隐私脱敏盾 (Privacy Redaction Shield)</span>
+                            </div>
+                            <button 
+                              onClick={() => {
+                                setPrivacyShieldActive(!privacyShieldActive);
+                              }}
+                              className={`relative inline-flex h-5 w-10 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${privacyShieldActive ? 'bg-teal-500' : 'bg-gray-200'}`}
+                            >
+                              <span
+                                className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${privacyShieldActive ? 'translate-x-5' : 'translate-x-0'}`}
+                              />
+                            </button>
+                          </div>
+
+                          <div className="pt-3 flex flex-col gap-2.5">
+                            {privacyShieldActive ? (
+                              <>
+                                {shieldStatus === 'scanning' ? (
+                                  <div className="flex flex-col gap-1.5 animate-in fade-in duration-300">
+                                    <div className="flex justify-between items-center text-[10px] font-bold text-teal-600 font-mono">
+                                      <span className="flex items-center gap-1">
+                                        <span className="w-1.5 h-1.5 bg-teal-500 rounded-full animate-ping" />
+                                        正在标记待脱敏的敏感字段...
+                                      </span>
+                                      <span>{scanProgress}%</span>
+                                    </div>
+                                    <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                                      <div className="bg-teal-400 h-1.5 rounded-full transition-all duration-150" style={{ width: `${scanProgress}%` }} />
+                                    </div>
+                                    <p className="text-[10px] text-muted-soft leading-relaxed">
+                                      正在为本次分析登记脱敏规则：姓名、学号、住址、单号等字段将在 AI 输出中被打码替换。
+                                    </p>
+                                  </div>
+                                ) : shieldStatus === 'secured' ? (
+                                  <div className="animate-in fade-in duration-500 flex items-start gap-2.5">
+                                    <div className="p-1 bg-teal-50 text-teal-600 rounded-lg text-xs mt-0.5">
+                                      🔒
+                                    </div>
+                                    <div>
+                                      <span className="text-[11px] font-black text-teal-700 bg-teal-50 px-2 py-0.5 rounded">输出层脱敏已启用</span>
+                                      <p className="text-[10px] text-muted-soft leading-relaxed mt-1">
+                                        AI 返回的分析结论与生成信件中，姓名、学号、住址、单号等个人字段将替换为 <span className="text-teal-700 font-extrabold">[REDACTED]</span> 打码标签；内置案例预览已同步打上黑条。
+                                      </p>
+                                      <p className="text-[9px] text-teal-600 font-semibold mt-1">
+                                        🛡️ 原件仅经我们的后端转发给 Gemini 用于本次分析，不落库、不缓存、不用于训练。
+                                      </p>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="animate-in fade-in duration-300 flex items-start gap-2.5">
+                                    <div className="p-1 bg-gray-50 text-gray-400 rounded-lg text-xs mt-0.5">
+                                      ⏳
+                                    </div>
+                                    <div>
+                                      <span className="text-[11px] font-black text-gray-500 bg-gray-100 px-2 py-0.5 rounded">脱敏盾待命中</span>
+                                      <p className="text-[10px] text-muted-soft leading-relaxed mt-1">
+                                        载入经典案例或上传公文后，将自动为本次分析启用输出层脱敏（姓名、学号、住址、单号打码）。
+                                      </p>
+                                    </div>
+                                  </div>
+                                )}
+                              </>
+                            ) : (
+                              <div className="flex items-start gap-2.5 animate-in fade-in duration-300">
+                                <div className="p-1 bg-amber-50 text-amber-600 rounded-lg text-xs mt-0.5">
+                                  ⚠️
+                                </div>
+                                <div>
+                                  <span className="text-[11px] font-black text-amber-700 bg-amber-50 px-2 py-0.5 rounded">端侧隐私扫描已关闭</span>
+                                  <p className="text-[10px] text-muted-soft leading-relaxed mt-1">
+                                    此时公文正本中的个人敏感隐私信息（如果存在）将以原始文本明文传送至 AI。为了您的个人隐私安全，推荐重新开启保护。
+                                  </p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                       
@@ -1399,6 +1669,134 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
 
                    {/* Right Column: AI Translation & Responses */}
                    <div className="lg:col-span-7 flex flex-col gap-6 overflow-y-auto pr-1 custom-scrollbar max-h-[85vh]">
+                      {/* Document Verification Status & AI Confidence Card.
+                          Rendered only when the analysis actually carries these fields —
+                          the preset fallback has no status, and must never fake a verdict. */}
+                      {(analysis.status || analysis.confidence != null) && (
+                        <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-xs flex flex-col md:flex-row items-center gap-4">
+                          <div className={`p-3 rounded-xl ${analysis.status === 'risky' ? 'bg-red-50 text-red-600 border border-red-100' : analysis.status === 'clean' ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-gray-50 text-gray-500 border border-gray-100'} flex items-center justify-center shrink-0`}>
+                            <Shield size={24} className={analysis.status === 'risky' ? "animate-pulse" : ""} />
+                          </div>
+                          <div className="flex-1 text-center md:text-left">
+                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
+                              {analysis.status && (
+                                <span className={`text-[10px] font-black tracking-wider px-2.5 py-0.5 rounded-full uppercase ${analysis.status === 'risky' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+                                  {analysis.status === 'risky' ? '⚠️ RISKY / 存在违规风险' : '✅ CLEAN / 合规安全'}
+                                </span>
+                              )}
+                              {analysis.confidence != null && (
+                                <span className="bg-blue-50 text-blue-800 border border-blue-100 text-[10px] font-black px-2.5 py-0.5 rounded-full tracking-wider font-mono">
+                                  🧠 AI 置信度: {confidencePct(analysis.confidence)}%
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1.5 leading-relaxed font-sans">
+                              {analysis.status === 'risky'
+                                ? '经过高级 AI 视觉模型及消保法例深度交叉研判，本公函中存在以下潜在违规细节、霸王条款或权益被损害细节，请予以审慎对线。'
+                                : analysis.status === 'clean'
+                                  ? '经 AI 研判，此文件属于常规凭证或合规往来公函，暂未扫描到明显的霸王条款、消费欺诈或无故扣款风险。'
+                                  : '预置示例模式下不出具合规风险研判；恢复实时分析后将展示 RISKY / CLEAN 结论。'}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Violations / Clause Warning Cards Panel */}
+                      {analysis.violations && analysis.violations.length > 0 && (
+                        <div className="flex flex-col gap-3">
+                          <div className="text-[10px] font-bold text-gray-400 tracking-widest uppercase flex items-center space-x-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                            <span>违规及霸王条款解析卡片 ({analysis.violations.length})</span>
+                          </div>
+                          <div className="grid grid-cols-1 gap-4">
+                            {analysis.violations.map((v, i) => (
+                              <div key={i} className="bg-red-50/20 hover:bg-red-50/40 p-5 rounded-2xl border border-red-100/60 shadow-xs flex flex-col gap-3 transition-colors">
+                                <div className="flex justify-between items-start gap-4">
+                                  <h4 className="text-xs font-bold text-red-900 bg-red-100/60 px-2.5 py-1 rounded-lg">
+                                    📜 触及条款 / 条约: {v.clause}
+                                  </h4>
+                                  <span className="bg-red-500 text-white text-[9px] font-black uppercase px-1.5 py-0.5 rounded shadow-2xs font-mono">
+                                    {v.penaltyRisk}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-gray-700 leading-relaxed font-medium">
+                                  {v.description}
+                                </p>
+                                <div className="bg-white/80 p-3.5 rounded-xl border border-red-100 text-[11px] text-red-800 flex items-start gap-2 shadow-2xs">
+                                  <span className="text-sm shrink-0">💡</span>
+                                  <div className="leading-normal">
+                                    <strong className="font-bold font-sans">对线突击方案:</strong> {v.solution}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* FCM 48H Proactive Push Alert Guardian Card */}
+                      <div className="bg-gradient-to-r from-red-500/10 via-amber-500/5 to-transparent p-5 rounded-2xl border border-red-200/50 shadow-sm flex flex-col md:flex-row items-center gap-4">
+                        <div className="p-3 bg-red-100 text-red-600 rounded-xl flex items-center justify-center shrink-0">
+                          <BellRing size={22} className="animate-bounce" />
+                        </div>
+                        <div className="flex-1 text-center md:text-left font-sans">
+                          <h4 className="text-xs font-black text-gray-900 tracking-wider uppercase">
+                            🚨 48小时申诉红线提醒守护
+                          </h4>
+                          <p className="text-[11px] text-gray-500 mt-1 leading-normal">
+                            申诉硬截止日期是留学生的生命线，错失将面临遣返、退学或大额罚金。一键开启后，截止前 48 小时触发浏览器桌面通知与应用内红线警报（保持 Serene 页面开启即可接收；离线 FCM 推送在路线图中）。
+                          </p>
+                          <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-3">
+                            <button
+                              onClick={async () => {
+                                try {
+                                  const permission = await Notification.requestPermission();
+                                  if (permission === 'granted') {
+                                    // Register this browser session as an alert subscriber. The id is a
+                                    // plain session identifier — deadline alerts are delivered over the
+                                    // SSE stream + HTML5 Notification (not a real FCM device token).
+                                    await fetch('/api/register-fcm', {
+                                      method: 'POST',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({
+                                        token: 'web-session-' + Math.random().toString(36).substring(2, 11),
+                                        userId: 'anonymous-user',
+                                        email: 'student@serene.org'
+                                      })
+                                    });
+                                    showToast('🎉 成功开启 48小时红线提醒守护！截止前 48 小时将收到桌面通知与应用内警报。', 'success');
+                                  } else {
+                                    showToast('⚠️ 浏览器通知权限被拒绝，将退化为应用内弹窗守护。', 'info');
+                                  }
+                                } catch (e) {
+                                  console.error(e);
+                                }
+                              }}
+                              className="bg-red-500 hover:bg-red-600 text-white text-[10px] font-black px-3 py-1.5 rounded-lg transition-all cursor-pointer shadow-xs active:scale-95"
+                            >
+                              🚀 一键开启 48h 申诉守护
+                            </button>
+                            <button
+                              onClick={async () => {
+                                try {
+                                  await fetch('/api/test-fcm-push', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                      token: 'test-fcm-token'
+                                    })
+                                  });
+                                } catch (e) {
+                                  console.error(e);
+                                }
+                              }}
+                              className="bg-neutral-800 hover:bg-neutral-900 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all cursor-pointer shadow-xs active:scale-95"
+                            >
+                              🧪 立即测试 48h 紧急推送
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                      <div className="bg-[#FFF4F2] p-6 rounded-2xl border border-[#FEE6E3]">
                     <div className="text-[10px] font-bold text-[#ff5a3c] tracking-widest mb-3 uppercase flex items-center space-x-2">
                        <span className="w-2 h-2 rounded-full bg-[#ff5a3c]"></span>
@@ -1682,7 +2080,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
               <div className="p-4 md:p-8 overflow-y-auto bg-gray-100 flex-1 flex justify-center custom-scrollbar">
                 <div className="w-full max-w-2xl overflow-x-auto">
                   {activeCase ? (
-                    renderDocumentHTML(activeCase, false)
+                    renderDocumentHTML(activeCase, false, privacyShieldActive && shieldStatus === 'secured')
                   ) : (
                     filePreview && (
                       <div className="flex justify-center bg-white p-4 rounded-xl border shadow-sm">

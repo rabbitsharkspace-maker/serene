@@ -1,40 +1,97 @@
 {
-  "collections": [
-    {
-      "name": "appeals",
-      "fields": [
-        { "name": "uid", "type": "string", "description": "User ID" },
-        { "name": "type", "type": "string", "description": "Type of appeal (fine, bill, warning)" },
-        { "name": "content", "type": "string", "description": "Extracted text content" },
-        { "name": "analysis", "type": "string", "description": "Gemini analysis in Chinese" },
-        { "name": "draft", "type": "string", "description": "Draft response in English" },
-        { "name": "createdAt", "type": "timestamp" }
-      ]
+  "entities": {
+    "Appeal": {
+      "title": "Appeal",
+      "description": "Personal legal-appeal data for a user.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Owner User ID" },
+        "type": { "type": "string", "description": "Type of appeal (fine, bill, warning)" },
+        "content": { "type": "string", "description": "Extracted text content" },
+        "analysis": { "type": "string", "description": "Gemini analysis in Chinese" },
+        "draft": { "type": "string", "description": "Draft response in English" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" }
+      },
+      "required": ["uid", "type", "content", "analysis", "draft", "createdAt"]
     },
-    {
-      "name": "userProfiles",
-      "fields": [
-        { "name": "uid", "type": "string", "description": "User ID" },
-        { "name": "visaType", "type": "string", "description": "User visa details (e.g., 500 student visa)" },
-        { "name": "school", "type": "string", "description": "User university / school name" },
-        { "name": "leaseKeyTerms", "type": "string", "description": "User lease key terms (e.g., lease ends 30 June)" },
-        { "name": "additionalDetails", "type": "string", "description": "Any additional academic or personal details" },
-        { "name": "updatedAt", "type": "timestamp" }
-      ]
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "The user's educational and visa profile details.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "User ID" },
+        "visaType": { "type": "string", "description": "User visa details (e.g., 500 student visa)" },
+        "school": { "type": "string", "description": "User university / school name" },
+        "leaseKeyTerms": { "type": "string", "description": "User lease key terms" },
+        "additionalDetails": { "type": "string", "description": "Any additional academic or personal details" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Last updated timestamp" }
+      },
+      "required": ["uid", "visaType", "school", "leaseKeyTerms", "updatedAt"]
     },
-    {
-      "name": "kanbanTasks",
-      "fields": [
-        { "name": "uid", "type": "string", "description": "User ID" },
-        { "name": "title", "type": "string", "description": "Task name or step description" },
-        { "name": "dueDate", "type": "string", "description": "Task deadline" },
-        { "name": "status", "type": "string", "description": "Task status (todo, in_progress, completed)" },
-        { "name": "priority", "type": "string", "description": "Task priority (red, yellow, green)" },
-        { "name": "channel", "type": "string", "description": "Official communication channel or entity name" },
-        { "name": "url", "type": "string", "description": "External resource URL" },
-        { "name": "sourceLetter", "type": "string", "description": "Subject of the appeal letter this task originated from" },
-        { "name": "createdAt", "type": "timestamp" }
-      ]
+    "KanbanTask": {
+      "title": "KanbanTask",
+      "description": "A student's to-do or compliance task.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique Task ID" },
+        "uid": { "type": "string", "description": "User ID" },
+        "title": { "type": "string", "description": "Task name or step description" },
+        "dueDate": { "type": "string", "description": "Task deadline" },
+        "status": { "type": "string", "enum": ["todo", "done"], "description": "Task completion status" },
+        "priority": { "type": "string", "enum": ["red", "yellow", "green"], "description": "Task priority level" },
+        "channel": { "type": "string", "description": "Official communication channel or entity name" },
+        "url": { "type": "string", "description": "External resource URL" },
+        "sourceLetter": { "type": "string", "description": "Subject of the appeal letter this task originated from" },
+        "createdAt": { "type": "integer", "description": "Creation epoch time" }
+      },
+      "required": ["id", "uid", "title", "dueDate", "status", "priority", "createdAt"]
+    },
+    "Meetup": {
+      "title": "Meetup",
+      "description": "A group-meal room for the login-free 拼饭 (Group Dinner) feature.",
+      "type": "object",
+      "properties": {
+        "hostId": { "type": "string", "description": "The creator's browser-generated client ID" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Room creation server timestamp" },
+        "result": { "type": "object", "description": "Calculated recommendation or coordinates" },
+        "chosen": { "type": "integer", "description": "Chosen option index" }
+      },
+      "required": ["hostId"]
+    },
+    "Participant": {
+      "title": "Participant",
+      "description": "A participant in a group-meal room.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique browser client ID of the participant" },
+        "name": { "type": "string", "description": "Display name of the participant" },
+        "address": { "type": "string", "description": "The user's starting location" },
+        "taste": { "type": "string", "description": "Food preference or taste" },
+        "joinedAt": { "type": "integer", "description": "Timestamp when the participant joined" }
+      },
+      "required": ["name", "address", "taste", "joinedAt"]
     }
-  ]
+  },
+  "firestore": {
+    "appeals/{appealId}": {
+      "schema": "Appeal",
+      "description": "User appeals for fines, warnings, or bills."
+    },
+    "userProfiles/{userId}": {
+      "schema": "UserProfile",
+      "description": "Profiles for students including visa, lease, and school details."
+    },
+    "kanbanTasks/{taskId}": {
+      "schema": "KanbanTask",
+      "description": "User-specific compliance or academic tasks on the kanban board."
+    },
+    "meetups/{code}": {
+      "schema": "Meetup",
+      "description": "Shared real-time group-meal rooms."
+    },
+    "meetups/{code}/participants/{participantId}": {
+      "schema": "Participant",
+      "description": "Participants in a specific group-meal room."
+    }
+  }
 }

@@ -3,6 +3,7 @@ import { Scale, Phone, Shield, BookOpen, AlertCircle, ExternalLink, Loader2, Lis
 import { useLocale, getCountryContent, getCountryName, REGIONS } from '../lib/locale';
 import { useT, StringKey } from '../lib/i18n';
 import GroundingSources, { Grounding } from './GroundingSources';
+import { showToast } from '../lib/toast';
 
 interface ContactInfo { name: string; phone?: string; website?: string; desc: string; }
 interface Scenario { title: string; rights?: string[]; steps: string[]; template: string; interpreterTip?: string; }
@@ -306,7 +307,7 @@ export default function LegalHubDemo({ onOpenLetterOfficer }: { onOpenLetterOffi
                   </span>
                   {scenario?.template && (
                     <button
-                      onClick={() => { navigator.clipboard.writeText(scenario.template); alert('模板已复制到剪贴板!'); }}
+                      onClick={() => { navigator.clipboard.writeText(scenario.template); showToast('模板已复制到剪贴板!', 'success'); }}
                       className="text-primary hover:text-ink font-bold cursor-pointer transition-colors text-[11px]"
                     >💡 复制信件草案</button>
                   )}

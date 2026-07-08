@@ -22,6 +22,7 @@ const STRINGS = {
   nav_letter: { zh: '信件官', es: 'Cartas', hi: 'पत्र', vi: 'Thư tín', ar: 'الرسائل' },
   nav_shield: { zh: '防坑盾', es: 'Escudo', hi: 'सुरक्षा कवच', vi: 'Lá chắn', ar: 'الحماية' },
   nav_legalhub: { zh: '法援站', es: 'Ayuda legal', hi: 'कानूनी मदद', vi: 'Pháp lý', ar: 'المساعدة القانونية' },
+  nav_hearing: { zh: '听证模拟', es: 'Audiencia', hi: 'सुनवाई अभ्यास', vi: 'Phiên điều trần', ar: 'محاكاة الجلسة' },
   nav_history: { zh: '我的案头', es: 'Mi escritorio', hi: 'मेरा डेस्क', vi: 'Bàn của tôi', ar: 'مكتبي' },
   nav_emergency: { zh: '急救包', es: 'Emergencia', hi: 'आपातकाल', vi: 'Khẩn cấp', ar: 'الطوارئ' },
   nav_roadmap: { zh: '生态', es: 'Ecosistema', hi: 'इकोसिस्टम', vi: 'Hệ sinh thái', ar: 'النظام' },

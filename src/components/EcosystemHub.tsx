@@ -5,6 +5,14 @@ import {
   Shield, Lock, MapPin, Search, ChevronRight, X, AlertCircle, ShoppingCart, Trash2, Upload
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { APIProvider, Map as GoogleMap, AdvancedMarker, Pin } from '@vis.gl/react-google-maps';
+
+const API_KEY =
+  process.env.GOOGLE_MAPS_PLATFORM_KEY ||
+  (import.meta as any).env?.VITE_GOOGLE_MAPS_PLATFORM_KEY ||
+  (globalThis as any).GOOGLE_MAPS_PLATFORM_KEY ||
+  '';
+const hasValidKey = Boolean(API_KEY) && API_KEY !== 'YOUR_API_KEY' && API_KEY !== '';
 import { useLocale } from '../lib/locale';
 import { useT, type StringKey } from '../lib/i18n';
 import FallbackNotice from './FallbackNotice';
@@ -1458,7 +1466,7 @@ export default function EcosystemHub() {
                     </div>
                   </div>
 
-                  {/* HIGH QUALITY STYLISH CSS INTERACTIVE LOCAL MAP SIMULATOR */}
+                  {/* REAL INTERACTIVE GOOGLE MAP OR ENJOYABLE INSTRUCTIONS IF API KEY MISSING */}
                   <div className="bg-gradient-to-br from-[#ff5a3c]/10 via-[#f5f5f7] to-surface-soft/10 border border-gray-200 rounded-3xl p-5 shadow-inner">
                     <div className="flex items-center justify-between mb-3 text-xs leading-none">
                       <span className="font-black text-gray-800 uppercase tracking-wider flex items-center gap-1.5">
@@ -1468,51 +1476,57 @@ export default function EcosystemHub() {
                       <span className="text-[10px] text-ink font-extrabold bg-surface-soft px-1.5 py-0.5 rounded animate-pulse">{t('eh_map_active')}</span>
                     </div>
 
-                    <div className="w-full h-44 bg-[#F2EDE4] rounded-2xl border border-gray-200 relative overflow-hidden shadow-inner flex items-center justify-center">
-                      {/* Grid overlay for map vibe */}
-                      <div className="absolute inset-0 grid grid-cols-6 grid-rows-4 opacity-15 pointer-events-none">
-                        {Array.from({ length: 24 }).map((_, i) => (
-                          <div key={i} className="border border-[#1d1d1f] border-dashed"></div>
-                        ))}
+                    {hasValidKey ? (
+                      <div className="w-full h-64 rounded-2xl border border-gray-200 relative overflow-hidden shadow-inner bg-gray-100">
+                        <APIProvider apiKey={API_KEY} version="weekly">
+                          <GoogleMap
+                            defaultCenter={{ lat: -37.8074, lng: 144.9634 }}
+                            defaultZoom={14}
+                            mapId="DEMO_MAP_ID"
+                            internalUsageAttributionIds={['gmp_mcp_codeassist_v1_aistudio']}
+                            style={{ width: '100%', height: '100%' }}
+                            gestureHandling={'cooperative'}
+                          >
+                            {/* Your Location Pin */}
+                            <AdvancedMarker position={{ lat: -37.8074, lng: 144.9634 }} title={t('eh_map_you')}>
+                              <Pin background="#1d1d1f" glyphColor="#fff" scale={1.1} />
+                            </AdvancedMarker>
+
+                            {/* Pin A: Dapanji */}
+                            <AdvancedMarker 
+                              position={{ lat: -37.8007, lng: 144.9669 }} 
+                              title={t('eh_map_pin1')}
+                              onClick={() => { const meal = meals.find(m => m.id === 'm-1'); if(meal) setSelectedMeal(meal); }}
+                            >
+                              <Pin background="#ff5a3c" glyphColor="#fff" glyphText="1" />
+                            </AdvancedMarker>
+
+                            {/* Pin B: Shuizhuyu */}
+                            <AdvancedMarker 
+                              position={{ lat: -37.8118, lng: 144.9627 }} 
+                              title={t('eh_map_pin2')}
+                              onClick={() => { const meal = meals.find(m => m.id === 'm-2'); if(meal) setSelectedMeal(meal); }}
+                            >
+                              <Pin background="#ff5a3c" glyphColor="#fff" glyphText="2" />
+                            </AdvancedMarker>
+                          </GoogleMap>
+                        </APIProvider>
                       </div>
-
-                      {/* Map lines illustration */}
-                      <div className="absolute w-[1px] h-full bg-gray-300 left-1/3 rotate-12"></div>
-                      <div className="absolute w-full h-[1px] bg-gray-300 top-1/2 -rotate-12"></div>
-                      <span className="absolute left-4 top-4 text-[9px] font-bold text-gray-400 font-mono">Swanston Street</span>
-                      <span className="absolute right-6 bottom-4 text-[9px] font-bold text-gray-400 font-mono">Lygon Street</span>
-
-                      {/* Your Location Pin */}
-                      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10">
-                        <div className="bg-[#1d1d1f] text-white px-2 py-0.5 rounded-md text-[10px] font-black shadow-md border border-white">
-                          {t('eh_map_you')}
+                    ) : (
+                      <div className="w-full p-6 bg-amber-50/70 rounded-2xl border border-amber-200 shadow-inner flex flex-col justify-center">
+                        <h3 className="text-sm font-black text-amber-900 mb-1 flex items-center gap-1.5">
+                          <AlertCircle size={16} className="text-amber-700" />
+                          <span>Google Maps API Key Required / 需要 Google Maps 密钥</span>
+                        </h3>
+                        <p className="text-xs text-amber-800 leading-relaxed mb-3 font-semibold">
+                          To see the active student meal map, please configure your Google Maps API key. / 要查看活跃留学生拼餐地图，请配置您的 Google Maps API 密钥。
+                        </p>
+                        <div className="space-y-1.5 text-[11px] text-amber-900 font-bold leading-normal">
+                          <p><strong>Step 1 / 步骤 1:</strong> <a href="https://console.cloud.google.com/google/maps-apis/start?utm_campaign=gmp-code-assist-ais" target="_blank" rel="noopener noreferrer" className="underline hover:text-amber-700">Get an API Key / 获取 API 密钥</a></p>
+                          <p><strong>Step 2 / 步骤 2:</strong> Paste your key in the popup, or set <code>GOOGLE_MAPS_PLATFORM_KEY</code> in <strong>Settings (⚙️) → Secrets</strong> / 在弹窗或右上角<strong>设置 (⚙️) → 密钥 Secrets</strong> 中添加名为 <code>GOOGLE_MAPS_PLATFORM_KEY</code> 的密钥。</p>
                         </div>
-                        <div className="w-3 h-3 bg-[#1d1d1f] rounded-full border-2 border-white animate-pulse mt-0.5"></div>
                       </div>
-
-                      {/* Pin A: Dapanji */}
-                      <div 
-                        onClick={() => { const meal = meals.find(m => m.id === 'm-1'); if(meal) setSelectedMeal(meal); }}
-                        className="absolute left-1/4 top-1/4 hover:scale-110 cursor-pointer flex flex-col items-center transition-transform z-10"
-                      >
-                        <div className="bg-amber-100 border border-amber-300 text-amber-900 font-black px-1.5 py-0.5 rounded-lg text-[9px] shadow-sm flex items-center gap-1">
-                          <span>{t('eh_map_pin1')}</span>
-                        </div>
-                        <div className="w-3.5 h-3.5 bg-red-600 rounded-full border-2 border-white mt-0.5 flex items-center justify-center text-white text-[7px] font-black">1</div>
-                      </div>
-
-                      {/* Pin B: Shuizhuyu */}
-                      <div 
-                        onClick={() => { const meal = meals.find(m => m.id === 'm-2'); if(meal) setSelectedMeal(meal); }}
-                        className="absolute right-1/4 top-1/3 hover:scale-110 cursor-pointer flex flex-col items-center transition-transform z-10"
-                      >
-                        <div className="bg-red-50 border border-red-200 text-red-900 font-black px-1.5 py-0.5 rounded-lg text-[9px] shadow-sm flex items-center gap-1">
-                          <span>{t('eh_map_pin2')}</span>
-                        </div>
-                        <div className="w-3.5 h-3.5 bg-red-600 rounded-full border-2 border-white mt-0.5 flex items-center justify-center text-white text-[7px] font-black">2</div>
-                      </div>
-
-                    </div>
+                    )}
                   </div>
 
                   {/* List of meals */}

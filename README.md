@@ -54,7 +54,7 @@
 ## ⚙️ Google 与 Firebase 技术实力背书 (Technologies)
 
 - **Gemini API & SDK** (`@google/genai`):
-  - **Gemini 2.5 Flash**（`gemini-2.5-flash`）：提供瞬时、高响应速度的多模态图像扫描（Vision）和复杂语境下的申诉公函写作能力，所有后端接口均实际调用此型号。
+  - **Gemini 3.5 Flash**（`gemini-3.5-flash`）：提供瞬时、高响应速度的多模态图像扫描（Vision）和复杂语境下的申诉公函写作能力，所有分析类后端接口均实际调用此型号（语音播报走 `gemini-3.1-flash-tts-preview`，纯文本生成走 Gemma）。
   - **Google Search Grounding (联网实时搜索)**：集成在 `/api/analyze-bill`、`/api/check-price`、`/api/scam-check`、`/api/tenancy-guide` 等接口，绕过模型时效局限，按用户所选「国家 + 州/省」实时检索当地法规、机构与物价。
 - **Firebase 服务**:
   - **Firebase Authentication**：提供安全的 Google 账号一键安全登录，无需记录冗长密码，保障留学生账号统一与会话合规。
