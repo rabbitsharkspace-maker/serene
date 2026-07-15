@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocale } from '../lib/locale';
 import { useT } from '../lib/i18n';
 import { showToast } from '../lib/toast';
+import FallbackNotice from './FallbackNotice';
 import { 
   Mic, 
   MicOff, 
@@ -33,6 +34,7 @@ interface Message {
   role: 'user' | 'model';
   text: string;
   timestamp: number;
+  isQuotaFallback?: boolean;
 }
 
 type ScenarioType = 'academic' | 'bond' | 'fine';
@@ -558,7 +560,8 @@ export default function HearingMock() {
       const aiMsg: Message = {
         role: 'model',
         text: data.reply,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        isQuotaFallback: !!data.isQuotaFallback
       };
 
       setMessages(prev => [...prev, aiMsg]);
@@ -611,6 +614,7 @@ export default function HearingMock() {
     } catch (err) {
       console.error(err);
       setScorecardData({
+        isQuotaFallback: true,
         grade: 'B',
         scores: { logic: 78, expression: 75, composure: 80, legalGrounds: 70 },
         feedback: '评估模块遭遇额度限制，请重新尝试。总体建议：应更强烈地援引官方条款（如 RTBA 或学校条例），用词应更加礼貌但态度坚定。',
@@ -728,6 +732,9 @@ export default function HearingMock() {
               </div>
             ) : (
               <div className="animate-in zoom-in-95 duration-400">
+                {scorecardData?.isQuotaFallback && (
+                  <FallbackNotice className="mb-6" />
+                )}
                 {/* Header card with Grade */}
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-br from-[#1d1d1f] to-neutral-900 p-6 md:p-8 rounded-2xl text-white mb-8">
                   <div className="flex items-center gap-4">
@@ -1133,6 +1140,9 @@ export default function HearingMock() {
               </div>
 
               {/* Chat messages */}
+              {messages.some(m => m.isQuotaFallback) && (
+                <FallbackNotice className="mt-5 -mb-2" />
+              )}
               <div className="flex-1 overflow-y-auto max-h-[320px] my-5 p-3 rounded-2xl bg-gray-50/50 border border-gray-100 flex flex-col gap-4 custom-scrollbar">
                 {messages.map((m, idx) => {
                   const isUser = m.role === 'user';
@@ -1147,11 +1157,16 @@ export default function HearingMock() {
                         {isUser ? 'ME' : SCENARIOS[activeScenario].avatar}
                       </div>
                       <div className={`rounded-2xl px-4 py-2.5 text-xs leading-relaxed ${
-                        isUser 
-                          ? 'bg-neutral-900 text-[#fffdf9] rounded-tr-none font-bold' 
+                        isUser
+                          ? 'bg-neutral-900 text-[#fffdf9] rounded-tr-none font-bold'
                           : 'bg-white text-gray-800 border border-gray-150/70 rounded-tl-none font-medium'
                       }`}>
                         {m.text}
+                        {m.isQuotaFallback && (
+                          <span className="block mt-1.5 text-[9px] font-black text-amber-700 tracking-wide uppercase">
+                            💡 {isZh ? '预置台词（非实时 AI）' : 'Preset line — not live AI'}
+                          </span>
+                        )}
                       </div>
                     </div>
                   );

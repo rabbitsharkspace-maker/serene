@@ -1262,7 +1262,7 @@ function formatPresetToNewSchema(preset: any, key: string): any {
       { step: "收集并打包全套电脑本地 Word 编辑历史、Git 备份日志及原始思路树手稿自证原创", officialChannel: "Student Academic Advocacy Team", url: "https://www.studyassist.gov.au/" }
     ];
     userRights = [
-      { claim: "因引用规范不熟悉导致的初犯拼写与漏引过错，有权主张为非蓄意意图（Unintentional Misconduct）进行警告改写降级，豁免 0 分处分", legalBasis: "TEQSA 国际学术诚信自证指南及学生救济权益汇编", sourceUrl: "https://www.teqsa.gov.au/guides-resources/resources/academic-integrity/academic-integrity-toolkit" }
+      { claim: "可以提交草稿、版本历史与研究记录，说明创作过程并请求学校依其学术诚信程序综合考虑主观意图与初犯情节；最终处理结果由学校决定", legalBasis: "TEQSA Academic Integrity Toolkit 与学校自身申诉程序", sourceUrl: "https://www.teqsa.gov.au/guides-resources/resources/academic-integrity/academic-integrity-toolkit" }
     ];
     riskLevel = "high";
   } else if (key === "noise") {
@@ -1289,7 +1289,7 @@ function formatPresetToNewSchema(preset: any, key: string): any {
       { step: "代报维州政府 Utility Relief Grant，申请应急小额补助直接抵扣欠费", officialChannel: "Victorian Government URGS Portal", url: "https://www.services.dffh.vic.gov.au/utility-relief-grant-scheme" }
     ];
     userRights = [
-      { claim: "属于断能拉闸高危民生设施，依法受极为严苛的水电不断连法案庇护，进入 Hardship 困难方案后自动免去逾期利息并至少有 12 个月免息分期特权", legalBasis: "Energy & Water Ombudsman Victoria (EWOV) 能源与水资源申诉合规最高民生规范", sourceUrl: "https://www.ewov.com.au/" }
+      { claim: "可联系能源商申请 hardship assistance，并向 EWOV 了解争议处理选择；暂停断供、费用减免或分期安排需以供应商政策和个案审核结果为准", legalBasis: "Energy & Water Ombudsman Victoria (EWOV) hardship guidance", sourceUrl: "https://www.ewov.com.au/" }
     ];
     riskLevel = "high";
   }
@@ -1465,7 +1465,7 @@ app.post("/api/analyze-bill", upload.single("image"), async (req, res) => {
               .replace(/Notice of Intention to Cancel/g, `Notice of Intention to Cancel under my ${visaType} conditions`);
           }
         } else if (matchedPresetKey === "bond") {
-          enrichedResult.summaryPlain = `【个性房退房诊断】针对您的租房状况（${leaseKeyTerms || "将于 6月30日 到期"}），考虑到您在 ${school || "学府"} 深造，中介 Horizons 的 $420.00 AUD 押金强扣项目完全与维拉民生租赁法规（RTA）相违背。地毯自然使用陈旧、墙壁细微擦碰均为完全合法的合理磨损 (Fair Wear and Tear)。在此个性化诊断下，无需您付蒸汽清洗或墙面修补费，我们教您单方面直接向 RTBA 提交一键全额扣返申请，彻底秒杀中介！`;
+          enrichedResult.summaryPlain = `【个性化退房初步分析】针对您的租房状况（${leaseKeyTerms || "租约即将到期"}），中介提出的 $420.00 AUD 扣款可能包含可争议项目。地毯自然老化与墙面轻微痕迹有机会被认定为合理磨损，但仍需结合入住状况报告、照片和租约条款核实。你可以整理证据并通过 RTBA/VCAT 官方流程提出异议；最终结果由相关机构依据材料决定。`;
           enrichedResult.summary = enrichedResult.summaryPlain;
           
           if (leaseKeyTerms) {
@@ -1473,10 +1473,10 @@ app.post("/api/analyze-bill", upload.single("image"), async (req, res) => {
               .replace(/Objection to proposed bond deduction/g, `Objection to proposed bond deduction for our lease ending ${leaseKeyTerms}`);
           }
         } else if (matchedPresetKey === "fine") {
-          enrichedResult.summaryPlain = `【个性停车罚单诊断】针对您的个人情况：${school ? `作为在 ${school} 就读的国际学生，` : ""}这是来自 Brentmoor 市政厅 of $85.00 AUD 罚单（车牌 ABC-123）。鉴于您在澳属于优秀记录初犯 (Good Driving Record)，结合道路遮挡因素，强烈建议采用我们定制申诉信申请内部警告替代（Official Warning），可百分百免罚免缴！`;
+          enrichedResult.summaryPlain = `【个性化停车罚单初步分析】${school ? `作为在 ${school} 就读的国际学生，` : ""}你收到一张 $85.00 AUD 停车罚单（车牌 ABC-123）。良好记录或标志遮挡可能构成申请内部复核时可陈述的理由，但不保证撤销。建议在截止日前核对签发机构、准备现场照片，并通过官方渠道提交复核请求。`;
           enrichedResult.summary = enrichedResult.summaryPlain;
         } else if (matchedPresetKey === "plagiarism") {
-          enrichedResult.summaryPlain = `【个性学术抄袭自证】针对您的 ${visaType || "500学签"}${school ? `以及在 ${school} 的学业进展` : ""}，本次 ECON101 作业 48% 重合率指控绝对是重大危机（最坏将通报挂科甚至退学）。您必须在 6月28日前 确认参加 7月3日 的听听证会。我们的申诉案已经过由于学术引用体系不透导致非主观抄袭的个性化纠错，将安全降级警告，守护您的学业！`;
+          enrichedResult.summaryPlain = `【个性化学术诚信应对】针对您的 ${visaType || "学生签证"}${school ? `以及在 ${school} 的学业进展` : ""}，48% 重合率需要认真回应，但相似率本身不等同于已认定抄袭。请先核对通知中的回复与听证期限，保留版本历史、草稿和引用记录，并联系学校 Student Advocacy 获取独立支持；处分结果只能由学校程序决定。`;
           enrichedResult.summary = enrichedResult.summaryPlain;
         } else {
           enrichedResult.summaryPlain = `【个性化分析结论】${contextIntro}\n\n` + enrichedResult.summaryPlain;
