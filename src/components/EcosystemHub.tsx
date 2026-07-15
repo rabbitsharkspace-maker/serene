@@ -323,7 +323,9 @@ export default function EcosystemHub() {
   const verdictLabel = (v: string) => v === '划算' ? t('eh_verdict_deal') : v === '偏贵' ? t('eh_verdict_pricey') : t('eh_verdict_fair');
   const conditionLabel = (c: string) => c === '全新' ? t('eh_cond_short_new') : c === '90新' ? t('eh_cond_short_90') : c === '85新' ? t('eh_cond_short_85') : t('eh_cond_short_99');
 
-  const [activeTab, setActiveTab] = useState<'guides' | 'private_chef' | 'marketplace' | 'daigou' | 'community' | 'tools'>('guides');
+  // Open on a genuinely connected capability. Marketplace/community supply is a
+  // transparent prototype; Community Radar calls the live AI endpoint.
+  const [activeTab, setActiveTab] = useState<'guides' | 'private_chef' | 'marketplace' | 'daigou' | 'community' | 'tools'>('community');
 
   // Multi-tab role toggling
   const [guideRole, setGuideRole] = useState<'student' | 'guide'>('student');
@@ -893,35 +895,67 @@ export default function EcosystemHub() {
         )}
       </AnimatePresence>
 
-      {/* Hero Welcome banner */}
-      <div className="mb-8 bg-gradient-to-r from-[#1d1d1f]/5 to-[#ff5a3c]/5 border border-[#1d1d1f]/10 rounded-3xl p-6 relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="absolute right-0 bottom-0 translate-y-3 translate-x-3 text-ink/5 rotate-12">
-          <Compass size={240} />
-        </div>
-        <div className="relative z-10">
-          <div className="flex flex-wrap items-center gap-2 mb-2.5">
-            <div className="inline-flex items-center space-x-1.5 bg-surface-soft text-ink px-3 py-1 rounded-full text-xs font-black tracking-wider">
-              <Shield size={14} />
-              <span>{t('eh_hero_badge')}</span>
+      {/* Honest capability map: live product first, future supply clearly separated. */}
+      <section className="mb-8 overflow-hidden rounded-[2rem] bg-surface-dark text-on-dark border border-neutral-800 shadow-[0_24px_80px_-48px_rgba(28,22,17,.8)]">
+        <div className="relative px-6 py-7 md:px-9 md:py-9">
+          <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-primary/20 blur-3xl" />
+          <div className="relative grid gap-8 lg:grid-cols-[1.2fr_.8fr] lg:items-end">
+            <div>
+              <div className="mb-4 flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/8 px-3 py-1.5 text-[11px] font-bold tracking-[.12em] text-on-dark">
+                  <MapPin size={13} className="text-primary" /> MELBOURNE · VIC
+                </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/12 px-3 py-1.5 text-[11px] font-bold text-emerald-300">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 animate-pulse" /> LIVE AI CONNECTED
+                </span>
+              </div>
+              <p className="mb-2 text-xs font-bold uppercase tracking-[.18em] text-on-dark-soft">Serene local support layer</p>
+              <h2 className="max-w-2xl text-3xl font-black tracking-tight !text-on-dark md:text-5xl">
+                不只帮你看懂问题，<br className="hidden sm:block" />也帮你找到下一步。
+              </h2>
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-on-dark-soft md:text-[15px]">
+                从一封难懂的罚单，到附近可信的官方机构、校园支持与生活资源。Serene 用 Gemini 将个人处境连接到墨尔本真实可执行的帮助路径。
+              </p>
             </div>
-            <span className="inline-flex items-center gap-1 bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide">
-              {t('eh_hero_roadmap')}
-            </span>
+
+            <div className="grid grid-cols-3 gap-2.5">
+              <div className="rounded-2xl border border-white/10 bg-white/6 p-3.5">
+                <p className="text-xl font-black text-on-dark">2</p>
+                <p className="mt-1 text-[10px] leading-4 text-on-dark-soft">项实时 AI<br/>生活工具</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/6 p-3.5">
+                <p className="text-xl font-black text-on-dark">VIC</p>
+                <p className="mt-1 text-[10px] leading-4 text-on-dark-soft">州级规则<br/>优先匹配</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/6 p-3.5">
+                <p className="text-xl font-black text-on-dark">6</p>
+                <p className="mt-1 text-[10px] leading-4 text-on-dark-soft">类生活场景<br/>逐步验证</p>
+              </div>
+            </div>
           </div>
-          <h2 className="text-2xl md:text-3xl font-black text-[#1d1d1f] tracking-tight">
-            {t('eh_hero_title')}
-          </h2>
-          <p className="text-xs text-gray-500 mt-1 max-w-2xl leading-relaxed">
-            {t('eh_hero_desc_1')}<strong>{t('eh_hero_desc_strong1')}</strong>{t('eh_hero_desc_2')}<strong className="text-amber-700">{t('eh_hero_desc_strong2')}</strong>{t('eh_hero_desc_3')}<strong className="text-ink">{t('eh_hero_desc_strong3')}</strong>{t('eh_hero_desc_4')}
-          </p>
         </div>
-      </div>
+
+        <div className="grid border-t border-white/10 sm:grid-cols-3">
+          <div className="flex gap-3 border-b border-white/10 px-6 py-4 sm:border-b-0 sm:border-r">
+            <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-400/15 text-emerald-300"><Check size={15}/></span>
+            <div><p className="text-xs font-bold text-on-dark">现在可用</p><p className="mt-1 text-[11px] leading-4 text-on-dark-soft">社区雷达、拍照翻译、实时汇率与 AI 验价</p></div>
+          </div>
+          <div className="flex gap-3 border-b border-white/10 px-6 py-4 sm:border-b-0 sm:border-r">
+            <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary"><Zap size={15}/></span>
+            <div><p className="text-xs font-bold text-on-dark">AI 如何参与</p><p className="mt-1 text-[11px] leading-4 text-on-dark-soft">Gemini 理解处境，Google Search Grounding 核验本地信息</p></div>
+          </div>
+          <div className="flex gap-3 px-6 py-4">
+            <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-300/15 text-amber-300"><Compass size={15}/></span>
+            <div><p className="text-xs font-bold text-on-dark">验证中原型</p><p className="mt-1 text-[11px] leading-4 text-on-dark-soft">向导、拼饭与二手交易仅展示流程，不承载真实资金</p></div>
+          </div>
+        </div>
+      </section>
 
       {/* Segment switcher */}
-      <div className="flex border-b border-gray-200 mb-8 overflow-x-auto gap-2 scrollbar-none">
+      <div className="mb-8 flex gap-2 overflow-x-auto rounded-2xl border border-hairline bg-surface-card p-2 scrollbar-none shadow-sm">
         <button 
           onClick={() => { setActiveTab('guides'); setSelectedGuide(null); setSelectedMeal(null); setSelectedItem(null); }}
-          className={`px-5 py-3 rounded-t-2xl font-black text-sm transition-all flex items-center gap-2 shrink-0 ${activeTab === 'guides' ? 'border-b-4 border-[#1d1d1f] text-[#1d1d1f] bg-white bg-opacity-50' : 'text-gray-400 hover:text-gray-900'}`}
+          className={`px-4 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 shrink-0 ${activeTab === 'guides' ? 'bg-ink text-on-dark shadow-sm' : 'text-muted hover:text-ink hover:bg-surface-soft'}`}
         >
           <Users size={18} />
           <span>{t('eh_tab_companion')}</span>
@@ -929,7 +963,7 @@ export default function EcosystemHub() {
         </button>
         <button 
           onClick={() => { setActiveTab('private_chef'); setSelectedGuide(null); setSelectedMeal(null); setSelectedItem(null); }}
-          className={`px-5 py-3 rounded-t-2xl font-black text-sm transition-all flex items-center gap-2 shrink-0 ${activeTab === 'private_chef' ? 'border-b-4 border-[#1d1d1f] text-[#1d1d1f] bg-white bg-opacity-50' : 'text-gray-400 hover:text-gray-900'}`}
+          className={`px-4 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 shrink-0 ${activeTab === 'private_chef' ? 'bg-ink text-on-dark shadow-sm' : 'text-muted hover:text-ink hover:bg-surface-soft'}`}
         >
           <Utensils size={18} />
           <span>{t('eh_tab_kitchen')}</span>
@@ -937,7 +971,7 @@ export default function EcosystemHub() {
         </button>
         <button 
           onClick={() => { setActiveTab('marketplace'); setSelectedGuide(null); setSelectedMeal(null); setSelectedItem(null); }}
-          className={`px-5 py-3 rounded-t-2xl font-black text-sm transition-all flex items-center gap-2 shrink-0 ${activeTab === 'marketplace' ? 'border-b-4 border-[#1d1d1f] text-[#1d1d1f] bg-white bg-opacity-50' : 'text-gray-400 hover:text-gray-900'}`}
+          className={`px-4 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 shrink-0 ${activeTab === 'marketplace' ? 'bg-ink text-on-dark shadow-sm' : 'text-muted hover:text-ink hover:bg-surface-soft'}`}
         >
           <ShoppingBag size={18} />
           <span>{t('eh_tab_market')}</span>
@@ -945,7 +979,7 @@ export default function EcosystemHub() {
         </button>
         <button
           onClick={() => { setActiveTab('daigou'); setSelectedGuide(null); setSelectedMeal(null); setSelectedItem(null); }}
-          className={`px-5 py-3 rounded-t-2xl font-black text-sm transition-all flex items-center gap-2 shrink-0 ${activeTab === 'daigou' ? 'border-b-4 border-[#1d1d1f] text-[#1d1d1f] bg-white bg-opacity-50' : 'text-gray-400 hover:text-gray-900'}`}
+          className={`px-4 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 shrink-0 ${activeTab === 'daigou' ? 'bg-ink text-on-dark shadow-sm' : 'text-muted hover:text-ink hover:bg-surface-soft'}`}
         >
           <span>📦</span>
           <span>{t('eh_tab_daigou')}</span>
@@ -953,7 +987,7 @@ export default function EcosystemHub() {
         </button>
         <button
           onClick={() => { setActiveTab('community'); setSelectedGuide(null); setSelectedMeal(null); setSelectedItem(null); }}
-          className={`px-5 py-3 rounded-t-2xl font-black text-sm transition-all flex items-center gap-2 shrink-0 ${activeTab === 'community' ? 'border-b-4 border-[#1d1d1f] text-[#1d1d1f] bg-white bg-opacity-50' : 'text-gray-400 hover:text-gray-900'}`}
+          className={`px-4 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 shrink-0 ${activeTab === 'community' ? 'bg-ink text-on-dark shadow-sm' : 'text-muted hover:text-ink hover:bg-surface-soft'}`}
         >
           <span>📡</span>
           <span>社区雷达</span>
@@ -961,7 +995,7 @@ export default function EcosystemHub() {
         </button>
         <button
           onClick={() => { setActiveTab('tools'); setSelectedGuide(null); setSelectedMeal(null); setSelectedItem(null); }}
-          className={`px-5 py-3 rounded-t-2xl font-black text-sm transition-all flex items-center gap-2 shrink-0 ${activeTab === 'tools' ? 'border-b-4 border-[#1d1d1f] text-[#1d1d1f] bg-white bg-opacity-50' : 'text-gray-400 hover:text-gray-900'}`}
+          className={`px-4 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 shrink-0 ${activeTab === 'tools' ? 'bg-ink text-on-dark shadow-sm' : 'text-muted hover:text-ink hover:bg-surface-soft'}`}
         >
           <span>🧰</span>
           <span>{t('eh_tab_tools')}</span>
@@ -989,7 +1023,7 @@ export default function EcosystemHub() {
       {activeTab === 'community' && <CommunityRadar />}
 
       {/* Main Panel views */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 items-start ${activeTab === 'tools' || activeTab === 'daigou' || activeTab === 'community' ? 'hidden' : ''}`}>
         
         {/* Left Interactive section */}
         <div className="lg:col-span-8 space-y-6">
@@ -2034,7 +2068,7 @@ export default function EcosystemHub() {
         </div>
 
         {/* Right Details inspector sidebar & Dynamic simulation panels */}
-        <div className={`lg:col-span-4 space-y-6 ${activeTab === 'tools' || activeTab === 'daigou' ? 'hidden' : ''}`}>
+        <div className={`lg:col-span-4 space-y-6 ${activeTab === 'tools' || activeTab === 'daigou' || activeTab === 'community' ? 'hidden' : ''}`}>
 
           {/* 1. Dynamic Detail Inspector */}
           <div className="bg-white border border-gray-150 rounded-3xl p-6 shadow-xs relative">
@@ -2532,7 +2566,7 @@ export default function EcosystemHub() {
       </AnimatePresence>
 
       {/* Dynamic Floating Shopping Cart Sidebar Trigger */}
-      <div className="fixed bottom-6 right-6 z-40">
+      <div className={`fixed bottom-6 right-6 z-40 ${activeTab === 'tools' || activeTab === 'community' ? 'hidden' : ''}`}>
         <button
           onClick={() => setIsCartOpen(true)}
           className="bg-[#1d1d1f] hover:bg-neutral-800 text-white p-4 rounded-full shadow-2xl hover:scale-105 transition-all flex items-center justify-center relative border-2 border-white cursor-pointer"
@@ -2548,7 +2582,7 @@ export default function EcosystemHub() {
 
       {/* Shopping Cart Drawer Overlay */}
       <AnimatePresence>
-        {isCartOpen && (
+        {isCartOpen && activeTab !== 'tools' && activeTab !== 'community' && (
           <div className="fixed inset-0 z-50 overflow-hidden">
             {/* Backdrop */}
             <motion.div

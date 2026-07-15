@@ -207,6 +207,12 @@ export default function App() {
                 <HearingMock />
               </div>
             )}
+            <footer className="mt-16 pt-6 border-t border-hairline flex flex-col sm:flex-row items-center justify-center gap-x-3 gap-y-1.5 text-[11px] text-muted-soft font-medium text-center">
+              <span className="inline-flex items-center gap-1.5 bg-surface-soft border border-hairline rounded-full px-3 py-1">
+                🏆 GDG 出海创想赛参赛作品 <span className="text-primary font-bold">#GDG出海创想赛</span> <span className="text-primary font-bold">#Google开发者大会</span>
+              </span>
+              <span>Built with Gemini · Google Search Grounding · Firebase</span>
+            </footer>
          </div>
       </main>
 

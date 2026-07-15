@@ -25,7 +25,7 @@ const STRINGS = {
   nav_hearing: { zh: '听证模拟', es: 'Audiencia', hi: 'सुनवाई अभ्यास', vi: 'Phiên điều trần', ar: 'محاكاة الجلسة' },
   nav_history: { zh: '我的案头', es: 'Mi escritorio', hi: 'मेरा डेस्क', vi: 'Bàn của tôi', ar: 'مكتبي' },
   nav_emergency: { zh: '急救包', es: 'Emergencia', hi: 'आपातकाल', vi: 'Khẩn cấp', ar: 'الطوارئ' },
-  nav_roadmap: { zh: '生态', es: 'Ecosistema', hi: 'इकोसिस्टम', vi: 'Hệ sinh thái', ar: 'النظام' },
+  nav_roadmap: { zh: '生活圈', es: 'Comunidad', hi: 'समुदाय', vi: 'Cộng đồng', ar: 'المجتمع' },
   title_country: {
     zh: '目的国 Destination country',
     es: 'País de destino',

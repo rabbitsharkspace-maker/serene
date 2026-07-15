@@ -1,6 +1,6 @@
 {
-  "name": "Remix: Remix: Remix: Overseas First Responder",
-  "description": "An AI-powered assistant for overseas students to analyze bills, fines, and warnings, and automatically draft and send appeal emails.",
+  "name": "Serene ｜ 留学生海外避坑安心助手",
+  "description": "An AI-powered safety copilot for international students: analyze bills, fines and warning letters with Gemini + Google Search grounding, verify second-hand prices, and draft compliant English appeal letters in one tap.",
   "requestFramePermissions": [
     "microphone"
   ],

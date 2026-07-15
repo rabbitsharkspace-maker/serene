@@ -10,6 +10,7 @@ import { useLocale, getCountryContent, getDefaultVisa } from '../lib/locale';
 import { useT } from '../lib/i18n';
 import GroundingSources from './GroundingSources';
 import { googleCalendarUrl } from '../lib/calendar';
+import JudgingProof from './JudgingProof';
 
 type AppState = 'upload' | 'analyzing' | 'result' | 'sent';
 
@@ -920,6 +921,8 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
             {t('lo_hero_1')}<br className="hidden md:block"/>{t('lo_hero_2')}
           </h2>
         </div>
+
+        <JudgingProof />
 
         <div className="flex flex-col relative z-10 w-full">
           {/* Interactive Main Area */}

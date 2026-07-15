@@ -63,7 +63,7 @@ describe('App shell (A5, A6 — navigation)', () => {
     ['法援站', 'tab-legalhub'],
     ['我的案头', 'tab-history'],
     ['急救包', 'tab-emergency'],
-    ['生态', 'tab-roadmap'],
+    ['生活圈', 'tab-roadmap'],
   ])('navigates to %s', async (label, testid) => {
     const user = userEvent.setup();
     renderApp();
