@@ -2183,7 +2183,8 @@ const LINGO_FALLBACK: Record<string, any> = {
   woolies: { term: "Woolies", meaning: "Woolworths 超市", usage: "澳洲两大超市之一，另一家 Coles 不缩写。", example: "\"I'm off to Woolies\" = 我去 Woolworths 买东西。" },
   servo: { term: "Servo", meaning: "加油站（service station）", usage: "也指便利店，很多 servo 24 小时营业。", example: "\"Stop at the servo\" = 在加油站停一下。" },
   "bottle-o": { term: "Bottle-o", meaning: "酒类专卖店（bottle shop）", usage: "澳洲超市不卖酒，买酒要去 bottle-o。", example: "\"Grab some from the bottle-o\" = 去酒铺买点。" },
-  bond: { term: "Bond", meaning: "租房押金", usage: "⚠️ 重要：通常为 4 周租金，须存入政府机构（维州为 RTBA），房东不能私自保管。退租时如被扣要有依据。", example: "\"4 weeks bond\" = 四周租金的押金。" },
+  "g'day": { term: "G'day", meaning: "你好（good day 的缩写）", usage: "澳洲最典型的招呼语，写作 G'day，不写成 good day。日常、工地、邮件开头都用得上。", example: "\"G'day mate\" = 你好啊。" },
+  bond: { term: "Bond", meaning: "租房押金", usage: "⚠️ 重要：通常为 4 周租金。维州须在 10 个工作日内存入政府机构 RTBA，房东和中介都不持有这笔钱。退租时房东想扣、你不同意，他必须申请争议处理（RDRV→VCAT），且举证责任在他——要证明损失、违约与金额合理。", example: "\"4 weeks bond\" = 四周租金的押金。" },
   centrelink: { term: "Centrelink", meaning: "澳洲社会福利署", usage: "发放各类补助的政府机构。信件抬头出现它，通常涉及资格审核或还款。", example: "收到 Centrelink 来信建议尽快处理，有期限。" },
   "fair dinkum": { term: "Fair dinkum", meaning: "真的／不骗你", usage: "表示真实、诚恳，语气偏亲切。", example: "\"Fair dinkum?\" = 真的假的？" },
 };
