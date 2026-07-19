@@ -2765,6 +2765,81 @@ WRITE ALL HUMAN-READABLE VALUES IN ${langName}. Do NOT invent fake laws, agencie
   }
 });
 
+// Ask-a-Photo: point the camera at something and ask about it in your own language.
+//
+// Why this is separate from /api/photo-translate: translation answers "what does this say",
+// which is only half the problem. Standing in front of a two-sign parking pole, the newcomer's
+// real question is "can I park here right now, and until when" — that needs the sign read, the
+// state rule checked, and a direct answer. Grounding is on so the answer cites the actual rule
+// instead of recalling one, same evidence standard as the Letter Officer.
+app.post("/api/ask-photo", upload.single("image"), async (req, res) => {
+  const question = String(req.body?.question || "").trim();
+  try {
+    const file = req.file;
+    if (!file) return res.status(400).json({ error: "No image file provided" });
+
+    const langName = getLang(req.body.language);
+    const country = getCountry(req.body.country);
+    const stateHint = String(req.body?.region || "").trim();
+    const aiClient = getAI();
+
+    const prompt = `You are a calm local friend standing next to a newcomer in ${country.name}${stateHint ? ` (${stateHint})` : ''}. They have photographed something they don't understand and asked you about it.
+
+Their question: "${question || 'What is this and what should I do?'}"
+
+Rules that matter more than completeness:
+- ANSWER THE QUESTION FIRST, in one or two plain sentences. No preamble.
+- Rules in ${country.name} differ by state/territory. If the answer depends on which state, use Google Search to check the rule that applies${stateHint ? ` in ${stateHint}` : ''}, and say which state your answer is for.
+- If the photo genuinely does not contain enough to answer (blurred, cropped, wrong subject), say so plainly in "answer" and put what you'd need in "readsAs". NEVER guess at text you cannot see.
+- If acting on a wrong reading could cost them money, a fine, housing or visa standing, fill "caution". Otherwise leave it "".
+- If there is nothing useful to do next, return an empty "nextSteps" array. Do not pad it.
+
+WRITE ALL HUMAN-READABLE VALUES IN ${langName}. Keep any quoted sign/document text in its original language inside "readsAs".
+
+Return ONLY raw JSON (no markdown fences):
+{
+  "answer": "the direct answer, 1-2 sentences in ${langName}",
+  "readsAs": "what the image actually says, original wording preserved",
+  "detail": "the reasoning or context behind the answer, in ${langName}",
+  "nextSteps": ["concrete step in ${langName}"],
+  "caution": ""
+}`;
+
+    const response = await generateWithRetry(aiClient, 'generateContent', {
+      model: GEMINI_MODEL,
+      contents: [{ role: "user", parts: [
+        { text: prompt },
+        { inlineData: { data: file.buffer.toString("base64"), mimeType: file.mimetype } },
+      ] }],
+      // responseSchema/responseMimeType can't be combined with the googleSearch tool, so the
+      // shape is enforced by the prompt and parsed defensively (same pattern as /api/analyze).
+      config: { tools: [{ googleSearch: {} }] },
+    }) as any;
+
+    let text = response.text;
+    if (!text) throw new Error("Empty response from AI");
+    const s = text.indexOf('{');
+    const e = text.lastIndexOf('}');
+    if (s !== -1 && e > s) text = text.slice(s, e + 1);
+
+    const result = JSON.parse(text);
+    if (!Array.isArray(result.nextSteps)) result.nextSteps = [];
+    return res.json({ ...result, groundingSources: extractGrounding(response) });
+  } catch (error: any) {
+    console.warn("Ask-photo failed, fallback active:", error?.message || error);
+    // Never blank the screen, never let a preset pose as a real reading of THEIR photo —
+    // this fallback deliberately refuses to describe the image it could not analyse.
+    return res.json({
+      answer: "暂时无法分析这张照片。",
+      readsAs: "",
+      detail: "AI 图像服务当前不可用或已达限流。为避免给出错误信息，这里不对您的照片作任何推测。请稍后重试；如果事情紧急，建议直接联系相关机构或现场工作人员确认。",
+      nextSteps: ["稍后重新上传照片重试", "如涉及罚单或期限，可先到「信件官」上传文件"],
+      caution: "",
+      isQuotaFallback: true,
+    });
+  }
+});
+
 // Photo translate: a newcomer photographs a sign / menu / letter / label;
 // Gemini Vision OCRs it, detects the source language, and translates into the user's language.
 app.post("/api/photo-translate", upload.single("image"), async (req, res) => {

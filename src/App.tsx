@@ -7,9 +7,10 @@ import HistoryView from './components/HistoryView';
 import LegalHubDemo from './components/LegalHubDemo';
 import HearingMock from './components/HearingMock';
 import LocalLingo from './components/LocalLingo';
+import AskPhoto from './components/AskPhoto';
 import ToastContainer from './components/ToastContainer';
 import { showToast } from './lib/toast';
-import { Mail, Shield, AlertTriangle, Compass, LogIn, LogOut, Clock, Scale, ListTodo, Mic, MessageCircleQuestion } from 'lucide-react';
+import { Mail, Shield, AlertTriangle, Compass, LogIn, LogOut, Clock, Scale, ListTodo, Mic, MessageCircleQuestion, Camera } from 'lucide-react';
 
 import { initAuth, googleSignIn, consumeRedirectResult, logout } from './lib/firebase';
 import { createGmailDraft } from './lib/gmail';
@@ -17,7 +18,7 @@ import { User } from 'firebase/auth';
 import { useLocale, LANGUAGES, REGIONS, getCountryName } from './lib/locale';
 import { useT } from './lib/i18n';
 
-type TabView = 'letter' | 'shield' | 'legalhub' | 'emergency' | 'roadmap' | 'history' | 'hearing' | 'lingo';
+type TabView = 'letter' | 'shield' | 'legalhub' | 'emergency' | 'roadmap' | 'history' | 'hearing' | 'lingo' | 'askphoto';
 
 export default function App() {
   const { country, language, region, setLanguage, setRegion } = useLocale();
@@ -109,6 +110,7 @@ export default function App() {
     { id: 'legalhub', label: t('nav_legalhub'), icon: <Scale size={24} /> },
     { id: 'hearing', label: t('nav_hearing'), icon: <Mic size={24} /> },
     { id: 'history', label: t('nav_history'), icon: <ListTodo size={24} /> },
+    { id: 'askphoto', label: t('nav_askphoto'), icon: <Camera size={24} /> },
     { id: 'lingo', label: t('nav_lingo'), icon: <MessageCircleQuestion size={24} /> },
     { id: 'emergency', label: t('nav_emergency'), icon: <AlertTriangle size={24} /> },
     { id: 'roadmap', label: t('nav_roadmap'), icon: <Compass size={24} /> }
@@ -192,6 +194,11 @@ export default function App() {
             {activeTab === 'history' && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <HistoryView />
+              </div>
+            )}
+            {activeTab === 'askphoto' && (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <AskPhoto />
               </div>
             )}
             {activeTab === 'lingo' && (
