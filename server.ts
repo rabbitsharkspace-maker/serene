@@ -2789,7 +2789,8 @@ Their question: "${question || 'What is this and what should I do?'}"
 
 Rules that matter more than completeness:
 - ANSWER THE QUESTION FIRST, in one or two plain sentences. No preamble.
-- Rules in ${country.name} differ by state/territory. If the answer depends on which state, use Google Search to check the rule that applies${stateHint ? ` in ${stateHint}` : ''}, and say which state your answer is for.
+- Answer from what is actually visible in the photo. You have NO search tool here, so never imply you looked a rule up or verified it against a source.
+- Rules in ${country.name} differ by state/territory. If the answer depends on which state${stateHint ? ` (the user is in ${stateHint})` : ''}, say so, give the answer the image itself supports, and tell them to confirm the state rule — point them to the「信件官」tab, which does check official sources, when the matter involves a fine, a deadline or an appeal.
 - If the photo genuinely does not contain enough to answer (blurred, cropped, wrong subject), say so plainly in "answer" and put what you'd need in "readsAs". NEVER guess at text you cannot see.
 - If acting on a wrong reading could cost them money, a fine, housing or visa standing, fill "caution". Otherwise leave it "".
 - If there is nothing useful to do next, return an empty "nextSteps" array. Do not pad it.
@@ -2811,9 +2812,13 @@ Return ONLY raw JSON (no markdown fences):
         { text: prompt },
         { inlineData: { data: file.buffer.toString("base64"), mimeType: file.mimetype } },
       ] }],
-      // responseSchema/responseMimeType can't be combined with the googleSearch tool, so the
-      // shape is enforced by the prompt and parsed defensively (same pattern as /api/analyze).
-      config: { tools: [{ googleSearch: {} }] },
+      // No googleSearch tool here. Grounding alongside an inline image fails on this model
+      // (verified against production: /api/photo-translate, vision without tools, returns real
+      // OCR on the same key that makes this endpoint fall back). Vision-only is the reliable
+      // path, so the prompt below is written to answer from the image and say when a rule needs
+      // checking, rather than to claim it verified one. Grounded state-rule lookup stays in the
+      // Letter Officer, where the input is a document rather than an inline photo.
+      config: { responseMimeType: "application/json" },
     }) as any;
 
     let text = response.text;
