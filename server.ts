@@ -2168,6 +2168,81 @@ Return JSON (never wrap in markdown):
 });
 
 // ==========================================
+// LOCAL LINGO: Australian everyday shorthand
+// ==========================================
+// Why this exists: the words that actually block a newcomer aren't in any textbook. "Arvo",
+// "Maccas", "Woolies", "servo", "bottle-o" are how Australians write rental ads, shift rosters
+// and group chats — a translator gives you the literal words and still leaves you guessing.
+// This decodes the term AND the situation it shows up in, which is the part that matters.
+//
+// Pure text, no vision, no grounding → Gemma, on its own free quota. A burst of lookups here
+// must never eat the Gemini budget that the Letter Officer demo depends on.
+const LINGO_FALLBACK: Record<string, any> = {
+  arvo: { term: "Arvo", meaning: "下午（afternoon）", usage: "This arvo = 今天下午。约时间时极常用。", example: "\"See you this arvo\" = 今天下午见。" },
+  maccas: { term: "Maccas", meaning: "麦当劳（McDonald's）", usage: "澳洲人几乎不说 McDonald's，一律说 Maccas。", example: "\"Let's grab Maccas\" = 去吃麦当劳。" },
+  woolies: { term: "Woolies", meaning: "Woolworths 超市", usage: "澳洲两大超市之一，另一家 Coles 不缩写。", example: "\"I'm off to Woolies\" = 我去 Woolworths 买东西。" },
+  servo: { term: "Servo", meaning: "加油站（service station）", usage: "也指便利店，很多 servo 24 小时营业。", example: "\"Stop at the servo\" = 在加油站停一下。" },
+  "bottle-o": { term: "Bottle-o", meaning: "酒类专卖店（bottle shop）", usage: "澳洲超市不卖酒，买酒要去 bottle-o。", example: "\"Grab some from the bottle-o\" = 去酒铺买点。" },
+  bond: { term: "Bond", meaning: "租房押金", usage: "⚠️ 重要：通常为 4 周租金，须存入政府机构（维州为 RTBA），房东不能私自保管。退租时如被扣要有依据。", example: "\"4 weeks bond\" = 四周租金的押金。" },
+  centrelink: { term: "Centrelink", meaning: "澳洲社会福利署", usage: "发放各类补助的政府机构。信件抬头出现它，通常涉及资格审核或还款。", example: "收到 Centrelink 来信建议尽快处理，有期限。" },
+  "fair dinkum": { term: "Fair dinkum", meaning: "真的／不骗你", usage: "表示真实、诚恳，语气偏亲切。", example: "\"Fair dinkum?\" = 真的假的？" },
+};
+app.post("/api/local-lingo", async (req, res) => {
+  const term = String(req.body?.term || "").trim();
+  const langName = getLang(req.body?.language);
+  const country = getCountry(req.body?.country);
+  if (!term) return res.status(400).json({ error: "No term provided" });
+
+  const key = term.toLowerCase().replace(/[?？。.!！]/g, "").trim();
+  try {
+    const aiClient = getAI();
+    const prompt = `You are a local-language decoder for a newcomer living in ${country.name}.
+The user encountered this everyday word, slang, abbreviation or shorthand: "${term}"
+
+It may appear in a rental ad, a work roster, a text message, a shop sign, or a government letter.
+Explain it the way a local friend would — not a dictionary.
+
+WRITE ALL HUMAN-READABLE VALUES IN ${langName}. Keep the original English term in "term".
+
+Rules:
+- "meaning": one short line. What it actually means.
+- "usage": when and where a newcomer meets this word, and anything that could trip them up.
+- "example": one natural sentence using it, followed by its meaning.
+- "caution": ONLY if getting this word wrong could cost the user money, housing, a visa or legal standing (e.g. bond, notice period, Centrelink, fine deadlines). Otherwise return an empty string. Do not invent risk where there is none.
+- If the term is not actually local slang or you are unsure, say so plainly in "meaning" rather than guessing.
+
+Return JSON only (never wrap in markdown):
+{"term":"...","meaning":"...","usage":"...","example":"...","caution":""}`;
+
+    const response = await generateWithRetry(aiClient, 'generateContent', {
+      model: GEMMA_MODEL,
+      contents: prompt,
+    });
+    let text = response.text;
+    if (!text) throw new Error("Empty response from lingo engine");
+    const s = text.indexOf('{');
+    const e = text.lastIndexOf('}');
+    if (s !== -1 && e !== -1 && e > s) text = text.slice(s, e + 1);
+    const result = JSON.parse(text);
+    return res.json({ ...result, _model: "gemma" });
+  } catch (error: any) {
+    console.warn("Local-lingo failed, fallback active:", error?.message || error);
+    // Same rule as everywhere else in this app: never blank the screen, never let a preset
+    // pretend to be a live result. isQuotaFallback drives the visible "降级" badge.
+    const hit = LINGO_FALLBACK[key];
+    if (hit) return res.json({ ...hit, caution: hit.caution || "", isQuotaFallback: true });
+    return res.json({
+      term,
+      meaning: "暂时无法查询这个词。",
+      usage: "AI 服务当前不可用，且本地词库中没有收录这个词。请稍后再试。",
+      example: "",
+      caution: "",
+      isQuotaFallback: true,
+    });
+  }
+});
+
+// ==========================================
 // NEW ENDPOINT: CROSS-DOCUMENT AUDIT & NEGOTIATIOR
 // ==========================================
 app.post("/api/cross-reference", upload.array("images", 2), async (req, res) => {
