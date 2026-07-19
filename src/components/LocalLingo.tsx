@@ -20,7 +20,9 @@ type LingoResult = {
 
 // Seeded with the words newcomers hit in their first week. "Bond" and "Centrelink" are in here
 // because they are the two that actually carry consequences.
-const QUICK_PICKS = ['Arvo', 'Maccas', 'Woolies', 'Servo', 'Bottle-o', 'Bond', 'Centrelink'];
+// Ordered light → consequential: a greeting, then everyday shorthand, then the two words that
+// cost real money if you get them wrong. Bond sits second-to-last on purpose.
+const QUICK_PICKS = ["G'day", 'Arvo', 'Maccas', 'Woolies', 'Servo', 'Bottle-o', 'Bond', 'Centrelink'];
 
 export default function LocalLingo() {
   const { language, country } = useLocale();
