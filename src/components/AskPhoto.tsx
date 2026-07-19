@@ -90,7 +90,8 @@ export default function AskPhoto() {
         </div>
         <p className="text-sm text-muted leading-relaxed">
           看不懂的路牌、账单、合同、机器界面——拍下来，用中文直接问。
-          规则按州不同，它会联网核实后再回答，并把查到的来源摆给你。
+          它读图回答，看不清会直说。涉及罚单、期限或申诉时，请到「信件官」——
+          那里会联网核实官方来源。
         </p>
       </div>
 
