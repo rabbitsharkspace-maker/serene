@@ -10,7 +10,7 @@
 
 </div>
 
-![Letter Officer](docs/screenshots/05-letter-en.png)
+![Letter Officer](docs/screenshots/01-letter-zh.png)
 
 ---
 
@@ -46,27 +46,33 @@ Six real, high-frequency sample cases are built in (parking fine / Show Cause / 
 
 ### 🛡️ Scam Shield — don't get ripped off, don't get scammed
 
+![Scam Shield](docs/screenshots/02-shield-zh.png)
+
 - **Smart price check**: is $80 too much for a second-hand microwave? It compares live against new prices at Kmart / IKEA / Target and suggests a fair second-hand range.
 - **Work-hours reality check**: converts a price into "how many hours you'd have to work at minimum wage to pay for this".
 - **Scam self-check**: tick suspicious signals (claims to be from the embassy / asks for gift-card payment / pressures you to decide right now…) and upload chat screenshots; it rates the risk level against Scamwatch alerts.
 
 ### ⚖️ Legal Hub — who to contact, what to do, how to write it
 
+![Legal Hub](docs/screenshots/03-legal-zh.png)
+
 Generated in real time for the state or province you choose: the rights you have by law, the steps in the dispute process, the relevant official agencies and their contact details, and English appeal templates you can use directly. Covers four high-frequency scenarios: rental bonds, traffic fines, wage theft and academic misconduct.
 
 ### 🚑 Emergency Kit — when you're panicking, just read it out
+
+![Emergency Kit](docs/screenshots/04-emergency-zh.png)
 
 - **Interpreter first**: the moment 000 answers, say `"Mandarin Chinese, Please!"` (or your own language) to be connected to Australia's free, 24-hour government telephone interpreting service. This is the single most important sentence in the whole module.
 - **English SOS cheat sheet**: bilingual phrases for four situations — sudden illness, robbery, break-in and fire — that can be read aloud or copied.
 - **Tenant emergency toolkit**: calm scripts, official channels and legal references for eight kinds of dispute, including a landlord entering without notice, forced eviction, water or power cut off, and bond withholding.
 
-### 🌏 Six display languages
+### 🌏 Five display languages
 
-![Chinese UI](docs/screenshots/01-letter-zh.png)
+![Spanish UI](docs/screenshots/05-letter-es.png)
 
-The interface supports **English / 中文 / Español / हिन्दी / Tiếng Việt / العربية**. Formal letters are always in English (they're the ones being sent); what changes is the language things are explained to you in.
+The interface supports **中文 / Español / हिन्दी / Tiếng Việt / العربية**, with Chinese as the default. Formal letters are always in English (they're the ones being sent); what changes is the language things are explained to you in.
 
-> Arabic currently has translated text only; full RTL layout is not yet supported.
+> Spanish, Hindi, Vietnamese and Arabic are first-pass translations and not every screen is translated yet (as the screenshot shows). Arabic has translated text only; full RTL layout is not yet supported. An English UI is not available yet.
 
 ---
 
@@ -181,7 +187,7 @@ gcloud run deploy serene --source . --region asia-southeast1 \
 │   ├── App.tsx            # App shell, header, tab navigation
 │   ├── components/        # Feature modules
 │   └── lib/
-│       ├── i18n.ts        # UI strings for all six languages
+│       ├── i18n.ts        # UI strings for all five languages
 │       ├── locale.tsx     # Country / state / display language
 │       └── firebase.ts    # Auth + Firestore (degrades gracefully when unconfigured)
 ├── firestore.rules        # Database security rules
