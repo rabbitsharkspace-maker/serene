@@ -3,7 +3,8 @@ import React from 'react';
 export function renderDocumentHTML(
   type: 'fine' | 'coe' | 'bond' | 'plagiarism' | 'noise' | 'utility',
   isMini: boolean,
-  isAnonymized: boolean = false
+  isAnonymized: boolean = false,
+  language: string = 'zh'
 ) {
   const p = isMini ? 'p-2 sm:p-3' : 'p-6 md:p-10';
   const textBase = isMini ? 'text-[8.5px] leading-snug' : 'text-xs md:text-sm leading-relaxed';
@@ -19,7 +20,7 @@ export function renderDocumentHTML(
     return (
       <span 
         className="bg-neutral-950 text-white font-mono rounded px-1.5 py-0.5 font-bold border border-neutral-900 select-none animate-pulse inline-block"
-        title={`🛡️ ${category} 已由隐私脱敏盾打码`}
+        title={language === 'zh' ? `🛡️ ${category} 已由隐私脱敏盾打码` : `🛡️ ${category} redacted by Privacy Shield`}
       >
         [REDACTED_{category}]
       </span>

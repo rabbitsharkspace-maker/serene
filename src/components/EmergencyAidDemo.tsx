@@ -227,6 +227,8 @@ export default function EmergencyAidDemo() {
   const countryName = getCountryName(country, language);
   const interpreter = getInterpreterName(language);
   const t = useT();
+  // Hardcoded (non-t()) copy: Chinese for zh, English for every other display language.
+  const isZh = language === 'zh';
   // Country+state label in the user's language, reused across guide copy.
   const locationLabel = `${countryName}${region ? ` · ${region}` : ''}`;
   const [isListening, setIsListening] = useState(false);
@@ -331,41 +333,67 @@ export default function EmergencyAidDemo() {
         isQuotaFallback: true
       };
       
-      if (s.includes("撬门") || s.includes("闯入") || s.includes("砸门") || s.includes("小偷") || s.includes("强行") || s.includes("入室")) {
-        fallback.scenarioTitle = "住宅遭到暴力侵入安全威胁 (Home Intrusion)";
+      // Keyword matching covers both Chinese and English input (matching only, never displayed).
+      const has = (...words: string[]) => words.some((w) => s.includes(w));
+      if (has("撬门", "闯入", "砸门", "小偷", "强行", "入室", "break in", "breaking in", "broke in", "intruder", "burglar", "trespass")) {
+        fallback.scenarioTitle = isZh ? "住宅遭到暴力侵入安全威胁 (Home Intrusion)" : "Home intrusion";
         fallback.englishTalk = "Help! Someone is breaking into my room right now! There is an active intruder! I need police. Address: [your address].";
-        fallback.chineseTalk = "抓人！有人正强行砸门撬锁闯入我的房间！现场有现行入侵者！我需要警察。地址：【你的地址】。";
-        fallback.actions = [
+        fallback.chineseTalk = isZh
+          ? "抓人！有人正强行砸门撬锁闯入我的房间！现场有现行入侵者！我需要警察。地址：【你的地址】。"
+          : "Tells the operator someone is forcing their way in right now, that you need police, and where you are.";
+        fallback.actions = isZh ? [
           "一、在入侵者还在防盗门外砸门时，立刻反锁房门并搬椅子、重物柜物理堵死门框！",
           "二、迅速关闭房灯，寻找结实掩体（床底或衣柜处），蹲身防守屏息静候！",
           "三、牢握自保器具以作合法防卫自救，一键打000大声叫唤Police！"
+        ] : [
+          "1. While the intruder is still outside, lock your door and block it with a chair or heavy furniture.",
+          "2. Turn off the lights, get behind something solid (under the bed or in a wardrobe) and stay quiet.",
+          `3. Call ${content.emergency} and ask for Police. Only defend yourself if you have no other option.`
         ];
-      } else if (s.includes("抢") || s.includes("打人") || s.includes("殴打") || s.includes("暴力") || s.includes("尾随") || s.includes("跟踪")) {
-        fallback.scenarioTitle = "遭受当街斗殴 / 袭击 / 跟踪尾随 (Assault & Robbery)";
+      } else if (has("抢", "打人", "殴打", "暴力", "尾随", "跟踪", "assault", "attack", "mugged", "robbed", "robbery", "followed", "stalk")) {
+        fallback.scenarioTitle = isZh ? "遭受当街斗殴 / 袭击 / 跟踪尾随 (Assault & Robbery)" : "Assault, robbery or being followed";
         fallback.englishTalk = "I was just assaulted and followed on the street by a suspect. I need immediate police support at [your address].";
-        fallback.chineseTalk = "我刚刚在街头遭到了人身尾随追踪和暴力打人袭击，我需要警察立即到场。定位在：【你的地址】附近。";
-        fallback.actions = [
+        fallback.chineseTalk = isZh
+          ? "我刚刚在街头遭到了人身尾随追踪和暴力打人袭击，我需要警察立即到场。定位在：【你的地址】附近。"
+          : "Tells the operator you were attacked and followed, and that you need police at your location now.";
+        fallback.actions = isZh ? [
           "一、立刻快步撤退向有公共监控、安保或路人密集的明亮正规商店（如7-11或中餐馆）！",
           "二、若面临财物胁迫，切记生命安全永远第一，顺势丢出钱包吸引罪犯目标，折身反跑！",
           "三、安全后用公用电话或本机速打000，大喊 Chinese Interpreter 要求语音三方中文支持。"
+        ] : [
+          "1. Move quickly to a bright, busy place with cameras or security, such as a 7-Eleven or open shop.",
+          "2. If someone demands your belongings, your safety comes first. Hand them over or drop your wallet and get away.",
+          `3. Once safe, call ${content.emergency} and ask for Police. Ask for an interpreter if you need one.`
         ];
-      } else if (s.includes("火") || s.includes("烟") || s.includes("爆炸") || s.includes("燃烧") || s.includes("起火")) {
-        fallback.scenarioTitle = "住宅引发火灾 / 绝火断道 / 浓烟逃生 (Active Fire)";
+      } else if (has("火", "烟", "爆炸", "燃烧", "起火", "fire", "smoke", "burning", "explosion")) {
+        fallback.scenarioTitle = isZh ? "住宅引发火灾 / 绝火断道 / 浓烟逃生 (Active Fire)" : "Fire or heavy smoke";
         fallback.englishTalk = "A fire broke out at my apartment, there is thick smoke trapped! Send a fire brigade. I am at [your address].";
-        fallback.chineseTalk = "我的套房里现在引发了大火并产生了浓重毒烟，请火速派遣消防局救援队！我目前在【你的地址】。";
-        fallback.actions = [
+        fallback.chineseTalk = isZh
+          ? "我的套房里现在引发了大火并产生了浓重毒烟，请火速派遣消防局救援队！我目前在【你的地址】。"
+          : "Tells the operator there is a fire with thick smoke at your home, asks for the fire brigade and gives your address.";
+        fallback.actions = isZh ? [
           "一、如果走道全是黑烟，立刻拨下毛巾床单一股脑全部浸冷水湿捂口鼻，压低身子、猫腰匍匐贴地逃生！",
           "二、手心贴门板测温，若发现楼下门把手已经发烫烫手，切莫开门！",
           "三、快步撤退至通风顺风的露台或外窗，大声求救！"
+        ] : [
+          "1. If the hallway is full of smoke, cover your nose and mouth with a wet cloth and stay low as you get out.",
+          "2. Feel doors with the back of your hand. If a door or handle is hot, do not open it.",
+          "3. Get to a balcony or open window with fresh air and call out for help."
         ];
-      } else if (s.includes("晕") || s.includes("窒息") || s.includes("过敏") || s.includes("病") || s.includes("血") || s.includes("伤") || s.includes("痛")) {
-        fallback.scenarioTitle = "急性严重爆发伤病 / 休克晕厥 / 呼吸急停 (Medical Trauma)";
+      } else if (has("晕", "窒息", "过敏", "病", "血", "伤", "痛", "faint", "collapse", "unconscious", "breath", "allerg", "bleed", "injur", "hurt", "pain", "sick")) {
+        fallback.scenarioTitle = isZh ? "急性严重爆发伤病 / 休克晕厥 / 呼吸急停 (Medical Trauma)" : "Medical emergency";
         fallback.englishTalk = "Emergency! Someone has collapsed and has severe breathing difficulty. Please send ambulance to [your address].";
-        fallback.chineseTalk = "紧急情况！这里有人突然晕厥跌倒，大口残重呼吸困难！请急速调派救护车到【你的地址】。";
-        fallback.actions = [
+        fallback.chineseTalk = isZh
+          ? "紧急情况！这里有人突然晕厥跌倒，大口残重呼吸困难！请急速调派救护车到【你的地址】。"
+          : "Tells the operator someone has collapsed and is struggling to breathe, and asks for an ambulance to your address.";
+        fallback.actions = isZh ? [
           "一、检查呼吸。如果病人尚存气但意识全无，立刻使其保持「侧卧复原体位」保持通调气道！",
           "二、排查急性过敏，寻找 EpiPen 自助注射大腿侧！",
           "三、生命休关的极速时刻，先点击按钮拨 000 先行抢救。"
+        ] : [
+          "1. Check their breathing. If they are breathing but unresponsive, roll them onto their side (recovery position) to keep the airway clear.",
+          "2. If it could be a severe allergic reaction, find their EpiPen and inject it into the outer thigh.",
+          `3. Don't wait. Call ${content.emergency} for an ambulance straight away.`
         ];
       }
       setCustomOutputs(fallback);
@@ -491,7 +519,9 @@ export default function EmergencyAidDemo() {
       if (SpeechRecognition) {
         const recognition = new SpeechRecognition();
         recognitionRef.current = recognition;
-        recognition.lang = 'zh-CN';
+        // Recognise speech in the user's display language (was hardcoded to Mandarin).
+        const SPEECH_LANG: Record<string, string> = { zh: 'zh-CN', en: 'en-AU', es: 'es-ES', hi: 'hi-IN', vi: 'vi-VN', ar: 'ar-SA' };
+        recognition.lang = SPEECH_LANG[language] || 'zh-CN';
         recognition.interimResults = true;
         recognition.maxAlternatives = 1;
 
@@ -1056,7 +1086,12 @@ export default function EmergencyAidDemo() {
                         {t('ea_strategy_desc', { emergency: content.emergency })}
                       </p>
                       <blockquote className="my-4 bg-white text-red-600 text-xl font-black p-4 rounded-2xl shadow-inner border-2 border-red-200">
-                        "{interpreter}, Please!"
+                        {language === 'en' ? '"Interpreter, please!"' : `"${interpreter}, Please!"`}
+                        {language === 'en' && (
+                          <span className="block text-xs font-bold text-red-500/90 mt-1.5">
+                            Only if English is hard for you right now. Otherwise just say "Police", "Fire" or "Ambulance".
+                          </span>
+                        )}
                       </blockquote>
                       <p className="text-sm leading-relaxed text-red-100 max-w-xl">
                         {t('ea_strategy_desc2', { country: countryName, emergency: content.emergency })}
@@ -1149,13 +1184,19 @@ export default function EmergencyAidDemo() {
                     <div className="flex items-center justify-between mb-1.5 flex-wrap gap-2">
                       <div className="flex items-center space-x-2">
                         <MapPin size={18} className="text-[#1d1d1f]" />
-                        <h4 className="text-sm font-black text-gray-900 uppercase tracking-wide">附近救援点 · Google 地图</h4>
+                        <h4 className="text-sm font-black text-gray-900 uppercase tracking-wide">{isZh ? '附近救援点 · Google 地图' : 'Nearby help · Google Maps'}</h4>
                       </div>
-                      <span className="text-[10px] text-gray-400 font-bold">离你最近的实体求助点</span>
+                      <span className="text-[10px] text-gray-400 font-bold">{isZh ? '离你最近的实体求助点' : 'Closest places to get help in person'}</span>
                     </div>
-                    <p className="text-[11px] text-gray-500 leading-relaxed mb-4">
-                      拨打 {content.emergency} 之后，下一个问题往往是 "我人应该往哪走"。我们对接了真实的 <strong>Places API 邻近位置检索</strong> 与 <strong>Routes API 实时路径规划</strong>，为您精准引路。
-                    </p>
+                    {isZh ? (
+                      <p className="text-[11px] text-gray-500 leading-relaxed mb-4">
+                        拨打 {content.emergency} 之后，下一个问题往往是 "我人应该往哪走"。我们对接了真实的 <strong>Places API 邻近位置检索</strong> 与 <strong>Routes API 实时路径规划</strong>，为您精准引路。
+                      </p>
+                    ) : (
+                      <p className="text-[11px] text-gray-500 leading-relaxed mb-4">
+                        After calling {content.emergency}, the next question is often "where do I go?". We use live <strong>Places API nearby search</strong> and <strong>Routes API directions</strong> to guide you there.
+                      </p>
+                    )}
                     <RescueMap country={country} countryName={countryName} />
                   </div>
 
@@ -1306,8 +1347,8 @@ export default function EmergencyAidDemo() {
                         <div className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 pt-0.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                           {onDeviceStatus === 'available'
-                            ? '本机已就绪：断网也能由端侧 Gemini Nano 本地生成'
-                            : '本浏览器支持端侧 AI：首次使用会下载离线模型'}
+                            ? (isZh ? '本机已就绪：断网也能由端侧 Gemini Nano 本地生成' : 'Ready on this device: Gemini Nano can generate a plan even offline')
+                            : (isZh ? '本浏览器支持端侧 AI：首次使用会下载离线模型' : 'This browser supports on-device AI: the offline model downloads on first use')}
                         </div>
                       )}
                     </div>
@@ -1327,8 +1368,10 @@ export default function EmergencyAidDemo() {
                             <div className="bg-emerald-50 border border-emerald-200 px-3.5 py-2.5 rounded-2xl flex items-start gap-2.5 shadow-sm">
                               <span className="text-base leading-none shrink-0">📴</span>
                               <p className="text-[10px] text-emerald-900 leading-relaxed font-semibold">
-                                <strong className="font-black">端侧离线生成 · On-device (Gemini Nano).</strong>{' '}
-                                本方案由 Chrome 内置 AI 在你的设备本地生成，全程无需联网、数据不出手机——断网时也能救命。
+                                <strong className="font-black">{isZh ? '端侧离线生成 · On-device (Gemini Nano).' : 'Generated on-device (Gemini Nano).'}</strong>{' '}
+                                {isZh
+                                  ? '本方案由 Chrome 内置 AI 在你的设备本地生成，全程无需联网、数据不出手机——断网时也能救命。'
+                                  : "This plan was created by Chrome's built-in AI right on your device. No internet needed and your data never leaves your phone, so it works even without signal."}
                               </p>
                             </div>
                           )}

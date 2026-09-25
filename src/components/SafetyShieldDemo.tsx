@@ -56,6 +56,7 @@ const SCAM_FLAG_GROUPS: { emoji: string; categoryKey: StringKey; itemKeys: Strin
 export default function SafetyShieldDemo() {
   const { country, language, region } = useLocale();
   const t = useT();
+  const isZh = language === 'zh';
   const [activeTab, setActiveTab] = useState<SubmoduleType>('valuation');
   const [appState, setAppState] = useState<AppState>('upload');
 
@@ -560,15 +561,15 @@ export default function SafetyShieldDemo() {
                             analysis.safetyLevel === 'danger' ? 'bg-red-100 text-red-800' : 
                             analysis.safetyLevel === 'warning' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
                           }`}>
-                            🛡️ 安全级别: {
-                              analysis.safetyLevel === 'danger' ? 'DANGER / 极其危险' : 
-                              analysis.safetyLevel === 'warning' ? 'WARNING / 潜在隐患' : 'SAFE / 安全合规'
+                            🛡️ {isZh ? '安全级别' : 'Safety level'}: {
+                              analysis.safetyLevel === 'danger' ? (isZh ? 'DANGER / 极其危险' : 'DANGER') : 
+                              analysis.safetyLevel === 'warning' ? (isZh ? 'WARNING / 潜在隐患' : 'WARNING') : (isZh ? 'SAFE / 安全合规' : 'SAFE')
                             }
                           </span>
                         </div>
                         {analysis.riskAnalysis && (
                           <div className="text-xs text-gray-600 leading-relaxed font-sans">
-                            <strong className="text-gray-900 block mb-1 font-bold">🧠 深度安全漏洞研判:</strong>
+                            <strong className="text-gray-900 block mb-1 font-bold">🧠 {isZh ? '深度安全漏洞研判:' : 'In-depth risk analysis:'}</strong>
                             <p>{analysis.riskAnalysis}</p>
                           </div>
                         )}
@@ -580,7 +581,7 @@ export default function SafetyShieldDemo() {
                       <div className="bg-blue-50/30 p-5 rounded-2xl border border-blue-100/60 flex flex-col gap-2">
                         <h4 className="text-xs font-black text-blue-900 uppercase tracking-widest flex items-center gap-1.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                          <span>维权及法理参考依据 ({analysis.lawReferences.length})</span>
+                          <span>{isZh ? '维权及法理参考依据' : 'Legal references & your rights'} ({analysis.lawReferences.length})</span>
                         </h4>
                         <ul className="space-y-1.5 list-disc list-inside">
                           {analysis.lawReferences.map((ref, idx) => (
@@ -597,7 +598,7 @@ export default function SafetyShieldDemo() {
                       <div className="bg-amber-50/30 p-5 rounded-2xl border border-amber-100/60 flex flex-col gap-2">
                         <h4 className="text-xs font-black text-amber-900 uppercase tracking-widest flex items-center gap-1.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                          <span>紧急防御阻断操作 ({analysis.urgentActions.length})</span>
+                          <span>{isZh ? '紧急防御阻断操作' : 'Urgent protective actions'} ({analysis.urgentActions.length})</span>
                         </h4>
                         <ul className="space-y-1.5">
                           {analysis.urgentActions.map((act, idx) => (

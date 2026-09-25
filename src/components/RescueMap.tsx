@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { APIProvider, Map as GoogleMap, useMap, useMapsLibrary, AdvancedMarker, Pin, InfoWindow } from '@vis.gl/react-google-maps';
 import { MapPin, Navigation, Info, Star, Compass } from 'lucide-react';
+import { useLocale, getInterpreterName } from '../lib/locale';
 
 const API_KEY =
   process.env.GOOGLE_MAPS_PLATFORM_KEY ||
@@ -23,18 +24,29 @@ const SAMPLE_COORDINATES: Record<string, { lat: number; lng: number }> = {
 
 export default function RescueMap({ country, countryName }: RescueMapProps) {
   const [category, setCategory] = useState<'police' | 'hospital' | 'pharmacy' | 'chinese_gp'>('police');
+  const { language } = useLocale();
+  const isZh = language === 'zh';
+  // Same-language GP: Chinese for zh, any GP for English, otherwise a GP speaking the user's language.
+  const gpLang = getInterpreterName(language).replace(/^Mandarin /, '');
 
   const CATEGORIES = [
-    { id: 'police' as const, label: '👮 最近警局', searchSuffix: 'police station' },
-    { id: 'hospital' as const, label: '🏥 24h 急诊', searchSuffix: 'hospital emergency room department' },
-    { id: 'pharmacy' as const, label: '💊 24h 药房', searchSuffix: '24 hour pharmacy chemist' },
-    { id: 'chinese_gp' as const, label: '🩺 华人 GP', searchSuffix: 'Chinese speaking GP clinic medical centre' }
+    { id: 'police' as const, label: isZh ? '👮 最近警局' : '👮 Nearest police', searchSuffix: 'police station' },
+    { id: 'hospital' as const, label: isZh ? '🏥 24h 急诊' : '🏥 24h emergency', searchSuffix: 'hospital emergency room department' },
+    { id: 'pharmacy' as const, label: isZh ? '💊 24h 药房' : '💊 24h pharmacy', searchSuffix: '24 hour pharmacy chemist' },
+    {
+      id: 'chinese_gp' as const,
+      label: isZh ? '🩺 华人 GP' : language === 'en' ? '🩺 Nearest GP' : `🩺 ${gpLang}-speaking GP`,
+      searchSuffix: isZh
+        ? 'Chinese speaking GP clinic medical centre'
+        : language === 'en' ? 'GP clinic medical centre' : `${gpLang} speaking GP clinic medical centre`,
+    }
   ];
 
   if (!hasValidKey) {
     // Elegant fallback UI when API key is missing, using safe iframe search
     const currentCat = CATEGORIES.find(c => c.id === category);
-    const fallbackQuery = `${currentCat?.searchSuffix || 'police station'} near ${countryName === '澳大利亚' ? 'Melbourne VIC' : countryName}`;
+    // Match on the country code: countryName is localized (e.g. 'Australia' for non-zh users).
+    const fallbackQuery = `${currentCat?.searchSuffix || 'police station'} near ${country === 'AU' ? 'Melbourne VIC' : countryName}`;
 
     return (
       <div className="flex flex-col space-y-4">
@@ -57,25 +69,47 @@ export default function RescueMap({ country, countryName }: RescueMapProps) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-          <div className="md:col-span-5 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-left space-y-3">
-            <span className="inline-flex items-center gap-1.5 text-[10px] font-black text-amber-800 uppercase tracking-wider bg-amber-200/60 px-2 py-0.5 rounded-lg">
-              🛡️ 高级地图能力已就绪
-            </span>
-            <h5 className="text-sm font-black text-amber-900 leading-snug">
-              检测到您正在使用本地演示版地图
-            </h5>
-            <p className="text-xs text-amber-800/90 leading-relaxed">
-              若要解锁<strong>真实 GPS 邻近推荐、一键计算步行/公交路径规划、实时耗时估算</strong>等核心加分项：
-            </p>
-            <ol className="text-xs text-amber-800/90 leading-relaxed list-decimal pl-4 space-y-1">
-              <li>点击右上角 <strong>Settings (⚙️齿轮图标)</strong></li>
-              <li>选择 <strong>Secrets</strong></li>
-              <li>添加 <code>GOOGLE_MAPS_PLATFORM_KEY</code> 填入您的 Google Maps API Key</li>
-            </ol>
-            <p className="text-[10px] text-amber-600/95 font-bold">
-              * 目前系统已为您展示了基于 iframe 的基础查询："{fallbackQuery}"
-            </p>
-          </div>
+          {isZh ? (
+            <div className="md:col-span-5 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-left space-y-3">
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-black text-amber-800 uppercase tracking-wider bg-amber-200/60 px-2 py-0.5 rounded-lg">
+                🛡️ 高级地图能力已就绪
+              </span>
+              <h5 className="text-sm font-black text-amber-900 leading-snug">
+                检测到您正在使用本地演示版地图
+              </h5>
+              <p className="text-xs text-amber-800/90 leading-relaxed">
+                若要解锁<strong>真实 GPS 邻近推荐、一键计算步行/公交路径规划、实时耗时估算</strong>等核心加分项：
+              </p>
+              <ol className="text-xs text-amber-800/90 leading-relaxed list-decimal pl-4 space-y-1">
+                <li>点击右上角 <strong>Settings (⚙️齿轮图标)</strong></li>
+                <li>选择 <strong>Secrets</strong></li>
+                <li>添加 <code>GOOGLE_MAPS_PLATFORM_KEY</code> 填入您的 Google Maps API Key</li>
+              </ol>
+              <p className="text-[10px] text-amber-600/95 font-bold">
+                * 目前系统已为您展示了基于 iframe 的基础查询："{fallbackQuery}"
+              </p>
+            </div>
+          ) : (
+            <div className="md:col-span-5 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-left space-y-3">
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-black text-amber-800 uppercase tracking-wider bg-amber-200/60 px-2 py-0.5 rounded-lg">
+                🛡️ Advanced maps available
+              </span>
+              <h5 className="text-sm font-black text-amber-900 leading-snug">
+                You're viewing the basic demo map
+              </h5>
+              <p className="text-xs text-amber-800/90 leading-relaxed">
+                To unlock <strong>real GPS nearby results, walking/public transport directions and live travel times</strong>:
+              </p>
+              <ol className="text-xs text-amber-800/90 leading-relaxed list-decimal pl-4 space-y-1">
+                <li>Click <strong>Settings (⚙️ gear icon)</strong> at the top right</li>
+                <li>Choose <strong>Secrets</strong></li>
+                <li>Add <code>GOOGLE_MAPS_PLATFORM_KEY</code> with your Google Maps API key</li>
+              </ol>
+              <p className="text-[10px] text-amber-600/95 font-bold">
+                * For now we're showing a basic embedded search: "{fallbackQuery}"
+              </p>
+            </div>
+          )}
 
           <div className="md:col-span-7 h-[300px] rounded-2xl overflow-hidden border border-gray-200 shadow-inner bg-gray-50">
             <iframe
@@ -114,6 +148,8 @@ interface RescueMapInnerProps {
 }
 
 function RescueMapInner({ country, countryName, category, setCategory, CATEGORIES }: RescueMapInnerProps) {
+  const { language } = useLocale();
+  const isZh = language === 'zh';
   const map = useMap();
   const placesLib = useMapsLibrary('places');
   const routesLib = useMapsLibrary('routes');
@@ -140,7 +176,8 @@ function RescueMapInner({ country, countryName, category, setCategory, CATEGORIE
     const currentCat = CATEGORIES.find(c => c.id === category);
     if (!currentCat) return;
 
-    const query = `${currentCat.searchSuffix} near ${countryName === '澳大利亚' ? 'Melbourne VIC' : countryName}`;
+    // Match on the country code: countryName is localized (e.g. 'Australia' for non-zh users).
+    const query = `${currentCat.searchSuffix} near ${country === 'AU' ? 'Melbourne VIC' : countryName}`;
     
     placesLib.Place.searchByText({
       textQuery: query,
@@ -161,7 +198,7 @@ function RescueMapInner({ country, countryName, category, setCategory, CATEGORIE
       .catch((err) => {
         console.error("Places Search failed:", err);
       });
-  }, [placesLib, map, category, country, countryName]);
+  }, [placesLib, map, category, country, countryName, language]);
 
   // 2. Compute Routes when a place is selected or travel mode changes
   useEffect(() => {
@@ -202,11 +239,11 @@ function RescueMapInner({ country, countryName, category, setCategory, CATEGORIE
 
           const distanceStr = distMeters >= 1000 
             ? `${(distMeters / 1000).toFixed(1)} km` 
-            : `${distMeters} 米`;
+            : `${distMeters} ${isZh ? '米' : 'm'}`;
 
           const durationStr = durationSec >= 60 
-            ? `${Math.round(durationSec / 60)} 分钟` 
-            : `${Math.round(durationSec)} 秒`;
+            ? `${Math.round(durationSec / 60)} ${isZh ? '分钟' : 'min'}` 
+            : `${Math.round(durationSec)} ${isZh ? '秒' : 's'}`;
 
           setRouteInfo({
             distance: distanceStr,
@@ -226,7 +263,7 @@ function RescueMapInner({ country, countryName, category, setCategory, CATEGORIE
     return () => {
       polylinesRef.current.forEach(p => p.setMap(null));
     };
-  }, [routesLib, map, selectedPlace, travelMode, country]);
+  }, [routesLib, map, selectedPlace, travelMode, country, isZh]);
 
   const handlePlaceSelect = (place: google.maps.places.Place) => {
     setSelectedPlace(place);
@@ -262,7 +299,7 @@ function RescueMapInner({ country, countryName, category, setCategory, CATEGORIE
           {places.length === 0 ? (
             <div className="text-center py-12 text-gray-400 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
               <Compass size={32} className="mx-auto mb-2 opacity-50 animate-spin" />
-              <p className="text-xs font-bold">正在搜寻附近救援点...</p>
+              <p className="text-xs font-bold">{isZh ? '正在搜寻附近救援点...' : 'Searching for help nearby...'}</p>
             </div>
           ) : (
             places.map((place, idx) => {
@@ -298,7 +335,7 @@ function RescueMapInner({ country, countryName, category, setCategory, CATEGORIE
                   {isSelected && (
                     <div className="mt-3.5 pt-3 border-t border-red-100/60 space-y-2.5">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-black text-red-600 uppercase tracking-wider">出行路径规划</span>
+                        <span className="text-[10px] font-black text-red-600 uppercase tracking-wider">{isZh ? '出行路径规划' : 'Directions'}</span>
                         <div className="flex bg-gray-100 rounded-lg p-0.5 border border-gray-200">
                           <button
                             type="button"
@@ -309,7 +346,7 @@ function RescueMapInner({ country, countryName, category, setCategory, CATEGORIE
                                 : 'text-gray-500 hover:text-gray-900'
                             }`}
                           >
-                            🚶 步行
+                            {isZh ? '🚶 步行' : '🚶 Walk'}
                           </button>
                           <button
                             type="button"
@@ -320,7 +357,7 @@ function RescueMapInner({ country, countryName, category, setCategory, CATEGORIE
                                 : 'text-gray-500 hover:text-gray-900'
                             }`}
                           >
-                            🚌 公交/轻轨
+                            {isZh ? '🚌 公交/轻轨' : '🚌 Public transport'}
                           </button>
                         </div>
                       </div>
@@ -329,13 +366,13 @@ function RescueMapInner({ country, countryName, category, setCategory, CATEGORIE
                         <div className="bg-red-500/10 text-red-700 text-xs font-black p-2 rounded-xl flex items-center justify-between border border-red-200/55">
                           <span className="flex items-center gap-1">
                             <Navigation size={12} className="animate-pulse" />
-                            预计路程: {routeInfo.distance}
+                            {isZh ? '预计路程: ' : 'Distance: '}{routeInfo.distance}
                           </span>
-                          <span>耗时约为: {routeInfo.duration}</span>
+                          <span>{isZh ? '耗时约为: ' : 'About '}{routeInfo.duration}</span>
                         </div>
                       ) : (
                         <div className="text-[10px] text-gray-400 font-bold animate-pulse text-center">
-                          正在实时计算路线...
+                          {isZh ? '正在实时计算路线...' : 'Calculating route...'}
                         </div>
                       )}
                     </div>
@@ -360,7 +397,7 @@ function RescueMapInner({ country, countryName, category, setCategory, CATEGORIE
             {/* Default User Center marker */}
             <AdvancedMarker
               position={userCoords}
-              title="你的当前位置"
+              title={isZh ? '你的当前位置' : 'Your current location'}
               onClick={() => {
                 setSelectedPlace(null);
                 setRouteInfo(null);
@@ -369,7 +406,7 @@ function RescueMapInner({ country, countryName, category, setCategory, CATEGORIE
               }}
             >
               <Pin background="#4285F4" glyphColor="#fff" scale={1.1}>
-                <span className="text-[10px] font-bold text-white">我</span>
+                <span className="text-[10px] font-bold text-white">{isZh ? '我' : 'Me'}</span>
               </Pin>
             </AdvancedMarker>
 
@@ -416,7 +453,7 @@ function RescueMapInner({ country, countryName, category, setCategory, CATEGORIE
                   {selectedPlace.rating && (
                     <div className="flex items-center gap-0.5 text-[9px] font-black text-amber-500 bg-amber-50 px-1.5 py-0.5 rounded-md border border-amber-150 inline-block">
                       <Star size={9} className="fill-amber-500" />
-                      评分: {selectedPlace.rating.toFixed(1)} / 5.0
+                      {isZh ? '评分: ' : 'Rating: '}{selectedPlace.rating.toFixed(1)} / 5.0
                     </div>
                   )}
                 </div>
@@ -426,7 +463,7 @@ function RescueMapInner({ country, countryName, category, setCategory, CATEGORIE
 
           {/* Info Badge */}
           <div className="absolute bottom-2.5 left-2.5 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-xl px-2.5 py-1 text-[9px] font-bold text-gray-500 shadow-sm z-10 pointer-events-none">
-            📍 蓝色标记点为您的当前位置
+            {isZh ? '📍 蓝色标记点为您的当前位置' : '📍 The blue marker is your current location'}
           </div>
         </div>
       </div>

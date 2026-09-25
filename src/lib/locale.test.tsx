@@ -39,8 +39,8 @@ describe('locale data integrity (A1–A3)', () => {
     }
   });
 
-  it('offers the five display languages with unique codes', () => {
-    expect(LANGUAGES.map((l) => l.code)).toEqual(['zh', 'es', 'hi', 'vi', 'ar']);
+  it('offers the six display languages with unique codes', () => {
+    expect(LANGUAGES.map((l) => l.code)).toEqual(['zh', 'en', 'es', 'hi', 'vi', 'ar']);
     expect(new Set(LANGUAGES.map((l) => l.code)).size).toBe(LANGUAGES.length);
   });
 

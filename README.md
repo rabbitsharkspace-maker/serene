@@ -10,7 +10,7 @@
 
 </div>
 
-![Letter Officer](docs/screenshots/01-letter-zh.png)
+![Letter Officer](docs/screenshots/01-letter-en.png)
 
 ---
 
@@ -46,7 +46,7 @@ Six real, high-frequency sample cases are built in (parking fine / Show Cause / 
 
 ### 🛡️ Scam Shield — don't get ripped off, don't get scammed
 
-![Scam Shield](docs/screenshots/02-shield-zh.png)
+![Scam Shield](docs/screenshots/02-shield-en.png)
 
 - **Smart price check**: is $80 too much for a second-hand microwave? It compares live against new prices at Kmart / IKEA / Target and suggests a fair second-hand range.
 - **Work-hours reality check**: converts a price into "how many hours you'd have to work at minimum wage to pay for this".
@@ -54,25 +54,34 @@ Six real, high-frequency sample cases are built in (parking fine / Show Cause / 
 
 ### ⚖️ Legal Hub — who to contact, what to do, how to write it
 
-![Legal Hub](docs/screenshots/03-legal-zh.png)
+![Legal Hub](docs/screenshots/03-legal-en.png)
 
 Generated in real time for the state or province you choose: the rights you have by law, the steps in the dispute process, the relevant official agencies and their contact details, and English appeal templates you can use directly. Covers four high-frequency scenarios: rental bonds, traffic fines, wage theft and academic misconduct.
 
 ### 🚑 Emergency Kit — when you're panicking, just read it out
 
-![Emergency Kit](docs/screenshots/04-emergency-zh.png)
+![Emergency Kit](docs/screenshots/04-emergency-en.png)
 
 - **Interpreter first**: the moment 000 answers, say `"Mandarin Chinese, Please!"` (or your own language) to be connected to Australia's free, 24-hour government telephone interpreting service. This is the single most important sentence in the whole module.
 - **English SOS cheat sheet**: bilingual phrases for four situations — sudden illness, robbery, break-in and fire — that can be read aloud or copied.
 - **Tenant emergency toolkit**: calm scripts, official channels and legal references for eight kinds of dispute, including a landlord entering without notice, forced eviction, water or power cut off, and bond withholding.
 
-### 🌏 Five display languages
+### 🌏 Six display languages
 
-![Spanish UI](docs/screenshots/05-letter-es.png)
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/lang-zh.png" width="400" alt="中文"><br>中文</td>
+    <td align="center"><img src="docs/screenshots/lang-es.png" width="400" alt="Español"><br>Español</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/lang-hi.png" width="400" alt="हिन्दी"><br>हिन्दी</td>
+    <td align="center"><img src="docs/screenshots/lang-vi.png" width="400" alt="Tiếng Việt"><br>Tiếng Việt</td>
+  </tr>
+</table>
 
-The interface supports **中文 / Español / हिन्दी / Tiếng Việt / العربية**, with Chinese as the default. Formal letters are always in English (they're the ones being sent); what changes is the language things are explained to you in.
+The interface supports **English / 中文 / Español / हिन्दी / Tiếng Việt / العربية**, with Chinese as the default. Formal letters are always in English (they're the ones being sent); what changes is the language things are explained to you in.
 
-> Spanish, Hindi, Vietnamese and Arabic are first-pass translations and not every screen is translated yet (as the screenshot shows). Arabic has translated text only; full RTL layout is not yet supported. An English UI is not available yet.
+> English currently covers the main flows (Letter Officer, Scam Shield, Legal Hub, Emergency Kit and the app shell); other tabs are still being translated. Spanish, Hindi, Vietnamese and Arabic are first-pass translations. Arabic has translated text only; full RTL layout is not yet supported.
 
 ---
 
@@ -187,7 +196,7 @@ gcloud run deploy serene --source . --region asia-southeast1 \
 │   ├── App.tsx            # App shell, header, tab navigation
 │   ├── components/        # Feature modules
 │   └── lib/
-│       ├── i18n.ts        # UI strings for all five languages
+│       ├── i18n.ts        # UI strings for all six languages
 │       ├── locale.tsx     # Country / state / display language
 │       └── firebase.ts    # Auth + Firestore (degrades gracefully when unconfigured)
 ├── firestore.rules        # Database security rules

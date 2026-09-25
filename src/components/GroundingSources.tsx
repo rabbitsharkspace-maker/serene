@@ -1,5 +1,6 @@
 import React from 'react';
 import { Search, ExternalLink, BadgeCheck } from 'lucide-react';
+import { useLocale } from '../lib/locale';
 
 export type Grounding = {
   sources?: { uri: string; title: string }[];
@@ -11,6 +12,8 @@ export type Grounding = {
 // the live sources it cited (clickable), and when it checked — so anyone can verify it
 // actually searched rather than answered from memory.
 export default function GroundingSources({ grounding }: { grounding?: Grounding | null }) {
+  const { language } = useLocale();
+  const isZh = language === 'zh';
   if (!grounding || ((grounding.sources?.length || 0) === 0 && (grounding.queries?.length || 0) === 0)) {
     return null;
   }
@@ -24,16 +27,16 @@ export default function GroundingSources({ grounding }: { grounding?: Grounding 
       <div className="flex items-center justify-between gap-2 mb-2.5">
         <div className="flex items-center gap-1.5 text-xs font-bold text-ink">
           <Search size={14} className="text-accent-teal" />
-          AI 实时检索来源
+          {isZh ? 'AI 实时检索来源' : 'Live AI search sources'}
         </div>
         <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-accent-teal bg-accent-teal/10 rounded-full px-2 py-0.5">
-          <BadgeCheck size={11} /> 已联网核查 · 非记忆
+          <BadgeCheck size={11} /> {isZh ? '已联网核查 · 非记忆' : 'Verified online · not from memory'}
         </span>
       </div>
 
       {(grounding.queries?.length || 0) > 0 && (
         <div className="flex flex-wrap items-center gap-1.5 mb-2.5">
-          <span className="text-[10px] text-muted-soft font-medium">检索词：</span>
+          <span className="text-[10px] text-muted-soft font-medium">{isZh ? '检索词：' : 'Search terms:'}</span>
           {grounding.queries!.map((q, i) => (
             <span key={i} className="text-[10px] text-body bg-surface-soft border border-hairline rounded-full px-2 py-0.5">
               {q}
@@ -61,7 +64,7 @@ export default function GroundingSources({ grounding }: { grounding?: Grounding 
       )}
 
       {when && (
-        <div className="text-[10px] text-muted-soft mt-2.5">🕒 检索时间：{when}</div>
+        <div className="text-[10px] text-muted-soft mt-2.5">🕒 {isZh ? '检索时间：' : 'Retrieved: '}{when}</div>
       )}
     </div>
   );

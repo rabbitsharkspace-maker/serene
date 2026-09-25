@@ -24,6 +24,7 @@ export default function App() {
   const { country, language, region, setLanguage, setRegion } = useLocale();
   const t = useT();
   const regionOptions = REGIONS[country] || [];
+  const isZh = language === 'zh';
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabView>('letter');
@@ -57,9 +58,9 @@ export default function App() {
         try {
           const d = JSON.parse(pending);
           await createGmailDraft(res.accessToken, d.recipient, d.subject, d.body);
-          showToast('✅ 草稿已存进你的 Gmail！打开 Gmail 的「草稿」即可查看并发送。', 'success');
+          showToast(isZh ? '✅ 草稿已存进你的 Gmail！打开 Gmail 的「草稿」即可查看并发送。' : '✅ Draft saved to your Gmail! Open Gmail → Drafts to review and send it.', 'success');
         } catch (e: any) {
-          showToast('草稿创建失败：' + (e?.message || e), 'error');
+          showToast((isZh ? '草稿创建失败：' : 'Failed to create draft: ') + (e?.message || e), 'error');
         }
       }
     });
@@ -138,7 +139,7 @@ export default function App() {
           >
             🇦🇺 {getCountryName('AU', language)}
             <span className="text-[9px] font-black text-primary bg-primary/10 border border-primary/20 rounded-full px-1.5 py-0.5 whitespace-nowrap">
-              {language === 'zh' ? '墨尔本首发' : 'Melbourne'}
+              {isZh ? '墨尔本首发' : 'Melbourne'}
             </span>
           </span>
           {regionOptions.length > 0 && (
@@ -223,7 +224,11 @@ export default function App() {
             )}
             <footer className="mt-16 pt-6 border-t border-hairline flex flex-col sm:flex-row items-center justify-center gap-x-3 gap-y-1.5 text-[11px] text-muted-soft font-medium text-center">
               <span className="inline-flex items-center gap-1.5 bg-surface-soft border border-hairline rounded-full px-3 py-1">
-                🏆 GDG 出海创想赛参赛作品 <span className="text-primary font-bold">#GDG出海创想赛</span> <span className="text-primary font-bold">#Google开发者大会</span>
+                {isZh ? (
+                  <>🏆 GDG 出海创想赛参赛作品 <span className="text-primary font-bold">#GDG出海创想赛</span> <span className="text-primary font-bold">#Google开发者大会</span></>
+                ) : (
+                  <>🏆 Entry in the GDG Go-Global Innovation Challenge</>
+                )}
               </span>
               <span>Built with Gemini · Google Search Grounding · Firebase</span>
             </footer>

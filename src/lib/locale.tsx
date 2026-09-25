@@ -12,6 +12,7 @@ export const COUNTRIES: { code: string; flag: string; label: string }[] = [
 // Display language for explanations/analysis (chosen by top immigrant source languages).
 export const LANGUAGES: { code: string; flag: string; label: string }[] = [
   { code: 'zh', flag: '🇨🇳', label: '中文' },
+  { code: 'en', flag: '🇬🇧', label: 'English' },
   { code: 'es', flag: '🇪🇸', label: 'Español' },
   { code: 'hi', flag: '🇮🇳', label: 'हिन्दी' },
   { code: 'vi', flag: '🇻🇳', label: 'Tiếng Việt' },
