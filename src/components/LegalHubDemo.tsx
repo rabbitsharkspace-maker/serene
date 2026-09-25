@@ -116,6 +116,7 @@ export default function LegalHubDemo({ onOpenLetterOfficer }: { onOpenLetterOffi
   const countryName = getCountryName(country, language);
   const place = `${countryName}${region ? ' · ' + region : ''}`;
   const regionOptions = REGIONS[country] || [];
+  const isZh = language === 'zh';
 
   const [selectedDomain, setSelectedDomain] = useState<Domain>('rent');
   const [data, setData] = useState<LegalData | null>(null);
@@ -204,7 +205,7 @@ export default function LegalHubDemo({ onOpenLetterOfficer }: { onOpenLetterOffi
       {/* Content */}
       {error ? (
         <div className="max-w-6xl mx-auto bg-white border border-hairline rounded-3xl p-10 text-center text-muted">
-          {t('lh_error')}「{countryName} {t(('dom_' + selectedDomain) as StringKey)} legal aid」
+          {t('lh_error')}{isZh ? '「' : ' "'}{countryName} {t(('dom_' + selectedDomain) as StringKey)} legal aid{isZh ? '」' : '"'}
         </div>
       ) : (
         <>
@@ -288,9 +289,9 @@ export default function LegalHubDemo({ onOpenLetterOfficer }: { onOpenLetterOffi
               <h3 className="text-lg font-black text-ink mb-4">{loading ? t('lh_generating') : scenario?.title}</h3>
 
               <div className="bg-surface-soft p-5 rounded-3xl border border-hairline mb-6">
-                <h4 className="text-xs font-extrabold text-ink mb-3 uppercase">🛡️ 专家级抗辩自卫流程</h4>
+                <h4 className="text-xs font-extrabold text-ink mb-3 uppercase">🛡️ {isZh ? '专家级抗辩自卫流程' : 'Expert self-defence playbook'}</h4>
                 <div className="space-y-4">
-                  {(loading ? ['AI 正在按当地法律生成步骤…'] : (scenario?.steps || [])).map((step, idx) => (
+                  {(loading ? [isZh ? 'AI 正在按当地法律生成步骤…' : 'AI is drafting steps based on local law…'] : (scenario?.steps || [])).map((step, idx) => (
                     <div key={idx} className="flex gap-3 text-xs leading-normal">
                       <div className="w-5 h-5 rounded-full bg-ink text-white flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">{idx + 1}</div>
                       <div className="text-body">{step}</div>
@@ -307,26 +308,30 @@ export default function LegalHubDemo({ onOpenLetterOfficer }: { onOpenLetterOffi
                   </span>
                   {scenario?.template && (
                     <button
-                      onClick={() => { navigator.clipboard.writeText(scenario.template); showToast('模板已复制到剪贴板!', 'success'); }}
+                      onClick={() => { navigator.clipboard.writeText(scenario.template); showToast(isZh ? '模板已复制到剪贴板!' : 'Template copied to clipboard!', 'success'); }}
                       className="text-primary hover:text-ink font-bold cursor-pointer transition-colors text-[11px]"
-                    >💡 复制信件草案</button>
+                    >💡 {isZh ? '复制信件草案' : 'Copy letter draft'}</button>
                   )}
                 </div>
                 <textarea
                   className="w-full flex-1 min-h-[220px] bg-neutral-900 text-on-dark p-4 rounded-2xl font-mono text-xs whitespace-pre-wrap leading-relaxed shadow-inner border border-neutral-800 focus:outline-none"
-                  value={loading ? '正在生成英文申诉模板…' : (scenario?.template || '')}
+                  value={loading ? (isZh ? '正在生成英文申诉模板…' : 'Generating English letter template…') : (scenario?.template || '')}
                   readOnly
                 />
                 <div className="mt-4 border-t border-hairline pt-4 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
                   <p className="text-[11px] text-muted-soft leading-normal max-w-sm">
-                    这是<strong className="text-muted">通用起草模板</strong>。要针对<strong className="text-muted">你手里那张具体的信/罚单</strong>生成个性化抗辩，请交给信件官——它会拍照读懂原件再逐条回。
+                    {isZh ? (
+                      <>这是<strong className="text-muted">通用起草模板</strong>。要针对<strong className="text-muted">你手里那张具体的信/罚单</strong>生成个性化抗辩，请交给信件官——它会拍照读懂原件再逐条回。</>
+                    ) : (
+                      <>This is a <strong className="text-muted">generic draft template</strong>. For a personalised response to <strong className="text-muted">the specific letter or fine in your hand</strong>, use the Letter Officer — it reads a photo of the original and replies point by point.</>
+                    )}
                   </p>
                   <button
                     onClick={() => onOpenLetterOfficer?.()}
                     disabled={!onOpenLetterOfficer}
                     className="cta-3d inline-flex items-center gap-1.5 px-5 py-2.5 text-sm font-semibold shrink-0 disabled:opacity-40 disabled:shadow-none"
                   >
-                    用信件官个性化这封信 <ArrowRight size={16} />
+                    {isZh ? '用信件官个性化这封信' : 'Personalise with Letter Officer'} <ArrowRight size={16} />
                   </button>
                 </div>
               </div>

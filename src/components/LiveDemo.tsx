@@ -181,6 +181,93 @@ const CASE_GUIDES: Record<string, {
   }
 };
 
+// English versions of CASE_GUIDES for every non-Chinese display language.
+const CASE_GUIDES_EN: typeof CASE_GUIDES = {
+  fine: {
+    title: 'Parking fine appeal: council parking infringement',
+    org: 'City of Brentmoor (fictional council)',
+    amount: '$85.00 AUD',
+    deadline: 'Pay or request a review by 1 May 2026',
+    difficulty: '⭐ (Low — a warning instead of a fine is very achievable)',
+    summary: 'City of Brentmoor issued a parking infringement alleging that a red Toyota Corolla (rego ABC-123) stopped in a no-stopping zone on Flinders Lane.',
+    tips: [
+      'If you have a clean driving record for the past 3 years, you can ask the council in writing to replace the fine with an "Official Warning" (first-offence leniency).',
+      'If you stopped because of an emergency, a breakdown or an urgent medical need, attach an RACV roadside assistance record or a hospital certificate — reviews like these are very often successful.',
+      'If the "No Stopping / time limit" sign was hidden by trees, or the road markings were badly faded, take photos — this is a strong ground for a review.'
+    ],
+    groundingSources: CASE_GUIDES.fine.groundingSources
+  },
+  coe: {
+    title: 'Academic standing: Show Cause and intention to cancel your CoE',
+    org: 'Westhaven University, Melbourne (fictional university)',
+    amount: 'Enrolment termination and loss of tuition fees',
+    deadline: 'Lodge an appeal within 20 business days of receiving the letter (by 20 July 2026)',
+    difficulty: '⭐⭐⭐⭐ (High — risk of visa cancellation)',
+    summary: 'After failing all units in the first semester (or not meeting minimum academic progress across consecutive semesters), Westhaven University intends to terminate Li Wei Chen\'s enrolment and cancel the CoE (Confirmation of Enrolment).',
+    tips: [
+      'You must lodge a written appeal within the strict 20-business-day deadline! If you miss it, the university will report you to Home Affairs and your student visa may move towards cancellation.',
+      'Gather detailed evidence of "Compassionate & Compelling" circumstances — e.g. sudden illness or depression (with a letter and diagnosis from an Australian registered doctor), or a serious event affecting close family.',
+      'Prepare a realistic Study Plan, with records of booked academic support sessions, to show the Academic Progress Committee you can get back on track next semester.'
+    ],
+    groundingSources: CASE_GUIDES.coe.groundingSources
+  },
+  bond: {
+    title: 'Renting: agent withholding part of your rental bond',
+    org: 'Horizon Residential VIC (fictional real estate agent)',
+    amount: '$420.00 AUD (proposed deduction)',
+    deadline: 'By 5:00 PM, 14 July 2026 (within 10 business days)',
+    difficulty: '⭐⭐ (Medium — tenancy law usually lets you recover it in full)',
+    summary: 'After tenant Alex Thompson moved out of 4/85 Bourke Street, the agent Horizon proposed deducting $420 from the bond: $180 for carpet steam cleaning, $90 for kitchen tile de-greasing and $150 for marks on the living-room wall.',
+    tips: [
+      'Carpet cleaning: under the Residential Tenancies Act (VIC), unless you left stains beyond normal use, the agent generally cannot require professional steam cleaning. Fair wear and tear is a right protected by law.',
+      'Minor wall damage: small scuffs and light wear from everyday living count as fair wear and tear, so the landlord generally cannot pass the repair cost on to you.',
+      'Act first online: log in to the RTBA bond system and apply to claim the entire bond. If the agent disagrees, they must apply to VCAT within 14 days to prove their claim, otherwise the bond is released to you. VCAT is an independent tribunal where both sides must provide evidence — it is not an automatic full refund, but agents often settle rather than go through the hassle of proving their claim.'
+    ],
+    groundingSources: CASE_GUIDES.bond.groundingSources
+  },
+  plagiarism: {
+    title: 'Academic integrity: plagiarism allegation',
+    org: 'Westhaven University (fictional academic integrity committee)',
+    amount: 'Zero marks for the assessment / fail warning',
+    deadline: 'Confirm attendance by 28 June 2026; interview on 3 July',
+    difficulty: '⭐⭐⭐⭐⭐ (Very high — a serious compliance issue)',
+    summary: 'Sarah Chen\'s ECON101 Assignment 2 is alleged to have a 48% similarity match with databases and online sources, raising suspected academic misconduct.',
+    tips: [
+      'Collect your full drafting history: Word version history and tracked changes, Git commits, handwritten mind maps and the lecture notes you used.',
+      'Understand the difference between plagiarism and poor referencing. If the issue is missing or badly formatted citations, argue at the interview that it was non-intentional academic misconduct, which can reduce the outcome to a warning.',
+      'You can ask for a free, independent Student Advocate from your university to attend the interview with you and advise you on what to say.'
+    ],
+    groundingSources: CASE_GUIDES.plagiarism.groundingSources
+  },
+  noise: {
+    title: 'Community living: late-night noise breach notice',
+    org: 'Meridian Strata Management VIC (fictional strata manager)',
+    amount: 'Warning; repeat breaches could lead to VCAT orders and fines',
+    deadline: 'Reply in writing by 6 July 2026 (within 14 days of receipt)',
+    difficulty: '⭐ (Low — usually resolved by adjusting your habits)',
+    summary: 'The occupant of Apartment 4B, 88 Flinders Lane received a breach notice from the Owners Corporation after multiple complaints about loud music and socialising after 10:00 PM over the past four weeks.',
+    tips: [
+      'Quiet hours: every Australian state regulates residential noise. On weeknights, from about 10:00 / 11:00 PM until 7:00 AM is a quiet period — avoid noise that disturbs your neighbours.',
+      'This is mainly a formal warning (Breach Notice). Reply politely in writing before the deadline, explain the situation and commit to keeping noise down — a calm, cooperative reply usually settles the matter.'
+    ],
+    groundingSources: CASE_GUIDES.noise.groundingSources
+  },
+  utility: {
+    title: 'Household bills: overdue utility bill and disconnection warning',
+    org: 'Coastal Energy & Water (fictional utility provider)',
+    amount: '$258.30 AUD (overdue, incl. late fee)',
+    deadline: 'Pay by 1 July 2026 to avoid disconnection and reconnection fees',
+    difficulty: '⭐ (Low — you can ask for an interest-free payment extension straight away)',
+    summary: 'Mrs. Eleanor Vance\'s account 9876 543 210 has two billing periods overdue, totalling $258.30, and she has received a disconnection warning.',
+    tips: [
+      'Strong consumer protections: providers are generally not allowed to disconnect households during extreme weather, on weekends or just before public holidays.',
+      'Call the number on your bill, or log in, and join the "Hardship Program". Once you ask, interest and late fees are waived and you can get a small interest-free payment plan over 12–24 months.',
+      'Your provider can also help you apply for state government relief (e.g. the Utility Relief Grant Scheme in VIC), worth several hundred dollars per household, which can cover all or much of the debt.'
+    ],
+    groundingSources: CASE_GUIDES.utility.groundingSources
+  }
+};
+
 // Normalize confidence into a 0-100 percentage: the live Gemini path returns a number,
 // while fallback/legacy payloads may carry 'high' / 'medium' / 'low' strings.
 function confidencePct(c: unknown): number {
@@ -203,6 +290,8 @@ interface LiveDemoProps {
 export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendEmail }: LiveDemoProps) {
   const { country, language, region } = useLocale();
   const t = useT();
+  const isZh = language === 'zh';
+  const guides = isZh ? CASE_GUIDES : CASE_GUIDES_EN;
   const content = getCountryContent(country);
   const [appState, setAppState] = useState<AppState>('upload');
   const [claimMode, setClaimMode] = useState<'single' | 'cross'>('single');
@@ -644,7 +733,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
               : []);
         
         if (tasksToSave.length > 0) {
-          const finalSubject = data.englishDraft?.subject || (activeCase ? `对线案例 - ${activeCase}` : '未知公来函');
+          const finalSubject = data.englishDraft?.subject || (activeCase ? (isZh ? `对线案例 - ${activeCase}` : `Sample case - ${activeCase}`) : (isZh ? '未知公来函' : 'Unknown letter'));
           const savedTasks = await saveExtractedTasks(
             tasksToSave, 
             finalSubject, 
@@ -677,13 +766,13 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
         localStorage.setItem('serene_draft_history', JSON.stringify(history));
       } catch (err) {
         console.error(err);
-        showToast('解析失败，请重试', 'error');
+        showToast(isZh ? '解析失败，请重试' : 'Analysis failed. Please try again.', 'error');
         setAppState('upload');
       }
     } else {
       // CROSS MODE CO-OBJECTION
       if (!crossFileA && !crossFileB && !activeCrossPreset) {
-        showToast("请上传租房合同及扣款声明，或者载入高能大招演示。", 'info');
+        showToast(isZh ? '请上传租房合同及扣款声明，或者载入高能大招演示。' : 'Please upload your lease and the deduction notice, or load the demo case.', 'info');
         return;
       }
       setAppState('analyzing');
@@ -737,11 +826,11 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
         // Populate and save persistent kanban tasks across all letters under unified store
         if (data.disputableItems && Array.isArray(data.disputableItems)) {
           const crossTasks = data.disputableItems.map((act: any) => ({
-            step: `抗辩不合理扣项: ${act.name}`,
-            officialChannel: 'VCAT和RTBA仲裁处',
+            step: isZh ? `抗辩不合理扣项: ${act.name}` : `Dispute unfair deduction: ${act.name}`,
+            officialChannel: isZh ? 'VCAT和RTBA仲裁处' : 'VCAT and RTBA',
             url: 'https://www.consumer.vic.gov.au/housing/renting'
           }));
-          const finalSubject = data.englishDraft?.subject || '退房租房押金争议';
+          const finalSubject = data.englishDraft?.subject || (isZh ? '退房租房押金争议' : 'Rental bond dispute at move-out');
           const savedTasks = await saveExtractedTasks(
             crossTasks,
             finalSubject,
@@ -762,7 +851,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
         setAppState('result');
       } catch (err) {
         console.error(err);
-        showToast('交叉核验对线审查失败，请重试', 'error');
+        showToast(isZh ? '交叉核验对线审查失败，请重试' : 'Cross-check failed. Please try again.', 'error');
         setAppState('upload');
       }
     }
@@ -873,8 +962,8 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
       'DTEND;TZID=Australia/Melbourne:' + end,
       'SUMMARY:' + title,
       'DESCRIPTION:' + details.replace(/\n/g, '\\n'),
-      ...alarm('-P3D', title + '（还剩 3 天）'),
-      ...alarm('-P1D', title + '（明天截止！）'),
+      ...alarm('-P3D', title + (isZh ? '（还剩 3 天）' : ' (3 days left)')),
+      ...alarm('-P1D', title + (isZh ? '（明天截止！）' : ' (due tomorrow!)')),
       'END:VEVENT',
       'END:VCALENDAR'
     ].join('\r\n');
@@ -958,7 +1047,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                       <div className="mt-5 border-t border-gray-150/50 pt-5 animate-in fade-in slide-in-from-top-2 duration-300">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                           <div className="flex flex-col gap-1.5">
-                            <label className="text-[10px] font-black tracking-wider text-gray-400 uppercase">学签/签证类型</label>
+                            <label className="text-[10px] font-black tracking-wider text-gray-400 uppercase">{isZh ? '学签/签证类型' : 'Visa type'}</label>
                             <input 
                               type="text" 
                               value={profileVisaType} 
@@ -968,32 +1057,32 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                             />
                           </div>
                           <div className="flex flex-col gap-1.5">
-                            <label className="text-[10px] font-black tracking-wider text-gray-400 uppercase">就读院校/专业团队</label>
+                            <label className="text-[10px] font-black tracking-wider text-gray-400 uppercase">{isZh ? '就读院校/专业团队' : 'School / course'}</label>
                             <input 
                               type="text" 
                               value={profileSchool} 
                               onChange={(e) => setProfileSchool(e.target.value)} 
-                              placeholder="例如: ANU, Master of Applied Data"
+                              placeholder={isZh ? '例如: ANU, Master of Applied Data' : 'e.g. ANU, Master of Applied Data'}
                               className="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-800 focus:outline-none focus:ring-2 ring-[#1d1d1f]/10 hover:border-gray-300 font-bold"
                             />
                           </div>
                           <div className="flex flex-col gap-1.5">
-                            <label className="text-[10px] font-black tracking-wider text-gray-400 uppercase">租房合约关键条款</label>
+                            <label className="text-[10px] font-black tracking-wider text-gray-400 uppercase">{isZh ? '租房合约关键条款' : 'Key lease terms'}</label>
                             <input 
                               type="text" 
                               value={profileLeaseKeyTerms} 
                               onChange={(e) => setProfileLeaseKeyTerms(e.target.value)} 
-                              placeholder="例如: lease ends 30 June"
+                              placeholder={isZh ? '例如: lease ends 30 June' : 'e.g. lease ends 30 June'}
                               className="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-800 focus:outline-none focus:ring-2 ring-[#1d1d1f]/10 hover:border-gray-300 font-bold"
                             />
                           </div>
                           <div className="flex flex-col gap-1.5">
-                            <label className="text-[10px] font-black tracking-wider text-gray-400 uppercase">额外背景特征 / 地址</label>
+                            <label className="text-[10px] font-black tracking-wider text-gray-400 uppercase">{isZh ? '额外背景特征 / 地址' : 'Other details / address'}</label>
                             <input 
                               type="text" 
                               value={profileAdditionalDetails} 
                               onChange={(e) => setProfileAdditionalDetails(e.target.value)} 
-                              placeholder="例如: 租住在 Flinder Lane 等"
+                              placeholder={isZh ? '例如: 租住在 Flinder Lane 等' : 'e.g. renting on Flinders Lane'}
                               className="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-800 focus:outline-none focus:ring-2 ring-[#1d1d1f]/10 hover:border-gray-300 font-bold"
                             />
                           </div>
@@ -1003,9 +1092,9 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                           <p className="text-[11px] text-gray-400 flex items-center gap-1.5">
                             <Smile size={13} className="text-[#ff5a3c]" />
                             {user ? (
-                              <span className="text-ink font-bold flex items-center gap-1"><UserCheck size={12}/> 已通过 Firebase 账户同步至云端数据库</span>
+                              <span className="text-ink font-bold flex items-center gap-1"><UserCheck size={12}/> {isZh ? '已通过 Firebase 账户同步至云端数据库' : 'Synced to the cloud with your Firebase account'}</span>
                             ) : (
-                              <span>您暂未登录。已保存在本地，登录后可同步至云端数据库保存</span>
+                              <span>{isZh ? '您暂未登录。已保存在本地，登录后可同步至云端数据库保存' : 'You\'re not signed in. Saved on this device — sign in to sync it to the cloud.'}</span>
                             )}
                           </p>
                           <div className="flex items-center gap-2">
@@ -1014,14 +1103,14 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                 onClick={onLogout}
                                 className="text-xs bg-white text-gray-600 hover:text-gray-900 border border-gray-200 hover:border-gray-300 px-4 py-2.5 rounded-xl font-bold transition-all flex items-center gap-1.5 cursor-pointer"
                               >
-                                <LogOut size={13}/> 退出登录
+                                <LogOut size={13}/> {isZh ? '退出登录' : 'Sign out'}
                               </button>
                             ) : (
                               <button
                                 onClick={onLogin}
                                 className="text-xs bg-white text-[#1d1d1f] border border-gray-200 hover:border-gray-400 px-4 py-2.5 rounded-xl font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
                               >
-                                <LogIn size={13}/> Google 登录并同步云端
+                                <LogIn size={13}/> {isZh ? 'Google 登录并同步云端' : 'Sign in with Google to sync'}
                               </button>
                             )}
                             <button
@@ -1029,7 +1118,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                               disabled={isSavingProfile}
                               className="text-xs bg-[#ff5a3c] text-white hover:bg-amber-600 disabled:opacity-50 px-5 py-2.5 rounded-xl font-bold transition-all shadow-sm flex items-center gap-1 cursor-pointer"
                             >
-                              {isSavingProfile ? "保存并同步中..." : "保存并更新记忆副驾"}
+                              {isSavingProfile ? (isZh ? '保存并同步中...' : 'Saving and syncing...') : (isZh ? '保存并更新记忆副驾' : 'Save and update Memory Co-pilot')}
                             </button>
                           </div>
                         </div>
@@ -1037,7 +1126,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                         {profileSaveSuccess && (
                           <div className="mt-3 text-xs bg-surface-soft text-ink p-2.5 rounded-xl border border-hairline flex items-center gap-1.5 font-bold animate-in fade-in zoom-in-95 duration-200">
                             <CheckCircle2 size={14} className="text-ink animate-bounce" />
-                            记忆载入成功！后续分析将全自动引入您的个人背景进行一对一定向抗诉诊断。
+                            {isZh ? '记忆载入成功！后续分析将全自动引入您的个人背景进行一对一定向抗诉诊断。' : 'Memory saved! Future analyses will automatically use your background for advice tailored to you.'}
                           </div>
                         )}
                       </div>
@@ -1052,7 +1141,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                         <div className="text-[11px] font-semibold text-muted mb-2.5 uppercase tracking-wider flex justify-between items-center">
                           <span>{t('lo_original_preview')}</span>
                           {activeCase && (
-                            <span className="text-[10px] text-amber-600 bg-amber-100 px-2 py-0.5 rounded font-bold">内置经典案例载入</span>
+                            <span className="text-[10px] text-amber-600 bg-amber-100 px-2 py-0.5 rounded font-bold">{isZh ? '内置经典案例载入' : 'Sample case loaded'}</span>
                           )}
                         </div>
                         <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept="image/*" className="hidden" />
@@ -1065,7 +1154,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                            {/* Render High definition document directly in container if a preset is selected! */}
                            {activeCase ? (
                              <div className="w-full h-[380px] overflow-y-auto custom-scrollbar p-1 select-none flex justify-center bg-gray-50/50 rounded-xl">
-                               {renderDocumentHTML(activeCase, true, privacyShieldActive && shieldStatus === 'secured')}
+                               {renderDocumentHTML(activeCase, true, privacyShieldActive && shieldStatus === 'secured', language)}
                              </div>
                            ) : (
                              filePreview ? (
@@ -1103,7 +1192,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                               }}
                               className="flex-1 text-xs font-bold border border-gray-200 hover:border-gray-300 text-gray-600 hover:text-gray-900 bg-white p-2.5 rounded-xl transition-all shadow-sm active:scale-95"
                             >
-                              清除案例，开始自选手传
+                              {isZh ? '清除案例，开始自选手传' : 'Clear sample and upload your own'}
                             </button>
                           ) : (
                             filePreview && (
@@ -1111,7 +1200,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                 onClick={reset}
                                 className="flex-1 text-xs font-bold border border-gray-200 hover:border-gray-300 text-gray-650 bg-white p-2.5 rounded-xl transition-all"
                               >
-                                重置上传
+                                {isZh ? '重置上传' : 'Reset upload'}
                               </button>
                             )
                           )}
@@ -1122,7 +1211,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                           <div className="flex items-center justify-between pb-3.5 border-b border-gray-100">
                             <div className="flex items-center gap-2">
                               <Shield size={16} className={privacyShieldActive ? "text-teal-500" : "text-gray-400"} />
-                              <span className="text-xs font-black text-gray-900 tracking-wide">隐私脱敏盾 (Privacy Redaction Shield)</span>
+                              <span className="text-xs font-black text-gray-900 tracking-wide">{isZh ? '隐私脱敏盾 (Privacy Redaction Shield)' : 'Privacy Redaction Shield'}</span>
                             </div>
                             <button 
                               onClick={() => {
@@ -1144,7 +1233,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                     <div className="flex justify-between items-center text-[10px] font-bold text-teal-600 font-mono">
                                       <span className="flex items-center gap-1">
                                         <span className="w-1.5 h-1.5 bg-teal-500 rounded-full animate-ping" />
-                                        正在标记待脱敏的敏感字段...
+                                        {isZh ? '正在标记待脱敏的敏感字段...' : 'Marking sensitive fields for redaction...'}
                                       </span>
                                       <span>{scanProgress}%</span>
                                     </div>
@@ -1152,7 +1241,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                       <div className="bg-teal-400 h-1.5 rounded-full transition-all duration-150" style={{ width: `${scanProgress}%` }} />
                                     </div>
                                     <p className="text-[10px] text-muted-soft leading-relaxed">
-                                      正在为本次分析登记脱敏规则：姓名、学号、住址、单号等字段将在 AI 输出中被打码替换。
+                                      {isZh ? '正在为本次分析登记脱敏规则：姓名、学号、住址、单号等字段将在 AI 输出中被打码替换。' : 'Setting redaction rules for this analysis: names, student IDs, addresses and reference numbers will be masked in the AI output.'}
                                     </p>
                                   </div>
                                 ) : shieldStatus === 'secured' ? (
@@ -1161,12 +1250,16 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                       🔒
                                     </div>
                                     <div>
-                                      <span className="text-[11px] font-black text-teal-700 bg-teal-50 px-2 py-0.5 rounded">输出层脱敏已启用</span>
+                                      <span className="text-[11px] font-black text-teal-700 bg-teal-50 px-2 py-0.5 rounded">{isZh ? '输出层脱敏已启用' : 'Output redaction on'}</span>
                                       <p className="text-[10px] text-muted-soft leading-relaxed mt-1">
-                                        AI 返回的分析结论与生成信件中，姓名、学号、住址、单号等个人字段将替换为 <span className="text-teal-700 font-extrabold">[REDACTED]</span> 打码标签；内置案例预览已同步打上黑条。
+                                        {isZh ? (
+                                          <>AI 返回的分析结论与生成信件中，姓名、学号、住址、单号等个人字段将替换为 <span className="text-teal-700 font-extrabold">[REDACTED]</span> 打码标签；内置案例预览已同步打上黑条。</>
+                                        ) : (
+                                          <>In the AI analysis and the generated letter, personal fields such as names, student IDs, addresses and reference numbers will be replaced with <span className="text-teal-700 font-extrabold">[REDACTED]</span> tags; the sample case preview is blacked out too.</>
+                                        )}
                                       </p>
                                       <p className="text-[9px] text-teal-600 font-semibold mt-1">
-                                        🛡️ 原件仅经我们的后端转发给 Gemini 用于本次分析，不落库、不缓存、不用于训练。
+                                        {isZh ? '🛡️ 原件仅经我们的后端转发给 Gemini 用于本次分析，不落库、不缓存、不用于训练。' : '🛡️ The original is only passed through our backend to Gemini for this analysis — never stored, cached or used for training.'}
                                       </p>
                                     </div>
                                   </div>
@@ -1176,9 +1269,9 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                       ⏳
                                     </div>
                                     <div>
-                                      <span className="text-[11px] font-black text-gray-500 bg-gray-100 px-2 py-0.5 rounded">脱敏盾待命中</span>
+                                      <span className="text-[11px] font-black text-gray-500 bg-gray-100 px-2 py-0.5 rounded">{isZh ? '脱敏盾待命中' : 'Shield on standby'}</span>
                                       <p className="text-[10px] text-muted-soft leading-relaxed mt-1">
-                                        载入经典案例或上传公文后，将自动为本次分析启用输出层脱敏（姓名、学号、住址、单号打码）。
+                                        {isZh ? '载入经典案例或上传公文后，将自动为本次分析启用输出层脱敏（姓名、学号、住址、单号打码）。' : 'Once you load a sample case or upload a letter, output redaction turns on automatically for this analysis (names, student IDs, addresses and reference numbers masked).'}
                                       </p>
                                     </div>
                                   </div>
@@ -1190,9 +1283,9 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                   ⚠️
                                 </div>
                                 <div>
-                                  <span className="text-[11px] font-black text-amber-700 bg-amber-50 px-2 py-0.5 rounded">端侧隐私扫描已关闭</span>
+                                  <span className="text-[11px] font-black text-amber-700 bg-amber-50 px-2 py-0.5 rounded">{isZh ? '端侧隐私扫描已关闭' : 'Privacy scan off'}</span>
                                   <p className="text-[10px] text-muted-soft leading-relaxed mt-1">
-                                    此时公文正本中的个人敏感隐私信息（如果存在）将以原始文本明文传送至 AI。为了您的个人隐私安全，推荐重新开启保护。
+                                    {isZh ? '此时公文正本中的个人敏感隐私信息（如果存在）将以原始文本明文传送至 AI。为了您的个人隐私安全，推荐重新开启保护。' : 'Any sensitive personal information in the letter will be sent to the AI as-is. For your privacy, we recommend turning protection back on.'}
                                   </p>
                                 </div>
                               </div>
@@ -1262,35 +1355,35 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                              <div>
                                <div className="flex justify-between items-start border-b border-amber-200 pb-3 mb-3">
                                  <div>
-                                   <span className="text-[10px] font-black tracking-wider text-amber-700 bg-amber-100 px-2 py-0.5 rounded uppercase font-mono">法援内参 · MORE INFO</span>
-                                   <h3 className="text-base font-bold text-gray-900 mt-1">{CASE_GUIDES[activeCase].title}</h3>
+                                   <span className="text-[10px] font-black tracking-wider text-amber-700 bg-amber-100 px-2 py-0.5 rounded uppercase font-mono">{isZh ? '法援内参 · MORE INFO' : 'MORE INFO'}</span>
+                                   <h3 className="text-base font-bold text-gray-900 mt-1">{guides[activeCase].title}</h3>
                                  </div>
                                  <div className="text-right">
-                                   <span className="text-[10px] text-gray-400 block font-bold">处理难度</span>
-                                   <span className="text-xs font-semibold text-amber-950 block">{CASE_GUIDES[activeCase].difficulty}</span>
+                                   <span className="text-[10px] text-gray-400 block font-bold">{isZh ? '处理难度' : 'Difficulty'}</span>
+                                   <span className="text-xs font-semibold text-amber-950 block">{guides[activeCase].difficulty}</span>
                                  </div>
                                </div>
                                
                                <div className="space-y-3 my-3 text-xs text-gray-700">
                                  <div>
-                                   <span className="font-bold text-gray-900">🏢 发方机构:</span> <span className="font-mono text-gray-650 bg-gray-100 px-1.5 py-0.5 rounded text-[11px]">{CASE_GUIDES[activeCase].org}</span>
+                                   <span className="font-bold text-gray-900">{isZh ? '🏢 发方机构:' : '🏢 Issuer:'}</span> <span className="font-mono text-gray-650 bg-gray-100 px-1.5 py-0.5 rounded text-[11px]">{guides[activeCase].org}</span>
                                  </div>
                                  <div>
-                                   <span className="font-bold text-gray-900">🚨 涉诉金额/威胁:</span> <span className="font-extrabold text-red-650">{CASE_GUIDES[activeCase].amount}</span>
+                                   <span className="font-bold text-gray-900">{isZh ? '🚨 涉诉金额/威胁:' : '🚨 Amount / risk:'}</span> <span className="font-extrabold text-red-650">{guides[activeCase].amount}</span>
                                  </div>
                                  <div>
-                                   <span className="font-bold text-gray-900">⏰ 行政抗诉死线:</span> <span className="font-bold text-[#1d1d1f] bg-white border px-1.5 py-0.5 rounded">{CASE_GUIDES[activeCase].deadline}</span>
+                                   <span className="font-bold text-gray-900">{isZh ? '⏰ 行政抗诉死线:' : '⏰ Deadline:'}</span> <span className="font-bold text-[#1d1d1f] bg-white border px-1.5 py-0.5 rounded">{guides[activeCase].deadline}</span>
                                  </div>
                                  <div className="bg-white/85 p-3 rounded-2xl border border-amber-100/50 leading-relaxed text-gray-600 mt-2">
-                                   <p className="font-bold text-gray-900 border-l-2 border-[#ff5a3c] pl-1.5 mb-1.5 text-[10px]">事件描述 (Case Overview):</p>
-                                   {CASE_GUIDES[activeCase].summary}
+                                   <p className="font-bold text-gray-900 border-l-2 border-[#ff5a3c] pl-1.5 mb-1.5 text-[10px]">{isZh ? '事件描述 (Case Overview):' : 'Case Overview:'}</p>
+                                   {guides[activeCase].summary}
                                  </div>
                                </div>
                                
                                <div className="mt-4 pt-1">
-                                 <h4 className="text-xs font-black text-amber-950 mb-2 flex items-center gap-1 uppercase tracking-wide">🛡️ 新移民与留学生维权防坑指南 (Strategy Guide):</h4>
+                                 <h4 className="text-xs font-black text-amber-950 mb-2 flex items-center gap-1 uppercase tracking-wide">{isZh ? '🛡️ 新移民与留学生维权防坑指南 (Strategy Guide):' : '🛡️ Strategy Guide for Newcomers & Students:'}</h4>
                                  <ul className="space-y-2 mb-4">
-                                   {CASE_GUIDES[activeCase].tips.map((tip, index) => (
+                                   {guides[activeCase].tips.map((tip, index) => (
                                      <li key={index} className="text-xs text-gray-700 flex items-start gap-1 pb-1 font-sans">
                                        <span className="text-amber-600 font-extrabold text-xs leading-none mt-0.5">•</span>
                                        <span>{tip}</span>
@@ -1299,14 +1392,14 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                  </ul>
 
                                  {/* Grounding Sources Panel */}
-                                 {CASE_GUIDES[activeCase].groundingSources && CASE_GUIDES[activeCase].groundingSources.length > 0 && (
+                                 {guides[activeCase].groundingSources && guides[activeCase].groundingSources.length > 0 && (
                                    <div className="bg-white/85 border border-amber-200/50 p-4 rounded-2xl mb-4 text-[11px] font-sans">
                                      <h5 className="text-[10px] font-black text-amber-900 uppercase tracking-widest mb-2.5 flex items-center gap-1.5 leading-none">
                                        <Globe size={13} className="text-amber-700 shrink-0"/>
-                                       <span className="font-extrabold">🔍 澳洲官方监管及法规信源对齐 (Grounding Sources):</span>
+                                       <span className="font-extrabold">{isZh ? '🔍 澳洲官方监管及法规信源对齐 (Grounding Sources):' : '🔍 Official Australian Sources (Grounding Sources):'}</span>
                                      </h5>
                                      <ul className="space-y-2">
-                                       {CASE_GUIDES[activeCase].groundingSources.map((source, index) => (
+                                       {guides[activeCase].groundingSources.map((source, index) => (
                                          <li key={index} className="leading-normal flex items-start gap-1">
                                            <span className="text-[#1d1d1f] shrink-0 mt-0.5 text-xs">🔗</span>
                                            <a 
@@ -1327,10 +1420,14 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                  {/* Disclaimer Banner */}
                                  <div className="bg-amber-100/35 border border-amber-200/60 rounded-2xl p-3.5 text-[10px]/relaxed text-gray-650 font-sans mt-3">
                                    <div className="text-amber-800 font-bold flex items-center gap-1 mb-1 text-[11px]">
-                                     <span>⚖️ R-AI 风险控制及责任声明 (Disclaimer):</span>
+                                     <span>{isZh ? '⚖️ R-AI 风险控制及责任声明 (Disclaimer):' : '⚖️ Disclaimer:'}</span>
                                    </div>
                                    <p>
-                                     本页面及平台服务解读的所有内容均基于澳大利亚联邦及各州公开法规之一般公共信息做梳理参考，<strong>不构成任何形式的执业律师正式法律意见（Legal Advice）</strong>。租客、学生或居民在正式进行法律抗辩、向法庭或审裁处（如 VCAT）提控前，请优先参阅上方对应官方直链，或向持牌顾问寻取协助。
+                                     {isZh ? (
+                                       <>本页面及平台服务解读的所有内容均基于澳大利亚联邦及各州公开法规之一般公共信息做梳理参考，<strong>不构成任何形式的执业律师正式法律意见（Legal Advice）</strong>。租客、学生或居民在正式进行法律抗辩、向法庭或审裁处（如 VCAT）提控前，请优先参阅上方对应官方直链，或向持牌顾问寻取协助。</>
+                                     ) : (
+                                       <>Everything explained on this page is general information based on publicly available Australian federal and state laws, and <strong>does not constitute legal advice from a practising lawyer</strong>. Before formally disputing a matter or applying to a court or tribunal (such as VCAT), tenants, students and residents should check the official links above or get help from a licensed adviser.</>
+                                     )}
                                    </p>
                                  </div>
                                </div>
@@ -1342,7 +1439,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                  className="flex-1 bg-[#1d1d1f] hover:bg-neutral-800 text-white font-extrabold py-2.5 px-4 rounded-xl text-xs flex justify-center items-center gap-1.5 active:scale-95 transition-all cursor-pointer shadow-sm"
                                >
                                  <Eye size={14}/>
-                                 <span>📄 放大查阅高清原始公文 (HTML排版原件)</span>
+                                 <span>{isZh ? '📄 放大查阅高清原始公文 (HTML排版原件)' : '📄 View the full original letter (HD)'}</span>
                                </button>
                              </div>
                            </div>
@@ -1370,14 +1467,14 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                   </div>
                   
                   <h3 className="text-lg font-extrabold text-gray-950 mb-1 flex items-center gap-1.5 justify-center">
-                    <span>⭐ Agentic 案件深度处理链巡航中</span>
+                    <span>{isZh ? '⭐ Agentic 案件深度处理链巡航中' : '⭐ Agentic case pipeline running'}</span>
                   </h3>
                   <p className="text-gray-500 text-xs mb-6 text-center leading-relaxed">
-                    正在执行 5 步自动闭环法务抗诉：为您编排最强合规信号。
+                    {isZh ? '正在执行 5 步自动闭环法务抗诉：为您编排最强合规信号。' : 'Running the 5-step automated workflow to build your strongest, compliant response.'}
                   </p>
                   
                   <div className="w-full space-y-3 text-left">
-                    {[
+                    {(isZh ? [
                       {
                         step: 1,
                         title: "Step 1: 🔍 读画/扫描 → 结构化主干大纲抽取",
@@ -1408,7 +1505,38 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                         success: "极速预置 Gmail 深链及自动发收口径，即刻呼之欲出！",
                         pending: "准备预热全能抗辩信道链接..."
                       }
-                    ].map((item) => {
+                    ] : [
+                      {
+                        step: 1,
+                        title: "Step 1: 🔍 Read / scan → extract key structure",
+                        success: "Captured key details, dates, and amounts or fines.",
+                        pending: "Reading the key fields of the notice, letter or contract..."
+                      },
+                      {
+                        step: 2,
+                        title: "Step 2: ⚖️ Grounding against current Australian law",
+                        success: "Matched the relevant tenancy / traffic rules, fair wear and tear provisions and past VCAT decisions.",
+                        pending: "Searching local tribunal rules and dispute resolution sources online..."
+                      },
+                      {
+                        step: 3,
+                        title: "Step 3: ✍️ Drafting a bilingual reply",
+                        success: "Built a formal written response with its intent clearly labelled.",
+                        pending: "Checking for conflicts between the parties' terms and working out the most effective response..."
+                      },
+                      {
+                        step: 4,
+                        title: "Step 4: 📅 Creating a deadline calendar event",
+                        success: "Calculated the deadline in the right time zone and prepared a one-click .ics file.",
+                        pending: "Encoding a calendar event so you don't miss the deadline..."
+                      },
+                      {
+                        step: 5,
+                        title: "Step 5: 📧 Straight to Gmail for the agency / agent",
+                        success: "Gmail link pre-filled with recipient and message — ready to go!",
+                        pending: "Preparing your Gmail link..."
+                      }
+                    ]).map((item) => {
                       const isActive = item.step === currentAgentStep;
                       const isDone = item.step < currentAgentStep;
                       return (
@@ -1431,7 +1559,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                 {item.title}
                               </h4>
                               <p className={`text-[10px] mt-0.5 leading-normal ${isDone ? 'text-ink' : isActive ? 'text-ink font-bold' : 'text-gray-400'}`}>
-                                {isDone ? item.success : isActive ? item.pending : "排队待命..."}
+                                {isDone ? item.success : isActive ? item.pending : (isZh ? '排队待命...' : 'Queued...')}
                               </p>
                             </div>
                           </div>
@@ -1456,10 +1584,14 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                      </div>
                      <div>
                        <h4 className="text-xs font-black text-amber-900 mb-1">
-                         预置示例分析（非对您文件的实时识别）· Preset Sample — Not Live Analysis
+                         {isZh ? '预置示例分析（非对您文件的实时识别）· Preset Sample — Not Live Analysis' : 'Preset Sample — Not Live Analysis of Your File'}
                        </h4>
                        <p className="text-[11px] text-amber-850 leading-relaxed font-sans font-medium">
-                         当前 Google Gemini 接口繁忙（限流），暂时无法对您刚上传的文件做实时视觉识别。以下展示的是<strong>同类案件的预置示例</strong>，用于演示分析与维权信生成能力，<strong>并非针对您这张文件的真实结果</strong>，其中的金额、机构、日期均为示例。请稍后点击「重新分析」以获取基于您文件的真实 Gemini + Google 实时检索结果。
+                         {isZh ? (
+                           <>当前 Google Gemini 接口繁忙（限流），暂时无法对您刚上传的文件做实时视觉识别。以下展示的是<strong>同类案件的预置示例</strong>，用于演示分析与维权信生成能力，<strong>并非针对您这张文件的真实结果</strong>，其中的金额、机构、日期均为示例。请稍后点击「重新分析」以获取基于您文件的真实 Gemini + Google 实时检索结果。</>
+                         ) : (
+                           <>Google Gemini is busy (rate-limited), so we can't read the file you just uploaded in real time. Below is a <strong>preset example of a similar case</strong> that demonstrates the analysis and letter drafting — <strong>it is not a real result for your file</strong>, and the amounts, organisations and dates are examples only. Please try again later to get a real Gemini + Google Search result based on your file.</>
+                         )}
                        </p>
                      </div>
                    </div>
@@ -1472,10 +1604,14 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                    </div>
                    <div>
                      <h4 className="text-xs font-black text-[#1d1d1f] mb-1">
-                       AI 闭环护航申诉：整套法务复议流程已全面自动为您办妥！(AI Auto-Resolution Actions Complete)
+                       {isZh ? 'AI 闭环护航申诉：整套法务复议流程已全面自动为您办妥！(AI Auto-Resolution Actions Complete)' : 'AI Auto-Resolution Actions Complete: your whole appeal workflow is ready!'}
                      </h4>
                      <p className="text-[11px] text-gray-700 leading-relaxed font-sans font-medium">
-                       系统已瞬间为您完成：<span className="font-bold">① 极速识别并精细拆解</span> / <span className="font-bold">② 匹配澳洲 CAV/VCAT 法定条规并附高能 Grounding 信源链接</span> / <span className="font-bold">③ 自动化拟定中外对线驳回英文回信</span> / <span className="font-bold">④ 预排日历死线行政纠纷纠错事件</span> / <span className="font-bold">⑤ 直达一键极速 Gmail 对线发信</span>。全部抗辩诉求一气呵成！
+                       {isZh ? (
+                         <>系统已瞬间为您完成：<span className="font-bold">① 极速识别并精细拆解</span> / <span className="font-bold">② 匹配澳洲 CAV/VCAT 法定条规并附高能 Grounding 信源链接</span> / <span className="font-bold">③ 自动化拟定中外对线驳回英文回信</span> / <span className="font-bold">④ 预排日历死线行政纠纷纠错事件</span> / <span className="font-bold">⑤ 直达一键极速 Gmail 对线发信</span>。全部抗辩诉求一气呵成！</>
+                       ) : (
+                         <>Done for you: <span className="font-bold">① Read and broke down the letter</span> / <span className="font-bold">② Matched the relevant Australian rules (CAV / VCAT) with grounded source links</span> / <span className="font-bold">③ Drafted an English reply</span> / <span className="font-bold">④ Prepared a deadline calendar event</span> / <span className="font-bold">⑤ One click to send via Gmail</span>. Everything you need, in one go!</>
+                       )}
                      </p>
                    </div>
                  </div>
@@ -1487,10 +1623,14 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                         {/* LEFT COLUMN: Disputable items list */}
                         <div className="lg:col-span-6 flex flex-col bg-neutral-100/60 p-5 rounded-3xl border border-gray-200/50 max-h-[85vh] overflow-y-auto custom-scrollbar">
                            <div className="text-[10px] font-black text-[#1d1d1f] tracking-wider uppercase mb-1">
-                             ⚖️ 交叉匹配合同条目冲突分析栏 (CROSS DISPUTE ITEMS)
+                             {isZh ? '⚖️ 交叉匹配合同条目冲突分析栏 (CROSS DISPUTE ITEMS)' : '⚖️ CROSS DISPUTE ITEMS'}
                            </div>
                            <h3 className="text-sm font-extrabold text-gray-900 mb-4">
-                             共匹配识别出 <span className="text-red-650 text-base">{crossAnalysis.disputableItems.length}</span> 处严重违约或无理扣押标签：
+                             {isZh ? (
+                               <>共匹配识别出 <span className="text-red-650 text-base">{crossAnalysis.disputableItems.length}</span> 处严重违约或无理扣押标签：</>
+                             ) : (
+                               <>Found <span className="text-red-650 text-base">{crossAnalysis.disputableItems.length}</span> breaches or unfair deductions:</>
+                             )}
                            </h3>
 
                            <div className="space-y-4">
@@ -1508,22 +1648,22 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                  
                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[10px] text-gray-500 font-sans leading-relaxed">
                                    <div className="bg-surface-soft/30 p-2.5 rounded-lg border border-hairline/50">
-                                     <p className="font-bold text-ink mb-1">Clause A 住宅契约条款或规范：</p>
+                                     <p className="font-bold text-ink mb-1">{isZh ? 'Clause A 住宅契约条款或规范：' : 'Clause A — lease term or rule:'}</p>
                                      <p>{item.clauseA}</p>
                                    </div>
                                    <div className="bg-red-50/20 p-2.5 rounded-lg border border-red-100/30">
-                                     <p className="font-bold text-red-900 mb-1">Clause B 索赔发票/罚缴单指控：</p>
+                                     <p className="font-bold text-red-900 mb-1">{isZh ? 'Clause B 索赔发票/罚缴单指控：' : 'Clause B — claim invoice / allegation:'}</p>
                                      <p>{item.clauseB}</p>
                                    </div>
                                  </div>
 
                                  <div className="bg-amber-50/35 p-3 rounded-xl border border-amber-100/50 text-xs font-sans text-gray-700 leading-relaxed font-normal">
-                                   <p className="font-extrabold text-amber-900 flex items-center gap-1 mb-1">维权法源抗辩建议 (Strategy):</p>
+                                   <p className="font-extrabold text-amber-900 flex items-center gap-1 mb-1">{isZh ? '维权法源抗辩建议 (Strategy):' : 'Strategy:'}</p>
                                    <p>{item.negotiableReason}</p>
                                  </div>
 
                                  <div className="bg-neutral-50 p-2.5 rounded-xl border border-gray-150 text-[11px] font-mono font-medium text-gray-600">
-                                   <p className="font-bold text-gray-900 mb-0.5">💬 英文沟通回复模板 (Response Template):</p>
+                                   <p className="font-bold text-gray-900 mb-0.5">{isZh ? '💬 英文沟通回复模板 (Response Template):' : '💬 Response Template:'}</p>
                                    <p className="italic">"{item.advicePlain}"</p>
                                  </div>
                                </div>
@@ -1537,13 +1677,13 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                            <div className="bg-[#FFF4F2] p-5 rounded-3xl border border-[#FEE6E3]">
                              <div className="text-[10px] font-bold text-[#ff5a3c] tracking-widest mb-2 uppercase flex items-center space-x-2">
                                <span className="w-2 h-2 rounded-full bg-[#ff5a3c]"></span>
-                               <span>总体驳回对线核心策略 (Chief Negotiator Directive)</span>
+                               <span>{isZh ? '总体驳回对线核心策略 (Chief Negotiator Directive)' : 'Chief Negotiator Directive'}</span>
                              </div>
                              <p className="text-gray-900 text-xs font-medium leading-relaxed mb-3">
                                {crossAnalysis.recommendation}
                              </p>
                              <div className="bg-white/80 backdrop-blur-sm p-3.5 rounded-xl border border-white font-black text-[11px] text-[#D84C3E] flex items-center justify-between shadow-sm font-sans">
-                               <span>🎯 可安全挽回押金金额 (Total Recoverable Loss):</span>
+                               <span>{isZh ? '🎯 可安全挽回押金金额 (Total Recoverable Loss):' : '🎯 Total Recoverable Loss:'}</span>
                                <span className="text-sm text-red-650 font-black font-mono">
                                  ${crossAnalysis.disputableItems.reduce((acc: number, item: any) => acc + (item.amount || 0), 0)} AUD
                                 </span>
@@ -1554,13 +1694,13 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                            <div className="bg-[#f5f5f7] p-5 rounded-3xl border border-gray-200 flex flex-col gap-4 font-sans">
                              <div className="flex justify-between items-center border-b border-gray-100 pb-2">
                                <span className="text-xs font-black text-gray-800 flex items-center gap-1">
-                                 📝 主力英文维权正式声明书 (Drafting Response Document)
+                                 {isZh ? '📝 主力英文维权正式声明书 (Drafting Response Document)' : '📝 Drafting Response Document'}
                                </span>
-                               <span className="text-[9px] bg-surface-soft text-ink border border-hairline px-2 py-0.5 rounded-full font-black">对线意图高度匹配</span>
+                               <span className="text-[9px] bg-surface-soft text-ink border border-hairline px-2 py-0.5 rounded-full font-black">{isZh ? '对线意图高度匹配' : 'Intent matched'}</span>
                              </div>
 
                              <div className="text-[11px]/relaxed text-gray-500 bg-surface-soft/10 p-2.5 rounded-xl border border-hairline/40 font-normal">
-                               <span className="font-bold text-ink">对线意图：</span>
+                               <span className="font-bold text-ink">{isZh ? '对线意图：' : 'Intent: '}</span>
                                {crossAnalysis.englishDraft.intention}
                              </div>
 
@@ -1580,7 +1720,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
 
                              {crossAnalysis.englishDraft.chineseTranslation && (
                                <div className="flex flex-col gap-1">
-                                 <label className="text-[10px] font-black uppercase text-gray-400">CN REFERENCE (中文直观对照大意)</label>
+                                 <label className="text-[10px] font-black uppercase text-gray-400">{isZh ? 'CN REFERENCE (中文直观对照大意)' : 'REFERENCE TRANSLATION'}</label>
                                  <div className="bg-gray-50 text-xs text-gray-600 border border-gray-100 rounded-xl p-3 max-h-[160px] overflow-y-auto leading-relaxed">
                                    <Markdown>{crossAnalysis.englishDraft.chineseTranslation}</Markdown>
                                  </div>
@@ -1594,23 +1734,23 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                    const dateStr = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
                                    downloadICS(
                                      dateStr, 
-                                     "维州租务扣押争议 VCAT / RTBA 时效死线", 
-                                     `请注意，今日向中介 Horizon 提交了正式抗诉信件，依据 14 天法定答复时限，若对方无理回绝，请立即单方面发起 RTBA 索赔！时效届满截止日期：${dateStr}`
+                                     isZh ? "维州租务扣押争议 VCAT / RTBA 时效死线" : "VIC bond dispute: VCAT / RTBA deadline", 
+                                     isZh ? `请注意，今日向中介 Horizon 提交了正式抗诉信件，依据 14 天法定答复时限，若对方无理回绝，请立即单方面发起 RTBA 索赔！时效届满截止日期：${dateStr}` : `You sent a formal dispute letter to the agent Horizon today. Under the 14-day response period, if they refuse without good reason, lodge your own RTBA claim straight away! Deadline: ${dateStr}`
                                    );
                                  }}
                                  className="flex-1 bg-white hover:bg-neutral-50 text-[#1d1d1f] border-2 border-[#1d1d1f]/35 font-extrabold text-xs py-3 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer active:scale-95"
                                >
                                  <Calendar size={14} />
-                                 <span>一键载入法定抗辩日历事件 (.ics)</span>
+                                 <span>{isZh ? '一键载入法定抗辩日历事件 (.ics)' : 'Add deadline to calendar (.ics)'}</span>
                                </button>
 
                                <button
                                  onClick={() => {
                                    const dateStr = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
                                    const url = googleCalendarUrl({
-                                     title: '⚠️ 维州租务扣押争议 VCAT / RTBA 时效死线',
+                                     title: isZh ? '⚠️ 维州租务扣押争议 VCAT / RTBA 时效死线' : '⚠️ VIC bond dispute: VCAT / RTBA deadline',
                                      dueDate: dateStr,
-                                     details: `依据 14 天法定答复时限，若中介无理回绝，请立即单方面发起 RTBA 索赔！时效届满截止日期：${dateStr}`,
+                                     details: isZh ? `依据 14 天法定答复时限，若中介无理回绝，请立即单方面发起 RTBA 索赔！时效届满截止日期：${dateStr}` : `Under the 14-day response period, if the agent refuses without good reason, lodge your own RTBA claim straight away! Deadline: ${dateStr}`,
                                      remindDaysBefore: 3,
                                    });
                                    if (url) window.open(url, '_blank', 'noopener');
@@ -1618,7 +1758,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                  className="flex-1 bg-white hover:bg-neutral-50 text-[#1d1d1f] border-2 border-[#1d1d1f]/35 font-extrabold text-xs py-3 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer active:scale-95"
                                >
                                  <Calendar size={14} />
-                                 <span>加入 Google 日历（提前 3 天提醒）</span>
+                                 <span>{isZh ? '加入 Google 日历（提前 3 天提醒）' : 'Add to Google Calendar (3-day reminder)'}</span>
                                </button>
 
                                <button 
@@ -1630,7 +1770,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                  className="flex-1 bg-[#1d1d1f] hover:bg-neutral-800 text-white font-extrabold text-xs py-3 px-4 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer active:scale-95"
                                >
                                  <Send size={14} />
-                                 <span>极速一键直达 Gmail 答复抗辩</span>
+                                 <span>{isZh ? '极速一键直达 Gmail 答复抗辩' : 'Reply via Gmail in one click'}</span>
                                </button>
                              </div>
                            </div>
@@ -1643,16 +1783,16 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                      <div className="text-xs font-black text-gray-400 mb-2.5 uppercase tracking-wider flex justify-between items-center">
                        <span>{t('lo_current_original')}</span>
                        {activeCase ? (
-                         <span className="text-[10px] text-amber-700 bg-amber-100 px-2 py-0.5 rounded font-bold">内置经典案例</span>
+                         <span className="text-[10px] text-amber-700 bg-amber-100 px-2 py-0.5 rounded font-bold">{isZh ? '内置经典案例' : 'Sample case'}</span>
                        ) : (
-                         <span className="text-[10px] text-on-dark bg-ink px-2 py-0.5 rounded font-bold">用户自选公文</span>
+                         <span className="text-[10px] text-on-dark bg-ink px-2 py-0.5 rounded font-bold">{isZh ? '用户自选公文' : 'Your letter'}</span>
                        )}
                      </div>
 
                      <div className="w-full bg-white border border-gray-155 rounded-2xl flex flex-col items-center justify-center overflow-x-auto overflow-y-auto relative shadow-sm p-1.5 flex-1 min-h-[300px]">
                        {activeCase ? (
                          <div className="w-full h-full md:max-h-[500px] overflow-y-auto custom-scrollbar p-1 select-none flex justify-center bg-gray-50/20 rounded-xl">
-                           {renderDocumentHTML(activeCase, true)}
+                           {renderDocumentHTML(activeCase, true, false, language)}
                          </div>
                        ) : (
                          filePreview && (
@@ -1666,7 +1806,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                        className="mt-3.5 w-full bg-[#1d1d1f] hover:bg-neutral-800 text-white font-extrabold py-2.5 px-4 rounded-xl text-xs flex justify-center items-center gap-1.5 active:scale-95 transition-all cursor-pointer shadow-sm"
                      >
                        <Eye size={13}/>
-                       <span>📄 放大查阅高清原始公文 (1:1 A4放大)</span>
+                       <span>{isZh ? '📄 放大查阅高清原始公文 (1:1 A4放大)' : '📄 View the full original letter (1:1 A4)'}</span>
                      </button>
                    </div>
 
@@ -1684,21 +1824,21 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
                               {analysis.status && (
                                 <span className={`text-[10px] font-black tracking-wider px-2.5 py-0.5 rounded-full uppercase ${analysis.status === 'risky' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-                                  {analysis.status === 'risky' ? '⚠️ RISKY / 存在违规风险' : '✅ CLEAN / 合规安全'}
+                                  {analysis.status === 'risky' ? (isZh ? '⚠️ RISKY / 存在违规风险' : '⚠️ RISKY') : (isZh ? '✅ CLEAN / 合规安全' : '✅ CLEAN')}
                                 </span>
                               )}
                               {analysis.confidence != null && (
                                 <span className="bg-blue-50 text-blue-800 border border-blue-100 text-[10px] font-black px-2.5 py-0.5 rounded-full tracking-wider font-mono">
-                                  🧠 AI 置信度: {confidencePct(analysis.confidence)}%
+                                  🧠 {isZh ? 'AI 置信度' : 'AI confidence'}: {confidencePct(analysis.confidence)}%
                                 </span>
                               )}
                             </div>
                             <p className="text-xs text-gray-500 mt-1.5 leading-relaxed font-sans">
                               {analysis.status === 'risky'
-                                ? '经过高级 AI 视觉模型及消保法例深度交叉研判，本公函中存在以下潜在违规细节、霸王条款或权益被损害细节，请予以审慎对线。'
+                                ? (isZh ? '经过高级 AI 视觉模型及消保法例深度交叉研判，本公函中存在以下潜在违规细节、霸王条款或权益被损害细节，请予以审慎对线。' : 'After cross-checking with an AI vision model and consumer protection law, this letter appears to contain the potential breaches, unfair terms or harm to your rights listed below. Respond carefully.')
                                 : analysis.status === 'clean'
-                                  ? '经 AI 研判，此文件属于常规凭证或合规往来公函，暂未扫描到明显的霸王条款、消费欺诈或无故扣款风险。'
-                                  : '预置示例模式下不出具合规风险研判；恢复实时分析后将展示 RISKY / CLEAN 结论。'}
+                                  ? (isZh ? '经 AI 研判，此文件属于常规凭证或合规往来公函，暂未扫描到明显的霸王条款、消费欺诈或无故扣款风险。' : 'The AI assessment found this to be a routine or compliant letter, with no obvious unfair terms, consumer fraud or unjustified charges.')
+                                  : (isZh ? '预置示例模式下不出具合规风险研判；恢复实时分析后将展示 RISKY / CLEAN 结论。' : 'No compliance risk assessment is given in preset sample mode; a RISKY / CLEAN result will show once live analysis is back.')}
                             </p>
                           </div>
                         </div>
@@ -1709,14 +1849,14 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                         <div className="flex flex-col gap-3">
                           <div className="text-[10px] font-bold text-gray-400 tracking-widest uppercase flex items-center space-x-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
-                            <span>违规及霸王条款解析卡片 ({analysis.violations.length})</span>
+                            <span>{isZh ? '违规及霸王条款解析卡片' : 'Breaches & unfair terms'} ({analysis.violations.length})</span>
                           </div>
                           <div className="grid grid-cols-1 gap-4">
                             {analysis.violations.map((v, i) => (
                               <div key={i} className="bg-red-50/20 hover:bg-red-50/40 p-5 rounded-2xl border border-red-100/60 shadow-xs flex flex-col gap-3 transition-colors">
                                 <div className="flex justify-between items-start gap-4">
                                   <h4 className="text-xs font-bold text-red-900 bg-red-100/60 px-2.5 py-1 rounded-lg">
-                                    📜 触及条款 / 条约: {v.clause}
+                                    📜 {isZh ? '触及条款 / 条约:' : 'Clause:'} {v.clause}
                                   </h4>
                                   <span className="bg-red-500 text-white text-[9px] font-black uppercase px-1.5 py-0.5 rounded shadow-2xs font-mono">
                                     {v.penaltyRisk}
@@ -1728,7 +1868,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                 <div className="bg-white/80 p-3.5 rounded-xl border border-red-100 text-[11px] text-red-800 flex items-start gap-2 shadow-2xs">
                                   <span className="text-sm shrink-0">💡</span>
                                   <div className="leading-normal">
-                                    <strong className="font-bold font-sans">对线突击方案:</strong> {v.solution}
+                                    <strong className="font-bold font-sans">{isZh ? '对线突击方案:' : 'How to respond:'}</strong> {v.solution}
                                   </div>
                                 </div>
                               </div>
@@ -1744,10 +1884,10 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                         </div>
                         <div className="flex-1 text-center md:text-left font-sans">
                           <h4 className="text-xs font-black text-gray-900 tracking-wider uppercase">
-                            🚨 48小时申诉红线提醒守护
+                            {isZh ? '🚨 48小时申诉红线提醒守护' : '🚨 48-hour deadline guard'}
                           </h4>
                           <p className="text-[11px] text-gray-500 mt-1 leading-normal">
-                            申诉硬截止日期是留学生的生命线，错失将面临遣返、退学或大额罚金。一键开启后，截止前 48 小时触发浏览器桌面通知与应用内红线警报（保持 Serene 页面开启即可接收；离线 FCM 推送在路线图中）。
+                            {isZh ? '申诉硬截止日期是留学生的生命线，错失将面临遣返、退学或大额罚金。一键开启后，截止前 48 小时触发浏览器桌面通知与应用内红线警报（保持 Serene 页面开启即可接收；离线 FCM 推送在路线图中）。' : 'Hard appeal deadlines are critical for international students — missing one can mean losing your visa, your enrolment or a big fine. Turn this on to get a desktop notification and an in-app alert 48 hours before the deadline (keep Serene open to receive them; offline FCM push is on the roadmap).'}
                           </p>
                           <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-3">
                             <button
@@ -1767,9 +1907,9 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                         email: 'student@serene.org'
                                       })
                                     });
-                                    showToast('🎉 成功开启 48小时红线提醒守护！截止前 48 小时将收到桌面通知与应用内警报。', 'success');
+                                    showToast(isZh ? '🎉 成功开启 48小时红线提醒守护！截止前 48 小时将收到桌面通知与应用内警报。' : '🎉 48-hour deadline guard is on! You\'ll get a desktop notification and in-app alert 48 hours before the deadline.', 'success');
                                   } else {
-                                    showToast('⚠️ 浏览器通知权限被拒绝，将退化为应用内弹窗守护。', 'info');
+                                    showToast(isZh ? '⚠️ 浏览器通知权限被拒绝，将退化为应用内弹窗守护。' : '⚠️ Browser notifications were blocked, so you\'ll get in-app alerts instead.', 'info');
                                   }
                                 } catch (e) {
                                   console.error(e);
@@ -1777,7 +1917,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                               }}
                               className="bg-red-500 hover:bg-red-600 text-white text-[10px] font-black px-3 py-1.5 rounded-lg transition-all cursor-pointer shadow-xs active:scale-95"
                             >
-                              🚀 一键开启 48h 申诉守护
+                              {isZh ? '🚀 一键开启 48h 申诉守护' : '🚀 Turn on 48h deadline guard'}
                             </button>
                             <button
                               onClick={async () => {
@@ -1795,7 +1935,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                               }}
                               className="bg-neutral-800 hover:bg-neutral-900 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all cursor-pointer shadow-xs active:scale-95"
                             >
-                              🧪 立即测试 48h 紧急推送
+                              {isZh ? '🧪 立即测试 48h 紧急推送' : '🧪 Test the 48h alert now'}
                             </button>
                           </div>
                         </div>
@@ -1803,7 +1943,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                      <div className="bg-[#FFF4F2] p-6 rounded-2xl border border-[#FEE6E3]">
                     <div className="text-[10px] font-bold text-[#ff5a3c] tracking-widest mb-3 uppercase flex items-center space-x-2">
                        <span className="w-2 h-2 rounded-full bg-[#ff5a3c]"></span>
-                       <span>它在说什么 & 痛感折算</span>
+                       <span>{isZh ? '它在说什么 & 痛感折算' : 'What it says & what\'s at stake'}</span>
                     </div>
                     <div className="text-gray-900 font-medium text-sm mb-4 markdown-body">
                        <Markdown>{analysis.summary}</Markdown>
@@ -1819,7 +1959,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                  <div className="bg-[#ececef] p-6 rounded-2xl mb-8 border border-[#EBE8E0]">
                     <div className="text-[10px] font-bold text-[#1d1d1f] tracking-widest mb-4 uppercase flex items-center space-x-2">
                        <span className="w-2 h-2 rounded-full bg-[#1d1d1f]"></span>
-                       <span>🚀 抗辩执行清单 (To-Do Checklist Kanban)</span>
+                       <span>{isZh ? '🚀 抗辩执行清单 (To-Do Checklist Kanban)' : '🚀 To-Do Checklist'}</span>
                      </div>
                      {analysis.deadline && (
                        <div className="bg-white p-4.5 rounded-2xl border border-gray-200/60 shadow-sm flex flex-col sm:flex-row items-center gap-4.5 mb-5 font-sans">
@@ -1829,9 +1969,9 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                const dStr = analysis.deadline?.date || "";
                                if (dStr) {
                                  const pts = dStr.split('-');
-                                 if (pts.length === 3) return `${parseInt(pts[1], 10)}月`;
+                                 if (pts.length === 3) return isZh ? `${parseInt(pts[1], 10)}月` : (['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][parseInt(pts[1], 10) - 1] || pts[1]);
                                }
-                               return "时限";
+                               return isZh ? '时限' : 'DUE';
                              })()}
                            </div>
                            <div className="text-2xl font-black text-gray-800 my-auto">
@@ -1849,17 +1989,17 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                          <div className="flex-1 text-center sm:text-left">
                            <div className="flex flex-wrap justify-center sm:justify-start items-center gap-1.5">
                              <span className={`text-[9px] font-black tracking-wider px-2 py-0.5 rounded-full uppercase font-mono bg-red-50 text-red-800`}>
-                               ⏰ 剩余 {analysis.deadline?.businessDaysLeft ?? 0} 天
+                               ⏰ {isZh ? `剩余 ${analysis.deadline?.businessDaysLeft ?? 0} 天` : `${analysis.deadline?.businessDaysLeft ?? 0} days left`}
                              </span>
                              {analysis.issuer?.isOfficial && (
                                <span className="bg-[#1d1d1f]/10 text-[#1d1d1f] text-[8px] font-black px-1.5 py-0.5 rounded">
-                                 🏛️ 官方认证
+                                 {isZh ? '🏛️ 官方认证' : '🏛️ Official'}
                                </span>
                              )}
                            </div>
-                           <h3 className="text-xs font-black text-gray-900 mt-1">抗诉截止日历：{analysis.deadline?.date}</h3>
+                           <h3 className="text-xs font-black text-gray-900 mt-1">{isZh ? '抗诉截止日历：' : 'Deadline: '}{analysis.deadline?.date}</h3>
                            <p className="text-[10px] text-gray-400 font-mono leading-none mt-0.5">
-                             发函机构：{analysis.issuer?.name || "未知机构"}
+                             {isZh ? '发函机构：' : 'Issuer: '}{analysis.issuer?.name || (isZh ? '未知机构' : 'Unknown issuer')}
                            </p>
                          </div>
                        </div>
@@ -1873,8 +2013,8 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                        return (
                          <div className="mb-4 font-sans">
                            <div className="flex justify-between items-center mb-1 text-[10px] font-black text-[#1d1d1f] tracking-wider uppercase">
-                             <span>申诉执行进度</span>
-                             <span>{completedCount}/{totalCount} 已完成 ({percentage}%)</span>
+                             <span>{isZh ? '申诉执行进度' : 'Progress'}</span>
+                             <span>{completedCount}/{totalCount} {isZh ? '已完成' : 'done'} ({percentage}%)</span>
                            </div>
                            <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden border border-gray-100">
                              <div className="bg-primary h-full transition-all duration-550" style={{ width: `${percentage}%` }} />
@@ -1904,7 +2044,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                  rel="noopener noreferrer" 
                                  className="inline-flex items-center gap-1 text-[10px] font-black text-ink hover:text-red-500 mt-1.5 transition-all bg-surface-soft px-2 py-0.5 rounded-md"
                                >
-                                 <span>🌐 去官网对线：{task.channel || "在线申诉纠纷平台"}</span>
+                                 <span>🌐 {isZh ? '去官网对线：' : 'Go to official site: '}{task.channel || (isZh ? '在线申诉纠纷平台' : 'Online dispute portal')}</span>
                                  <ExternalLink size={9} className="shrink-0" />
                                </a>
                              )}
@@ -1922,7 +2062,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                           <AlignLeft size={18} className="text-[#B58529]" />
                        </div>
                        <div>
-                          <h4 className="text-[11px] font-bold text-[#B58529] tracking-widest mb-1.5 uppercase">对线策略（中文意图）</h4>
+                          <h4 className="text-[11px] font-bold text-[#B58529] tracking-widest mb-1.5 uppercase">{isZh ? '对线策略（中文意图）' : 'Strategy (plain-language intent)'}</h4>
                           <div className="text-sm font-medium text-gray-800 markdown-body leading-relaxed">
                              <Markdown>{analysis.englishDraft.intention}</Markdown>
                           </div>
@@ -1945,7 +2085,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                </p>
                                <div className="flex flex-wrap items-center gap-2 mt-1">
                                  <span className="text-[10px] bg-red-50 text-red-800 border border-red-150 px-1.5 py-0.5 rounded font-bold font-sans">
-                                   依据：{right.legalBasis}
+                                   {isZh ? '依据：' : 'Basis: '}{right.legalBasis}
                                  </span>
                                  {right.sourceUrl && (
                                    <a 
@@ -1954,7 +2094,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                                      rel="noopener noreferrer" 
                                      className="inline-flex items-center gap-0.5 text-[#1d1d1f] font-black hover:text-[#ff5a3c] hover:underline whitespace-nowrap"
                                    >
-                                     <span>🔗 查看官方原文条款</span>
+                                     <span>{isZh ? '🔗 查看官方原文条款' : '🔗 View official source'}</span>
                                      <ExternalLink size={9} />
                                    </a>
                                  )}
@@ -1968,24 +2108,24 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                      <GroundingSources grounding={(analysis as any)._grounding} />
 
                        <div className="flex items-center space-x-3 bg-gray-50/80 p-3 rounded-xl border border-gray-100 focus-within:border-gray-300 focus-within:bg-white transition-colors">
-                          <span className="text-xs font-bold text-gray-400 whitespace-nowrap uppercase tracking-wider w-12">发给</span>
+                          <span className="text-xs font-bold text-gray-400 whitespace-nowrap uppercase tracking-wider w-12">{isZh ? '发给' : 'To'}</span>
                           <input 
                             type="email" 
                             value={recipient}
                             onChange={(e) => setRecipient(e.target.value)}
                             className="flex-1 bg-transparent text-sm font-bold text-gray-900 focus:outline-none"
-                            placeholder="机构邮箱地址"
+                            placeholder={isZh ? '机构邮箱地址' : 'Organisation email address'}
                           />
                        </div>
                        
                        <div className="flex items-center space-x-3 bg-gray-50/80 p-3 rounded-xl border border-gray-100">
-                          <span className="text-xs font-bold text-gray-400 whitespace-nowrap uppercase tracking-wider w-12">主题</span>
+                          <span className="text-xs font-bold text-gray-400 whitespace-nowrap uppercase tracking-wider w-12">{isZh ? '主题' : 'Subject'}</span>
                           <input 
                             type="text" 
                             value={analysis.englishDraft.subject}
                             readOnly
                             className="flex-1 bg-transparent text-sm font-bold text-gray-900 focus:outline-none placeholder-gray-400"
-                            placeholder="邮件主题"
+                            placeholder={isZh ? '邮件主题' : 'Email subject'}
                           />
                        </div>
                     </div>
@@ -1993,7 +2133,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                     <div className="flex flex-col xl:flex-row gap-4 mb-6">
                        <div className="flex-1 flex flex-col">
                           <div className="flex items-center justify-between mb-2 px-1">
-                             <label className="text-[11px] font-bold text-gray-500 tracking-widest uppercase">英文原稿（可自由修改）</label>
+                             <label className="text-[11px] font-bold text-gray-500 tracking-widest uppercase">{isZh ? '英文原稿（可自由修改）' : 'English draft (editable)'}</label>
                              <span className="text-[10px] bg-ink text-on-dark px-2 py-0.5 rounded-full font-bold">Editable</span>
                           </div>
                           <textarea 
@@ -2006,8 +2146,8 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                        {currentTranslation && (
                           <div className="flex-1 flex flex-col">
                              <div className="flex items-center justify-between mb-2 px-1">
-                               <label className="text-[11px] font-bold text-gray-500 tracking-widest uppercase">中文精准对照</label>
-                               {isTranslating && <span className="text-[10px] text-gray-400 font-bold flex items-center gap-1"><div className="w-2 h-2 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div> 翻译中...</span>}
+                               <label className="text-[11px] font-bold text-gray-500 tracking-widest uppercase">{isZh ? '中文精准对照' : 'Reference translation'}</label>
+                               {isTranslating && <span className="text-[10px] text-gray-400 font-bold flex items-center gap-1"><div className="w-2 h-2 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div> {isZh ? '翻译中...' : 'Translating...'}</span>}
                              </div>
                              <div className="w-full bg-[#FBFBFA] border border-gray-100 rounded-2xl p-5 text-sm font-sans resize-none h-[320px] shadow-inner overflow-y-auto leading-relaxed text-gray-600 markdown-body">
                                 <Markdown>{currentTranslation}</Markdown>
@@ -2018,7 +2158,11 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
 
                     <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 flex flex-col items-center">
                        <p className="text-xs text-gray-400 font-medium mb-5 text-center leading-relaxed max-w-md">
-                         AI 仅辅助生成草稿，<strong className="text-gray-500">发送前请仔细检查 [中括号] 内的信息</strong>。本服务不构成法律或学术建议。
+                         {isZh ? (
+                           <>AI 仅辅助生成草稿，<strong className="text-gray-500">发送前请仔细检查 [中括号] 内的信息</strong>。本服务不构成法律或学术建议。</>
+                         ) : (
+                           <>AI only helps you draft — <strong className="text-gray-500">check everything in [square brackets] carefully before sending</strong>. This service is not legal or academic advice.</>
+                         )}
                        </p>
                        
                        <div className="w-full max-w-md">
@@ -2030,7 +2174,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                             <span>{t('lo_open_gmail')}</span>
                             <ExternalLink size={16} className="ml-1 opacity-70" />
                          </button>
-                         <p className="text-[10px] text-gray-400 text-center mt-2">自动打开 Gmail 网页版，收件人、主题、正文已替你填好；你过目无误后点发送（不会自动发出）。</p>
+                         <p className="text-[10px] text-gray-400 text-center mt-2">{isZh ? '自动打开 Gmail 网页版，收件人、主题、正文已替你填好；你过目无误后点发送（不会自动发出）。' : 'Opens Gmail on the web with the recipient, subject and body filled in. Review it, then hit Send yourself (nothing is sent automatically).'}</p>
                        </div>
                     </div>
                   </div>
@@ -2047,7 +2191,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                   </div>
                   <h3 className="text-3xl font-extrabold text-gray-900 mb-4 font-serif">{t('lo_gmail_done_title')}</h3>
                   <p className="text-gray-500 text-base max-w-sm mb-8 leading-relaxed">
-                    切到 Gmail 标签页，收件人、主题、正文都已预填；过目无误后点发送。这道难关，就快跨过去了。
+                    {isZh ? '切到 Gmail 标签页，收件人、主题、正文都已预填；过目无误后点发送。这道难关，就快跨过去了。' : 'Switch to the Gmail tab — the recipient, subject and body are already filled in. Review it and hit Send. You\'re almost through this one.'}
                   </p>
                   
                   <button onClick={reset} className="text-[#1d1d1f] font-bold bg-white border-2 border-[#1d1d1f] hover:bg-[#1d1d1f] hover:text-white px-10 py-4 rounded-full transition-all shadow-sm flex items-center space-x-2 active:scale-95">
@@ -2068,13 +2212,13 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                 <div className="flex items-center gap-2">
                   <FileText size={18} className="text-[#ff5a3c]"/>
                   <span className="font-extrabold text-xs md:text-sm">
-                    {activeCase ? `${CASE_GUIDES[activeCase].title} - 官方正本 A4 高清阅览` : '已上传公文 - 高清放大阅览'}
+                    {activeCase ? `${guides[activeCase].title} - ${isZh ? '官方正本 A4 高清阅览' : 'original letter, A4 HD view'}` : (isZh ? '已上传公文 - 高清放大阅览' : 'Uploaded letter - HD view')}
                   </span>
                 </div>
                 <button 
                   onClick={() => setShowDocModal(false)}
                   className="bg-white/10 hover:bg-white/20 p-1.5 rounded-full text-white transition-colors cursor-pointer"
-                  title="关闭"
+                  title={isZh ? '关闭' : 'Close'}
                 >
                   <X size={15}/>
                 </button>
@@ -2083,7 +2227,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
               <div className="p-4 md:p-8 overflow-y-auto bg-gray-100 flex-1 flex justify-center custom-scrollbar">
                 <div className="w-full max-w-2xl overflow-x-auto">
                   {activeCase ? (
-                    renderDocumentHTML(activeCase, false, privacyShieldActive && shieldStatus === 'secured')
+                    renderDocumentHTML(activeCase, false, privacyShieldActive && shieldStatus === 'secured', language)
                   ) : (
                     filePreview && (
                       <div className="flex justify-center bg-white p-4 rounded-xl border shadow-sm">
@@ -2103,7 +2247,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
                     }}
                     className="bg-[#ff5a3c] hover:bg-[#e6492d] text-white font-extrabold py-2.5 px-6 rounded-xl shadow active:scale-95 transition-all flex items-center gap-1 cursor-pointer"
                   >
-                    <span>一键对该公文进行Ai深度解析与写信申诉</span>
+                    <span>{isZh ? '一键对该公文进行Ai深度解析与写信申诉' : 'Analyse this letter with AI and draft an appeal'}</span>
                     <ArrowRight size={14}/>
                   </button>
                 </div>
