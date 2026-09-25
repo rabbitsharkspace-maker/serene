@@ -1,4 +1,4 @@
-import { db, auth, handleFirestoreError, OperationType } from './firebase';
+import { getDb, auth, handleFirestoreError, OperationType } from './firebase';
 import { collection, addDoc, getDocs, query, where, updateDoc, doc, deleteDoc, writeBatch } from 'firebase/firestore';
 
 export interface KanbanTask {
@@ -33,7 +33,7 @@ export async function saveExtractedTasks(
 
   const newTasks: KanbanTask[] = tasks.map((t, idx) => ({
     id: `task-${Date.now()}-${idx}-${Math.floor(Math.random() * 1000)}`,
-    uid: auth.currentUser?.uid || 'guest',
+    uid: auth?.currentUser?.uid || 'guest',
     title: t.step,
     dueDate: finalDueDate,
     status: 'todo',
@@ -45,11 +45,11 @@ export async function saveExtractedTasks(
   }));
 
   // If authenticated, save to Firestore container
-  if (auth.currentUser) {
+  if (auth?.currentUser) {
     try {
-      const batch = writeBatch(db);
+      const batch = writeBatch(getDb());
       for (const t of newTasks) {
-        const taskDocRef = doc(db, 'kanbanTasks', t.id);
+        const taskDocRef = doc(getDb(), 'kanbanTasks', t.id);
         batch.set(taskDocRef, t);
       }
       await batch.commit();
@@ -70,9 +70,9 @@ export async function saveExtractedTasks(
 
 // Load all Kanban tasks (with Firebase cloud sync)
 export async function loadAllTasks(): Promise<KanbanTask[]> {
-  if (auth.currentUser) {
+  if (auth?.currentUser) {
     try {
-      const q = query(collection(db, 'kanbanTasks'), where('uid', '==', auth.currentUser.uid));
+      const q = query(collection(getDb(), 'kanbanTasks'), where('uid', '==', auth.currentUser.uid));
       const querySnapshot = await getDocs(q);
       const fsTasks: KanbanTask[] = [];
       querySnapshot.forEach((docSnap) => {
@@ -107,9 +107,9 @@ export async function loadAllTasks(): Promise<KanbanTask[]> {
 export async function toggleTaskStatus(taskId: string, currentStatus: 'todo' | 'done'): Promise<'todo' | 'done'> {
   const newStatus = currentStatus === 'todo' ? 'done' : 'todo';
 
-  if (auth.currentUser) {
+  if (auth?.currentUser) {
     try {
-      const taskDocRef = doc(db, 'kanbanTasks', taskId);
+      const taskDocRef = doc(getDb(), 'kanbanTasks', taskId);
       await updateDoc(taskDocRef, { status: newStatus });
     } catch (error) {
       console.error('Firestore task update failed:', error);
@@ -133,9 +133,9 @@ export async function toggleTaskStatus(taskId: string, currentStatus: 'todo' | '
 
 // Delete a task
 export async function deleteTask(taskId: string): Promise<void> {
-  if (auth.currentUser) {
+  if (auth?.currentUser) {
     try {
-      const taskDocRef = doc(db, 'kanbanTasks', taskId);
+      const taskDocRef = doc(getDb(), 'kanbanTasks', taskId);
       await deleteDoc(taskDocRef);
     } catch (error) {
       console.error('Firestore task delete failed:', error);
