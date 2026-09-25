@@ -118,7 +118,7 @@ Get a free `GEMINI_API_KEY` from [Google AI Studio](https://aistudio.google.com/
 
 ### 3. (Optional) Connect your own Firebase
 
-Replace the values in `firebase-applet-config.json` with your own Firebase web config to enable Google sign-in and cloud sync:
+`firebase-applet-config.json` in the repo **is an empty template**. Fill in your own Firebase web config to enable Google sign-in and cloud sync:
 
 ```json
 {
@@ -133,7 +133,7 @@ Replace the values in `firebase-applet-config.json` with your own Firebase web c
 }
 ```
 
-**It runs without Firebase too**: with the values left empty, the app switches to local mode and keeps all data in the browser's localStorage — you just won't have sign-in or cross-device sync.
+**It runs without Firebase too**: leave it empty and the app switches to local mode and keeps all data in the browser's localStorage — you just won't have sign-in or cross-device sync.
 
 Remember to deploy `firestore.rules` to your project, and add HTTP referrer restrictions to this web key in the GCP console.
 
@@ -185,7 +185,7 @@ gcloud run deploy serene --source . --region asia-southeast1 \
 │       ├── locale.tsx     # Country / state / display language
 │       └── firebase.ts    # Auth + Firestore (degrades gracefully when unconfigured)
 ├── firestore.rules        # Database security rules
-├── firebase-applet-config.json   # Firebase web config — replace with your own
+├── firebase-applet-config.json   # Empty template — fill in your own
 └── docs/screenshots/      # README screenshots
 ```
 
