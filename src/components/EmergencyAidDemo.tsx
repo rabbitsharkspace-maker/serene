@@ -19,7 +19,7 @@ const SAMPLE_COORDINATES: Record<string, { lat: number; lng: number }> = {
 };
 
 import { useLocale, getCountryContent, getCountryName, getInterpreterName } from '../lib/locale';
-import { useT, type StringKey } from '../lib/i18n';
+import { useT, useL, type StringKey } from '../lib/i18n';
 import FallbackNotice from './FallbackNotice';
 import { generateEmergencyGuideOnDevice, onDeviceAIStatus } from '../lib/onDeviceAI';
 
@@ -227,8 +227,8 @@ export default function EmergencyAidDemo() {
   const countryName = getCountryName(country, language);
   const interpreter = getInterpreterName(language);
   const t = useT();
-  // Hardcoded (non-t()) copy: Chinese for zh, English for every other display language.
-  const isZh = language === 'zh';
+  // Hardcoded (non-t()) copy, localized inline for every display language.
+  const L = useL();
   // Country+state label in the user's language, reused across guide copy.
   const locationLabel = `${countryName}${region ? ` · ${region}` : ''}`;
   const [isListening, setIsListening] = useState(false);
@@ -333,67 +333,161 @@ export default function EmergencyAidDemo() {
         isQuotaFallback: true
       };
       
-      // Keyword matching covers both Chinese and English input (matching only, never displayed).
+      // Keyword matching covers Chinese, English and other display-language input (matching only, never displayed).
       const has = (...words: string[]) => words.some((w) => s.includes(w));
-      if (has("撬门", "闯入", "砸门", "小偷", "强行", "入室", "break in", "breaking in", "broke in", "intruder", "burglar", "trespass")) {
-        fallback.scenarioTitle = isZh ? "住宅遭到暴力侵入安全威胁 (Home Intrusion)" : "Home intrusion";
+      const num = content.emergency;
+      if (has("撬门", "闯入", "砸门", "小偷", "强行", "入室", "break in", "breaking in", "broke in", "intruder", "burglar", "trespass",
+        "intruso", "ladrón", "forzando la puerta", "चोर", "घुस", "đột nhập", "kẻ trộm", "لص", "اقتحام", "يقتحم")) {
+        fallback.scenarioTitle = L({ zh: "住宅遭到暴力侵入安全威胁 (Home Intrusion)", en: "Home intrusion", es: "Intrusión en casa (Home Intrusion)", hi: "घर में घुसपैठ (Home Intrusion)", vi: "Có người đột nhập vào nhà (Home Intrusion)", ar: "اقتحام المنزل (Home Intrusion)" });
         fallback.englishTalk = "Help! Someone is breaking into my room right now! There is an active intruder! I need police. Address: [your address].";
-        fallback.chineseTalk = isZh
-          ? "抓人！有人正强行砸门撬锁闯入我的房间！现场有现行入侵者！我需要警察。地址：【你的地址】。"
-          : "Tells the operator someone is forcing their way in right now, that you need police, and where you are.";
-        fallback.actions = isZh ? [
-          "一、在入侵者还在防盗门外砸门时，立刻反锁房门并搬椅子、重物柜物理堵死门框！",
-          "二、迅速关闭房灯，寻找结实掩体（床底或衣柜处），蹲身防守屏息静候！",
-          "三、牢握自保器具以作合法防卫自救，一键打000大声叫唤Police！"
-        ] : [
-          "1. While the intruder is still outside, lock your door and block it with a chair or heavy furniture.",
-          "2. Turn off the lights, get behind something solid (under the bed or in a wardrobe) and stay quiet.",
-          `3. Call ${content.emergency} and ask for Police. Only defend yourself if you have no other option.`
+        fallback.chineseTalk = L({
+          zh: "抓人！有人正强行砸门撬锁闯入我的房间！现场有现行入侵者！我需要警察。地址：【你的地址】。",
+          en: "Tells the operator someone is forcing their way in right now, that you need police, and where you are.",
+          es: "Le dice al operador que alguien está entrando a la fuerza ahora mismo, que necesitas a la policía y dónde estás.",
+          hi: "ऑपरेटर को बताता है कि कोई अभी ज़बरदस्ती अंदर घुस रहा है, आपको पुलिस चाहिए, और आप कहाँ हैं।",
+          vi: "Báo cho tổng đài viên rằng có người đang cố xông vào ngay lúc này, bạn cần cảnh sát, và bạn đang ở đâu.",
+          ar: "يُخبر موظف الطوارئ بأن شخصًا يقتحم المكان الآن، وأنك تحتاج إلى الشرطة، وأين أنت.",
+        });
+        fallback.actions = [
+          L({
+            zh: "一、在入侵者还在防盗门外砸门时，立刻反锁房门并搬椅子、重物柜物理堵死门框！",
+            en: "1. While the intruder is still outside, lock your door and block it with a chair or heavy furniture.",
+            es: "1. Mientras el intruso siga fuera, cierra la puerta con llave y bloquéala con una silla o un mueble pesado.",
+            hi: "1. जब तक घुसपैठिया बाहर है, दरवाज़े पर ताला लगाएँ और कुर्सी या भारी फ़र्नीचर से उसे रोक दें।",
+            vi: "1. Khi kẻ đột nhập còn ở bên ngoài, hãy khóa cửa và chặn cửa bằng ghế hoặc đồ nội thất nặng.",
+            ar: "1. ما دام المقتحم في الخارج، أقفل بابك وسُدَّه بكرسي أو بأثاث ثقيل.",
+          }),
+          L({
+            zh: "二、迅速关闭房灯，寻找结实掩体（床底或衣柜处），蹲身防守屏息静候！",
+            en: "2. Turn off the lights, get behind something solid (under the bed or in a wardrobe) and stay quiet.",
+            es: "2. Apaga las luces, ponte detrás de algo sólido (debajo de la cama o en un armario) y guarda silencio.",
+            hi: "2. लाइट बंद करें, किसी मज़बूत चीज़ के पीछे (पलंग के नीचे या अलमारी में) छिप जाएँ और चुप रहें।",
+            vi: "2. Tắt đèn, nấp sau vật chắc chắn (dưới gầm giường hoặc trong tủ quần áo) và giữ im lặng.",
+            ar: "2. أطفئ الأنوار، واحتمِ خلف شيء صلب (تحت السرير أو داخل خزانة الملابس) والتزم الصمت.",
+          }),
+          L({
+            zh: "三、牢握自保器具以作合法防卫自救，一键打000大声叫唤Police！",
+            en: `3. Call ${num} and ask for Police. Only defend yourself if you have no other option.`,
+            es: `3. Llama al ${num} y pide la policía (Police). Defiéndete solo si no tienes otra opción.`,
+            hi: `3. ${num} पर कॉल करें और पुलिस (Police) माँगें। अपना बचाव तभी करें जब कोई और रास्ता न हो।`,
+            vi: `3. Gọi ${num} và yêu cầu cảnh sát (Police). Chỉ tự vệ khi không còn lựa chọn nào khác.`,
+            ar: `3. اتصل بـ ${num} واطلب الشرطة (Police). لا تدافع عن نفسك إلا إذا لم يكن أمامك خيار آخر.`,
+          }),
         ];
-      } else if (has("抢", "打人", "殴打", "暴力", "尾随", "跟踪", "assault", "attack", "mugged", "robbed", "robbery", "followed", "stalk")) {
-        fallback.scenarioTitle = isZh ? "遭受当街斗殴 / 袭击 / 跟踪尾随 (Assault & Robbery)" : "Assault, robbery or being followed";
+      } else if (has("抢", "打人", "殴打", "暴力", "尾随", "跟踪", "assault", "attack", "mugged", "robbed", "robbery", "followed", "stalk",
+        "asalt", "agred", "atacar", "me robaron", "me sigue", "हमला", "लूट", "पीछा", "tấn công", "cướp", "bám theo", "bị đánh", "اعتداء", "هجوم", "سرقة", "يلاحق")) {
+        fallback.scenarioTitle = L({ zh: "遭受当街斗殴 / 袭击 / 跟踪尾随 (Assault & Robbery)", en: "Assault, robbery or being followed", es: "Agresión, robo o persecución (Assault & Robbery)", hi: "हमला, लूट या पीछा किया जाना (Assault & Robbery)", vi: "Bị tấn công, cướp hoặc bị bám theo (Assault & Robbery)", ar: "اعتداء أو سرقة أو ملاحقة (Assault & Robbery)" });
         fallback.englishTalk = "I was just assaulted and followed on the street by a suspect. I need immediate police support at [your address].";
-        fallback.chineseTalk = isZh
-          ? "我刚刚在街头遭到了人身尾随追踪和暴力打人袭击，我需要警察立即到场。定位在：【你的地址】附近。"
-          : "Tells the operator you were attacked and followed, and that you need police at your location now.";
-        fallback.actions = isZh ? [
-          "一、立刻快步撤退向有公共监控、安保或路人密集的明亮正规商店（如7-11或中餐馆）！",
-          "二、若面临财物胁迫，切记生命安全永远第一，顺势丢出钱包吸引罪犯目标，折身反跑！",
-          "三、安全后用公用电话或本机速打000，大喊 Chinese Interpreter 要求语音三方中文支持。"
-        ] : [
-          "1. Move quickly to a bright, busy place with cameras or security, such as a 7-Eleven or open shop.",
-          "2. If someone demands your belongings, your safety comes first. Hand them over or drop your wallet and get away.",
-          `3. Once safe, call ${content.emergency} and ask for Police. Ask for an interpreter if you need one.`
+        fallback.chineseTalk = L({
+          zh: "我刚刚在街头遭到了人身尾随追踪和暴力打人袭击，我需要警察立即到场。定位在：【你的地址】附近。",
+          en: "Tells the operator you were attacked and followed, and that you need police at your location now.",
+          es: "Le dice al operador que te atacaron y te siguieron, y que necesitas a la policía en tu ubicación ahora.",
+          hi: "ऑपरेटर को बताता है कि आप पर हमला हुआ और आपका पीछा किया गया, और आपको अभी अपनी जगह पर पुलिस चाहिए।",
+          vi: "Báo cho tổng đài viên rằng bạn vừa bị tấn công và bị bám theo, và bạn cần cảnh sát đến chỗ bạn ngay.",
+          ar: "يُخبر موظف الطوارئ بأنك تعرّضت لاعتداء وملاحقة، وأنك تحتاج إلى الشرطة في موقعك الآن.",
+        });
+        fallback.actions = [
+          L({
+            zh: "一、立刻快步撤退向有公共监控、安保或路人密集的明亮正规商店（如7-11或中餐馆）！",
+            en: "1. Move quickly to a bright, busy place with cameras or security, such as a 7-Eleven or open shop.",
+            es: "1. Ve rápido a un lugar iluminado y concurrido, con cámaras o seguridad, como un 7-Eleven o una tienda abierta.",
+            hi: "1. जल्दी से किसी रोशनी वाली, भीड़भाड़ वाली जगह जाएँ जहाँ कैमरे या सुरक्षाकर्मी हों, जैसे 7-Eleven या कोई खुली दुकान।",
+            vi: "1. Nhanh chóng đến nơi sáng đèn, đông người, có camera hoặc bảo vệ, như 7-Eleven hoặc cửa hàng đang mở.",
+            ar: "1. توجّه بسرعة إلى مكان مضاء ومزدحم فيه كاميرات أو حراسة، مثل 7-Eleven أو متجر مفتوح.",
+          }),
+          L({
+            zh: "二、若面临财物胁迫，切记生命安全永远第一，顺势丢出钱包吸引罪犯目标，折身反跑！",
+            en: "2. If someone demands your belongings, your safety comes first. Hand them over or drop your wallet and get away.",
+            es: "2. Si alguien te exige tus pertenencias, tu seguridad es lo primero. Entrégalas o suelta la cartera y aléjate.",
+            hi: "2. अगर कोई आपका सामान माँगे, तो आपकी सुरक्षा सबसे पहले है। सामान दे दें या बटुआ गिराकर वहाँ से निकल जाएँ।",
+            vi: "2. Nếu có người đòi đồ của bạn, an toàn của bạn là trên hết. Hãy đưa cho họ hoặc thả ví xuống rồi rời đi.",
+            ar: "2. إذا طالبك أحد بمتاعك، فسلامتك أولًا. سلّمه ما يطلب أو ارمِ محفظتك وابتعد.",
+          }),
+          L({
+            zh: "三、安全后用公用电话或本机速打000，大喊 Chinese Interpreter 要求语音三方中文支持。",
+            en: `3. Once safe, call ${num} and ask for Police. Ask for an interpreter if you need one.`,
+            es: `3. Cuando estés a salvo, llama al ${num} y pide la policía (Police). Pide un intérprete si lo necesitas.`,
+            hi: `3. सुरक्षित होते ही ${num} पर कॉल करें और पुलिस (Police) माँगें। ज़रूरत हो तो दुभाषिया माँगें।`,
+            vi: `3. Khi đã an toàn, gọi ${num} và yêu cầu cảnh sát (Police). Nếu cần, hãy yêu cầu thông dịch viên.`,
+            ar: `3. عندما تصبح في أمان، اتصل بـ ${num} واطلب الشرطة (Police). اطلب مترجمًا إن احتجت إليه.`,
+          }),
         ];
-      } else if (has("火", "烟", "爆炸", "燃烧", "起火", "fire", "smoke", "burning", "explosion")) {
-        fallback.scenarioTitle = isZh ? "住宅引发火灾 / 绝火断道 / 浓烟逃生 (Active Fire)" : "Fire or heavy smoke";
+      } else if (has("火", "烟", "爆炸", "燃烧", "起火", "fire", "smoke", "burning", "explosion",
+        "incendio", "fuego", "आग लग", "धुआँ", "धुआं", "cháy", "khói", "حريق", "دخان")) {
+        fallback.scenarioTitle = L({ zh: "住宅引发火灾 / 绝火断道 / 浓烟逃生 (Active Fire)", en: "Fire or heavy smoke", es: "Incendio o humo denso (Active Fire)", hi: "आग या घना धुआँ (Active Fire)", vi: "Cháy hoặc khói dày đặc (Active Fire)", ar: "حريق أو دخان كثيف (Active Fire)" });
         fallback.englishTalk = "A fire broke out at my apartment, there is thick smoke trapped! Send a fire brigade. I am at [your address].";
-        fallback.chineseTalk = isZh
-          ? "我的套房里现在引发了大火并产生了浓重毒烟，请火速派遣消防局救援队！我目前在【你的地址】。"
-          : "Tells the operator there is a fire with thick smoke at your home, asks for the fire brigade and gives your address.";
-        fallback.actions = isZh ? [
-          "一、如果走道全是黑烟，立刻拨下毛巾床单一股脑全部浸冷水湿捂口鼻，压低身子、猫腰匍匐贴地逃生！",
-          "二、手心贴门板测温，若发现楼下门把手已经发烫烫手，切莫开门！",
-          "三、快步撤退至通风顺风的露台或外窗，大声求救！"
-        ] : [
-          "1. If the hallway is full of smoke, cover your nose and mouth with a wet cloth and stay low as you get out.",
-          "2. Feel doors with the back of your hand. If a door or handle is hot, do not open it.",
-          "3. Get to a balcony or open window with fresh air and call out for help."
+        fallback.chineseTalk = L({
+          zh: "我的套房里现在引发了大火并产生了浓重毒烟，请火速派遣消防局救援队！我目前在【你的地址】。",
+          en: "Tells the operator there is a fire with thick smoke at your home, asks for the fire brigade and gives your address.",
+          es: "Le dice al operador que hay un incendio con humo denso en tu casa, pide a los bomberos y da tu dirección.",
+          hi: "ऑपरेटर को बताता है कि आपके घर में आग लगी है और घना धुआँ है, दमकल (फ़ायर ब्रिगेड) माँगता है और आपका पता बताता है।",
+          vi: "Báo cho tổng đài viên rằng nhà bạn đang cháy và có khói dày đặc, yêu cầu lính cứu hỏa và cho biết địa chỉ của bạn.",
+          ar: "يُخبر موظف الطوارئ بوجود حريق ودخان كثيف في منزلك، ويطلب فرقة الإطفاء ويذكر عنوانك.",
+        });
+        fallback.actions = [
+          L({
+            zh: "一、如果走道全是黑烟，立刻拨下毛巾床单一股脑全部浸冷水湿捂口鼻，压低身子、猫腰匍匐贴地逃生！",
+            en: "1. If the hallway is full of smoke, cover your nose and mouth with a wet cloth and stay low as you get out.",
+            es: "1. Si el pasillo está lleno de humo, cúbrete la nariz y la boca con un paño húmedo y sal agachado.",
+            hi: "1. अगर गलियारे में धुआँ भरा हो, तो गीले कपड़े से नाक और मुँह ढकें और झुककर बाहर निकलें।",
+            vi: "1. Nếu hành lang đầy khói, hãy che mũi và miệng bằng khăn ướt và cúi thấp người khi thoát ra.",
+            ar: "1. إذا امتلأ الممر بالدخان، غطِّ أنفك وفمك بقطعة قماش مبللة وابقَ منخفضًا أثناء الخروج.",
+          }),
+          L({
+            zh: "二、手心贴门板测温，若发现楼下门把手已经发烫烫手，切莫开门！",
+            en: "2. Feel doors with the back of your hand. If a door or handle is hot, do not open it.",
+            es: "2. Toca las puertas con el dorso de la mano. Si la puerta o el pomo están calientes, no la abras.",
+            hi: "2. दरवाज़ों को हाथ के पिछले हिस्से से छूकर देखें। अगर दरवाज़ा या हैंडल गर्म हो, तो उसे न खोलें।",
+            vi: "2. Dùng mu bàn tay chạm thử cửa. Nếu cửa hoặc tay nắm nóng, đừng mở.",
+            ar: "2. تحسّس الأبواب بظهر يدك. إذا كان الباب أو المقبض ساخنًا، فلا تفتحه.",
+          }),
+          L({
+            zh: "三、快步撤退至通风顺风的露台或外窗，大声求救！",
+            en: "3. Get to a balcony or open window with fresh air and call out for help.",
+            es: "3. Ve a un balcón o a una ventana abierta con aire fresco y pide ayuda en voz alta.",
+            hi: "3. ताज़ी हवा वाली किसी बालकनी या खुली खिड़की के पास जाएँ और ज़ोर से मदद के लिए पुकारें।",
+            vi: "3. Ra ban công hoặc cửa sổ đang mở có không khí trong lành và kêu to để được giúp.",
+            ar: "3. اذهب إلى شرفة أو نافذة مفتوحة فيها هواء نقي، ونادِ بصوت عالٍ طلبًا للمساعدة.",
+          }),
         ];
-      } else if (has("晕", "窒息", "过敏", "病", "血", "伤", "痛", "faint", "collapse", "unconscious", "breath", "allerg", "bleed", "injur", "hurt", "pain", "sick")) {
-        fallback.scenarioTitle = isZh ? "急性严重爆发伤病 / 休克晕厥 / 呼吸急停 (Medical Trauma)" : "Medical emergency";
+      } else if (has("晕", "窒息", "过敏", "病", "血", "伤", "痛", "faint", "collapse", "unconscious", "breath", "allerg", "bleed", "injur", "hurt", "pain", "sick",
+        "desmay", "inconsciente", "respir", "alergi", "sangr", "herid", "dolor", "बेहोश", "साँस", "सांस", "एलर्जी", "खून", "चोट", "दर्द",
+        "ngất", "bất tỉnh", "khó thở", "dị ứng", "chảy máu", "bị thương", "إغماء", "مغمى", "تنفس", "حساسية", "نزيف", "جرح", "ألم")) {
+        fallback.scenarioTitle = L({ zh: "急性严重爆发伤病 / 休克晕厥 / 呼吸急停 (Medical Trauma)", en: "Medical emergency", es: "Emergencia médica (Medical Trauma)", hi: "मेडिकल इमरजेंसी (Medical Trauma)", vi: "Cấp cứu y tế (Medical Trauma)", ar: "حالة طبية طارئة (Medical Trauma)" });
         fallback.englishTalk = "Emergency! Someone has collapsed and has severe breathing difficulty. Please send ambulance to [your address].";
-        fallback.chineseTalk = isZh
-          ? "紧急情况！这里有人突然晕厥跌倒，大口残重呼吸困难！请急速调派救护车到【你的地址】。"
-          : "Tells the operator someone has collapsed and is struggling to breathe, and asks for an ambulance to your address.";
-        fallback.actions = isZh ? [
-          "一、检查呼吸。如果病人尚存气但意识全无，立刻使其保持「侧卧复原体位」保持通调气道！",
-          "二、排查急性过敏，寻找 EpiPen 自助注射大腿侧！",
-          "三、生命休关的极速时刻，先点击按钮拨 000 先行抢救。"
-        ] : [
-          "1. Check their breathing. If they are breathing but unresponsive, roll them onto their side (recovery position) to keep the airway clear.",
-          "2. If it could be a severe allergic reaction, find their EpiPen and inject it into the outer thigh.",
-          `3. Don't wait. Call ${content.emergency} for an ambulance straight away.`
+        fallback.chineseTalk = L({
+          zh: "紧急情况！这里有人突然晕厥跌倒，大口残重呼吸困难！请急速调派救护车到【你的地址】。",
+          en: "Tells the operator someone has collapsed and is struggling to breathe, and asks for an ambulance to your address.",
+          es: "Le dice al operador que alguien se ha desplomado y le cuesta respirar, y pide una ambulancia a tu dirección.",
+          hi: "ऑपरेटर को बताता है कि कोई अचानक गिर पड़ा है और उसे साँस लेने में तकलीफ़ है, और आपके पते पर एम्बुलेंस माँगता है।",
+          vi: "Báo cho tổng đài viên rằng có người vừa ngã gục và khó thở, và yêu cầu xe cứu thương đến địa chỉ của bạn.",
+          ar: "يُخبر موظف الطوارئ بأن شخصًا انهار ويعاني صعوبة في التنفس، ويطلب سيارة إسعاف إلى عنوانك.",
+        });
+        fallback.actions = [
+          L({
+            zh: "一、检查呼吸。如果病人尚存气但意识全无，立刻使其保持「侧卧复原体位」保持通调气道！",
+            en: "1. Check their breathing. If they are breathing but unresponsive, roll them onto their side (recovery position) to keep the airway clear.",
+            es: "1. Comprueba si respira. Si respira pero no responde, ponlo de lado (posición lateral de seguridad) para mantener libre la vía respiratoria.",
+            hi: "1. साँस जाँचें। अगर व्यक्ति साँस ले रहा है पर कोई प्रतिक्रिया नहीं दे रहा, तो साँस का रास्ता खुला रखने के लिए उसे करवट (रिकवरी पोज़िशन) में लिटा दें।",
+            vi: "1. Kiểm tra hơi thở. Nếu người đó còn thở nhưng không phản ứng, hãy đặt họ nằm nghiêng (tư thế hồi phục) để giữ thông đường thở.",
+            ar: "1. تحقّق من تنفّسه. إذا كان يتنفس لكنه لا يستجيب، فاقلبه على جانبه (وضعية الإفاقة) لإبقاء مجرى الهواء مفتوحًا.",
+          }),
+          L({
+            zh: "二、排查急性过敏，寻找 EpiPen 自助注射大腿侧！",
+            en: "2. If it could be a severe allergic reaction, find their EpiPen and inject it into the outer thigh.",
+            es: "2. Si puede ser una reacción alérgica grave, busca su EpiPen e inyéctalo en la parte externa del muslo.",
+            hi: "2. अगर यह गंभीर एलर्जी रिएक्शन हो सकता है, तो उनका EpiPen ढूँढें और जाँघ के बाहरी हिस्से में लगाएँ।",
+            vi: "2. Nếu có thể là phản ứng dị ứng nặng, hãy tìm bút EpiPen của họ và tiêm vào mặt ngoài đùi.",
+            ar: "2. إذا كان الأمر قد يكون تحسّسًا شديدًا، فابحث عن قلم EpiPen الخاص به واحقنه في الجزء الخارجي من الفخذ.",
+          }),
+          L({
+            zh: "三、生命休关的极速时刻，先点击按钮拨 000 先行抢救。",
+            en: `3. Don't wait. Call ${num} for an ambulance straight away.`,
+            es: `3. No esperes. Llama al ${num} y pide una ambulancia (Ambulance) de inmediato.`,
+            hi: `3. इंतज़ार न करें। तुरंत ${num} पर कॉल करके एम्बुलेंस (Ambulance) बुलाएँ।`,
+            vi: `3. Đừng chờ đợi. Gọi ngay ${num} để yêu cầu xe cứu thương (Ambulance).`,
+            ar: `3. لا تنتظر. اتصل فورًا بـ ${num} واطلب سيارة إسعاف (Ambulance).`,
+          }),
         ];
       }
       setCustomOutputs(fallback);
@@ -1184,19 +1278,24 @@ export default function EmergencyAidDemo() {
                     <div className="flex items-center justify-between mb-1.5 flex-wrap gap-2">
                       <div className="flex items-center space-x-2">
                         <MapPin size={18} className="text-[#1d1d1f]" />
-                        <h4 className="text-sm font-black text-gray-900 uppercase tracking-wide">{isZh ? '附近救援点 · Google 地图' : 'Nearby help · Google Maps'}</h4>
+                        <h4 className="text-sm font-black text-gray-900 uppercase tracking-wide">{L({ zh: '附近救援点 · Google 地图', en: 'Nearby help · Google Maps', es: 'Ayuda cercana · Google Maps', hi: 'आस-पास मदद · Google Maps', vi: 'Trợ giúp gần bạn · Google Maps', ar: 'مساعدة قريبة · Google Maps' })}</h4>
                       </div>
-                      <span className="text-[10px] text-gray-400 font-bold">{isZh ? '离你最近的实体求助点' : 'Closest places to get help in person'}</span>
+                      <span className="text-[10px] text-gray-400 font-bold">{L({ zh: '离你最近的实体求助点', en: 'Closest places to get help in person', es: 'Los lugares más cercanos para pedir ayuda en persona', hi: 'व्यक्तिगत रूप से मदद पाने की सबसे नज़दीकी जगहें', vi: 'Những nơi gần nhất để được trợ giúp trực tiếp', ar: 'أقرب الأماكن لطلب المساعدة شخصيًا' })}</span>
                     </div>
-                    {isZh ? (
-                      <p className="text-[11px] text-gray-500 leading-relaxed mb-4">
-                        拨打 {content.emergency} 之后，下一个问题往往是 "我人应该往哪走"。我们对接了真实的 <strong>Places API 邻近位置检索</strong> 与 <strong>Routes API 实时路径规划</strong>，为您精准引路。
-                      </p>
-                    ) : (
-                      <p className="text-[11px] text-gray-500 leading-relaxed mb-4">
-                        After calling {content.emergency}, the next question is often "where do I go?". We use live <strong>Places API nearby search</strong> and <strong>Routes API directions</strong> to guide you there.
-                      </p>
-                    )}
+                    <p className="text-[11px] text-gray-500 leading-relaxed mb-4">
+                      {L({
+                        zh: `拨打 ${content.emergency} 之后，下一个问题往往是 "我人应该往哪走"。我们对接了真实的 `,
+                        en: `After calling ${content.emergency}, the next question is often "where do I go?". We use live `,
+                        es: `Después de llamar al ${content.emergency}, la siguiente pregunta suele ser "¿a dónde voy?". Usamos `,
+                        hi: `${content.emergency} पर कॉल करने के बाद अगला सवाल अक्सर होता है "मैं कहाँ जाऊँ?"। हम लाइव `,
+                        vi: `Sau khi gọi ${content.emergency}, câu hỏi tiếp theo thường là "tôi nên đi đâu?". Chúng tôi dùng `,
+                        ar: `بعد الاتصال بـ ${content.emergency}، غالبًا ما يكون السؤال التالي "إلى أين أذهب؟". نستخدم `,
+                      })}
+                      <strong>{L({ zh: 'Places API 邻近位置检索', en: 'Places API nearby search', es: 'la búsqueda cercana en vivo de Places API', hi: 'Places API नज़दीकी खोज', vi: 'tìm kiếm lân cận Places API', ar: 'البحث المباشر عن الأماكن القريبة عبر Places API' })}</strong>
+                      {L({ zh: ' 与 ', en: ' and ', es: ' y ', hi: ' और ', vi: ' và ', ar: ' و' })}
+                      <strong>{L({ zh: 'Routes API 实时路径规划', en: 'Routes API directions', es: 'las indicaciones de Routes API', hi: 'Routes API दिशा-निर्देशों', vi: 'chỉ đường Routes API', ar: 'الاتجاهات عبر Routes API' })}</strong>
+                      {L({ zh: '，为您精准引路。', en: ' to guide you there.', es: ' para guiarte hasta allí.', hi: ' से आपको वहाँ तक पहुँचाते हैं।', vi: ' theo thời gian thực để dẫn bạn đến đó.', ar: ' لإرشادك إلى هناك.' })}
+                    </p>
                     <RescueMap country={country} countryName={countryName} />
                   </div>
 
@@ -1347,8 +1446,8 @@ export default function EmergencyAidDemo() {
                         <div className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 pt-0.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                           {onDeviceStatus === 'available'
-                            ? (isZh ? '本机已就绪：断网也能由端侧 Gemini Nano 本地生成' : 'Ready on this device: Gemini Nano can generate a plan even offline')
-                            : (isZh ? '本浏览器支持端侧 AI：首次使用会下载离线模型' : 'This browser supports on-device AI: the offline model downloads on first use')}
+                            ? L({ zh: '本机已就绪：断网也能由端侧 Gemini Nano 本地生成', en: 'Ready on this device: Gemini Nano can generate a plan even offline', es: 'Listo en este dispositivo: Gemini Nano puede generar un plan incluso sin conexión', hi: 'इस डिवाइस पर तैयार: Gemini Nano ऑफ़लाइन भी योजना बना सकता है', vi: 'Sẵn sàng trên thiết bị này: Gemini Nano có thể tạo kế hoạch ngay cả khi ngoại tuyến', ar: 'جاهز على هذا الجهاز: يمكن لـ Gemini Nano إعداد خطة حتى دون اتصال' })
+                            : L({ zh: '本浏览器支持端侧 AI：首次使用会下载离线模型', en: 'This browser supports on-device AI: the offline model downloads on first use', es: 'Este navegador admite IA en el dispositivo: el modelo sin conexión se descarga la primera vez que lo uses', hi: 'यह ब्राउज़र ऑन-डिवाइस AI सपोर्ट करता है: ऑफ़लाइन मॉडल पहली बार इस्तेमाल करने पर डाउनलोड होगा', vi: 'Trình duyệt này hỗ trợ AI trên thiết bị: mô hình ngoại tuyến sẽ được tải xuống ở lần dùng đầu tiên', ar: 'هذا المتصفح يدعم الذكاء الاصطناعي على الجهاز: يُنزَّل النموذج دون اتصال عند أول استخدام' })}
                         </div>
                       )}
                     </div>
@@ -1368,10 +1467,15 @@ export default function EmergencyAidDemo() {
                             <div className="bg-emerald-50 border border-emerald-200 px-3.5 py-2.5 rounded-2xl flex items-start gap-2.5 shadow-sm">
                               <span className="text-base leading-none shrink-0">📴</span>
                               <p className="text-[10px] text-emerald-900 leading-relaxed font-semibold">
-                                <strong className="font-black">{isZh ? '端侧离线生成 · On-device (Gemini Nano).' : 'Generated on-device (Gemini Nano).'}</strong>{' '}
-                                {isZh
-                                  ? '本方案由 Chrome 内置 AI 在你的设备本地生成，全程无需联网、数据不出手机——断网时也能救命。'
-                                  : "This plan was created by Chrome's built-in AI right on your device. No internet needed and your data never leaves your phone, so it works even without signal."}
+                                <strong className="font-black">{L({ zh: '端侧离线生成 · On-device (Gemini Nano).', en: 'Generated on-device (Gemini Nano).', es: 'Generado en el dispositivo (Gemini Nano).', hi: 'डिवाइस पर बनाया गया (Gemini Nano)।', vi: 'Được tạo trên thiết bị (Gemini Nano).', ar: 'أُنشئ على الجهاز (Gemini Nano).' })}</strong>{' '}
+                                {L({
+                                  zh: '本方案由 Chrome 内置 AI 在你的设备本地生成，全程无需联网、数据不出手机——断网时也能救命。',
+                                  en: "This plan was created by Chrome's built-in AI right on your device. No internet needed and your data never leaves your phone, so it works even without signal.",
+                                  es: 'Este plan lo creó la IA integrada de Chrome directamente en tu dispositivo. No necesita internet y tus datos nunca salen de tu teléfono, así que funciona incluso sin señal.',
+                                  hi: 'यह योजना Chrome के बिल्ट-इन AI ने सीधे आपके डिवाइस पर बनाई है। इंटरनेट की ज़रूरत नहीं और आपका डेटा फ़ोन से बाहर नहीं जाता, इसलिए सिग्नल न होने पर भी काम करती है।',
+                                  vi: 'Kế hoạch này được AI tích hợp sẵn của Chrome tạo ngay trên thiết bị của bạn. Không cần internet và dữ liệu không bao giờ rời khỏi điện thoại, nên vẫn dùng được khi không có sóng.',
+                                  ar: 'أنشأ الذكاء الاصطناعي المدمج في Chrome هذه الخطة مباشرة على جهازك. لا حاجة إلى الإنترنت ولا تغادر بياناتك هاتفك أبدًا، لذا تعمل حتى دون تغطية.',
+                                })}
                               </p>
                             </div>
                           )}

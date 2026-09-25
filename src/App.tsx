@@ -16,7 +16,7 @@ import { initAuth, googleSignIn, consumeRedirectResult, logout } from './lib/fir
 import { createGmailDraft } from './lib/gmail';
 import { User } from 'firebase/auth';
 import { useLocale, LANGUAGES, REGIONS, getCountryName } from './lib/locale';
-import { useT } from './lib/i18n';
+import { useT, useL } from './lib/i18n';
 
 type TabView = 'letter' | 'shield' | 'legalhub' | 'emergency' | 'roadmap' | 'history' | 'hearing' | 'lingo' | 'askphoto';
 
@@ -24,7 +24,7 @@ export default function App() {
   const { country, language, region, setLanguage, setRegion } = useLocale();
   const t = useT();
   const regionOptions = REGIONS[country] || [];
-  const isZh = language === 'zh';
+  const L = useL();
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabView>('letter');
@@ -58,9 +58,9 @@ export default function App() {
         try {
           const d = JSON.parse(pending);
           await createGmailDraft(res.accessToken, d.recipient, d.subject, d.body);
-          showToast(isZh ? '✅ 草稿已存进你的 Gmail！打开 Gmail 的「草稿」即可查看并发送。' : '✅ Draft saved to your Gmail! Open Gmail → Drafts to review and send it.', 'success');
+          showToast(L({ zh: '✅ 草稿已存进你的 Gmail！打开 Gmail 的「草稿」即可查看并发送。', en: '✅ Draft saved to your Gmail! Open Gmail → Drafts to review and send it.', es: '✅ ¡Borrador guardado en tu Gmail! Abre Gmail → Borradores para revisarlo y enviarlo.', hi: '✅ ड्राफ़्ट आपके Gmail में सहेज दिया गया! देखने और भेजने के लिए Gmail → Drafts खोलें।', vi: '✅ Đã lưu bản nháp vào Gmail của bạn! Mở Gmail → Thư nháp để xem lại và gửi.', ar: '✅ تم حفظ المسودة في Gmail! افتح «المسودات» في Gmail لمراجعتها وإرسالها.' }), 'success');
         } catch (e: any) {
-          showToast((isZh ? '草稿创建失败：' : 'Failed to create draft: ') + (e?.message || e), 'error');
+          showToast(L({ zh: '草稿创建失败：', en: 'Failed to create draft: ', es: 'No se pudo crear el borrador: ', hi: 'ड्राफ़्ट नहीं बन सका: ', vi: 'Không tạo được bản nháp: ', ar: 'تعذّر إنشاء المسودة: ' }) + (e?.message || e), 'error');
         }
       }
     });
@@ -139,7 +139,7 @@ export default function App() {
           >
             🇦🇺 {getCountryName('AU', language)}
             <span className="text-[9px] font-black text-primary bg-primary/10 border border-primary/20 rounded-full px-1.5 py-0.5 whitespace-nowrap">
-              {isZh ? '墨尔本首发' : 'Melbourne'}
+              {L({ zh: '墨尔本首发', en: 'Melbourne', es: 'Melbourne', hi: 'मेलबर्न', vi: 'Melbourne', ar: 'ملبورن' })}
             </span>
           </span>
           {regionOptions.length > 0 && (
@@ -224,10 +224,11 @@ export default function App() {
             )}
             <footer className="mt-16 pt-6 border-t border-hairline flex flex-col sm:flex-row items-center justify-center gap-x-3 gap-y-1.5 text-[11px] text-muted-soft font-medium text-center">
               <span className="inline-flex items-center gap-1.5 bg-surface-soft border border-hairline rounded-full px-3 py-1">
-                {isZh ? (
+                {language === 'zh' ? (
+                  // zh-only: the Chinese contest hashtags have no counterpart in other languages.
                   <>🏆 GDG 出海创想赛参赛作品 <span className="text-primary font-bold">#GDG出海创想赛</span> <span className="text-primary font-bold">#Google开发者大会</span></>
                 ) : (
-                  <>🏆 Entry in the GDG Go-Global Innovation Challenge</>
+                  <>{L({ zh: '🏆 GDG 出海创想赛参赛作品', en: '🏆 Entry in the GDG Go-Global Innovation Challenge', es: '🏆 Proyecto participante en el GDG Go-Global Innovation Challenge', hi: '🏆 GDG Go-Global Innovation Challenge की प्रविष्टि', vi: '🏆 Tác phẩm dự thi GDG Go-Global Innovation Challenge', ar: '🏆 مشاركة في GDG Go-Global Innovation Challenge' })}</>
                 )}
               </span>
               <span>Built with Gemini · Google Search Grounding · Firebase</span>

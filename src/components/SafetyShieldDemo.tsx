@@ -3,7 +3,7 @@ import { Camera, ShieldCheck, ArrowRight, ShieldAlert, FileText, CheckCircle2, R
 import { motion, AnimatePresence } from 'motion/react';
 import Markdown from 'react-markdown';
 import { useLocale, getCountryName } from '../lib/locale';
-import { useT, type StringKey } from '../lib/i18n';
+import { useT, useL, type StringKey } from '../lib/i18n';
 import GroundingSources from './GroundingSources';
 import FallbackNotice from './FallbackNotice';
 import { showToast } from '../lib/toast';
@@ -56,7 +56,7 @@ const SCAM_FLAG_GROUPS: { emoji: string; categoryKey: StringKey; itemKeys: Strin
 export default function SafetyShieldDemo() {
   const { country, language, region } = useLocale();
   const t = useT();
-  const isZh = language === 'zh';
+  const L = useL();
   const [activeTab, setActiveTab] = useState<SubmoduleType>('valuation');
   const [appState, setAppState] = useState<AppState>('upload');
 
@@ -276,7 +276,7 @@ export default function SafetyShieldDemo() {
       <div className="mb-8 relative z-10">
         <div className="flex items-center space-x-2 mb-2">
           <ShieldCheck size={24} className="text-[#ff5a3c]" />
-          <p className="text-gray-500 text-sm font-bold tracking-widest uppercase font-mono">SAFETY SHIELD</p>
+          <p className="text-gray-500 text-sm font-bold tracking-widest uppercase font-mono">{L({ zh: 'SAFETY SHIELD', en: 'SAFETY SHIELD', es: 'ESCUDO DE SEGURIDAD', hi: 'सुरक्षा कवच', vi: 'LÁ CHẮN AN TOÀN', ar: 'درع الأمان' })}</p>
         </div>
         <h2 className="text-3xl md:text-4xl font-extrabold text-[#1d1d1f] leading-tight font-display">
           {t('ss_title')}
@@ -561,15 +561,15 @@ export default function SafetyShieldDemo() {
                             analysis.safetyLevel === 'danger' ? 'bg-red-100 text-red-800' : 
                             analysis.safetyLevel === 'warning' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
                           }`}>
-                            🛡️ {isZh ? '安全级别' : 'Safety level'}: {
-                              analysis.safetyLevel === 'danger' ? (isZh ? 'DANGER / 极其危险' : 'DANGER') : 
-                              analysis.safetyLevel === 'warning' ? (isZh ? 'WARNING / 潜在隐患' : 'WARNING') : (isZh ? 'SAFE / 安全合规' : 'SAFE')
+                            🛡️ {L({ zh: '安全级别', en: 'Safety level', es: 'Nivel de seguridad', hi: 'सुरक्षा स्तर', vi: 'Mức độ an toàn', ar: 'مستوى الأمان' })}: {
+                              analysis.safetyLevel === 'danger' ? L({ zh: 'DANGER / 极其危险', en: 'DANGER', es: 'PELIGRO', hi: 'ख़तरा', vi: 'NGUY HIỂM', ar: 'خطر' }) : 
+                              analysis.safetyLevel === 'warning' ? L({ zh: 'WARNING / 潜在隐患', en: 'WARNING', es: 'ADVERTENCIA', hi: 'चेतावनी', vi: 'CẢNH BÁO', ar: 'تحذير' }) : L({ zh: 'SAFE / 安全合规', en: 'SAFE', es: 'SEGURO', hi: 'सुरक्षित', vi: 'AN TOÀN', ar: 'آمن' })
                             }
                           </span>
                         </div>
                         {analysis.riskAnalysis && (
                           <div className="text-xs text-gray-600 leading-relaxed font-sans">
-                            <strong className="text-gray-900 block mb-1 font-bold">🧠 {isZh ? '深度安全漏洞研判:' : 'In-depth risk analysis:'}</strong>
+                            <strong className="text-gray-900 block mb-1 font-bold">🧠 {L({ zh: '深度安全漏洞研判:', en: 'In-depth risk analysis:', es: 'Análisis de riesgos a fondo:', hi: 'गहन जोखिम विश्लेषण:', vi: 'Phân tích rủi ro chuyên sâu:', ar: 'تحليل معمّق للمخاطر:' })}</strong>
                             <p>{analysis.riskAnalysis}</p>
                           </div>
                         )}
@@ -581,7 +581,7 @@ export default function SafetyShieldDemo() {
                       <div className="bg-blue-50/30 p-5 rounded-2xl border border-blue-100/60 flex flex-col gap-2">
                         <h4 className="text-xs font-black text-blue-900 uppercase tracking-widest flex items-center gap-1.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                          <span>{isZh ? '维权及法理参考依据' : 'Legal references & your rights'} ({analysis.lawReferences.length})</span>
+                          <span>{L({ zh: '维权及法理参考依据', en: 'Legal references & your rights', es: 'Referencias legales y tus derechos', hi: 'कानूनी संदर्भ और आपके अधिकार', vi: 'Căn cứ pháp lý & quyền của bạn', ar: 'المراجع القانونية وحقوقك' })} ({analysis.lawReferences.length})</span>
                         </h4>
                         <ul className="space-y-1.5 list-disc list-inside">
                           {analysis.lawReferences.map((ref, idx) => (
@@ -598,7 +598,7 @@ export default function SafetyShieldDemo() {
                       <div className="bg-amber-50/30 p-5 rounded-2xl border border-amber-100/60 flex flex-col gap-2">
                         <h4 className="text-xs font-black text-amber-900 uppercase tracking-widest flex items-center gap-1.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                          <span>{isZh ? '紧急防御阻断操作' : 'Urgent protective actions'} ({analysis.urgentActions.length})</span>
+                          <span>{L({ zh: '紧急防御阻断操作', en: 'Urgent protective actions', es: 'Acciones de protección urgentes', hi: 'तत्काल सुरक्षा कदम', vi: 'Hành động bảo vệ khẩn cấp', ar: 'إجراءات حماية عاجلة' })} ({analysis.urgentActions.length})</span>
                         </h4>
                         <ul className="space-y-1.5">
                           {analysis.urgentActions.map((act, idx) => (

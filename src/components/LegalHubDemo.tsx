@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Scale, Phone, Shield, BookOpen, AlertCircle, ExternalLink, Loader2, ListChecks, ShieldCheck, Check, ArrowRight } from 'lucide-react';
 import { useLocale, getCountryContent, getCountryName, REGIONS } from '../lib/locale';
-import { useT, StringKey } from '../lib/i18n';
+import { useT, useL, StringKey } from '../lib/i18n';
 import GroundingSources, { Grounding } from './GroundingSources';
 import { showToast } from '../lib/toast';
 
@@ -116,7 +116,7 @@ export default function LegalHubDemo({ onOpenLetterOfficer }: { onOpenLetterOffi
   const countryName = getCountryName(country, language);
   const place = `${countryName}${region ? ' · ' + region : ''}`;
   const regionOptions = REGIONS[country] || [];
-  const isZh = language === 'zh';
+  const L = useL();
 
   const [selectedDomain, setSelectedDomain] = useState<Domain>('rent');
   const [data, setData] = useState<LegalData | null>(null);
@@ -205,7 +205,7 @@ export default function LegalHubDemo({ onOpenLetterOfficer }: { onOpenLetterOffi
       {/* Content */}
       {error ? (
         <div className="max-w-6xl mx-auto bg-white border border-hairline rounded-3xl p-10 text-center text-muted">
-          {t('lh_error')}{isZh ? '「' : ' "'}{countryName} {t(('dom_' + selectedDomain) as StringKey)} legal aid{isZh ? '」' : '"'}
+          {t('lh_error')}{L({ zh: '「', en: ' "', es: ' "', hi: ' "', vi: ' "', ar: ' «' })}{countryName} {t(('dom_' + selectedDomain) as StringKey)} legal aid{L({ zh: '」', en: '"', es: '"', hi: '"', vi: '"', ar: '»' })}
         </div>
       ) : (
         <>
@@ -289,9 +289,9 @@ export default function LegalHubDemo({ onOpenLetterOfficer }: { onOpenLetterOffi
               <h3 className="text-lg font-black text-ink mb-4">{loading ? t('lh_generating') : scenario?.title}</h3>
 
               <div className="bg-surface-soft p-5 rounded-3xl border border-hairline mb-6">
-                <h4 className="text-xs font-extrabold text-ink mb-3 uppercase">🛡️ {isZh ? '专家级抗辩自卫流程' : 'Expert self-defence playbook'}</h4>
+                <h4 className="text-xs font-extrabold text-ink mb-3 uppercase">🛡️ {L({ zh: '专家级抗辩自卫流程', en: 'Expert self-defence playbook', es: 'Guía experta para defender tus derechos', hi: 'अपने बचाव की विशेषज्ञ गाइड', vi: 'Cẩm nang tự bảo vệ chuyên sâu', ar: 'دليل الخبراء للدفاع عن حقوقك' })}</h4>
                 <div className="space-y-4">
-                  {(loading ? [isZh ? 'AI 正在按当地法律生成步骤…' : 'AI is drafting steps based on local law…'] : (scenario?.steps || [])).map((step, idx) => (
+                  {(loading ? [L({ zh: 'AI 正在按当地法律生成步骤…', en: 'AI is drafting steps based on local law…', es: 'La IA está redactando los pasos según la ley local…', hi: 'AI स्थानीय क़ानून के आधार पर कदम तैयार कर रहा है…', vi: 'AI đang soạn các bước theo luật địa phương…', ar: 'يصوغ الذكاء الاصطناعي الخطوات وفق القانون المحلي…' })] : (scenario?.steps || [])).map((step, idx) => (
                     <div key={idx} className="flex gap-3 text-xs leading-normal">
                       <div className="w-5 h-5 rounded-full bg-ink text-white flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">{idx + 1}</div>
                       <div className="text-body">{step}</div>
@@ -308,30 +308,30 @@ export default function LegalHubDemo({ onOpenLetterOfficer }: { onOpenLetterOffi
                   </span>
                   {scenario?.template && (
                     <button
-                      onClick={() => { navigator.clipboard.writeText(scenario.template); showToast(isZh ? '模板已复制到剪贴板!' : 'Template copied to clipboard!', 'success'); }}
+                      onClick={() => { navigator.clipboard.writeText(scenario.template); showToast(L({ zh: '模板已复制到剪贴板!', en: 'Template copied to clipboard!', es: '¡Plantilla copiada al portapapeles!', hi: 'टेम्पलेट क्लिपबोर्ड पर कॉपी हो गया!', vi: 'Đã sao chép mẫu vào bộ nhớ tạm!', ar: 'تم نسخ النموذج إلى الحافظة!' }), 'success'); }}
                       className="text-primary hover:text-ink font-bold cursor-pointer transition-colors text-[11px]"
-                    >💡 {isZh ? '复制信件草案' : 'Copy letter draft'}</button>
+                    >💡 {L({ zh: '复制信件草案', en: 'Copy letter draft', es: 'Copiar borrador de carta', hi: 'पत्र का ड्राफ़्ट कॉपी करें', vi: 'Sao chép bản nháp thư', ar: 'نسخ مسودة الرسالة' })}</button>
                   )}
                 </div>
                 <textarea
                   className="w-full flex-1 min-h-[220px] bg-neutral-900 text-on-dark p-4 rounded-2xl font-mono text-xs whitespace-pre-wrap leading-relaxed shadow-inner border border-neutral-800 focus:outline-none"
-                  value={loading ? (isZh ? '正在生成英文申诉模板…' : 'Generating English letter template…') : (scenario?.template || '')}
+                  value={loading ? L({ zh: '正在生成英文申诉模板…', en: 'Generating English letter template…', es: 'Generando plantilla de carta en inglés…', hi: 'अंग्रेज़ी पत्र टेम्पलेट बन रहा है…', vi: 'Đang tạo mẫu thư tiếng Anh…', ar: 'جارٍ إنشاء نموذج رسالة بالإنجليزية…' }) : (scenario?.template || '')}
                   readOnly
                 />
                 <div className="mt-4 border-t border-hairline pt-4 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
                   <p className="text-[11px] text-muted-soft leading-normal max-w-sm">
-                    {isZh ? (
-                      <>这是<strong className="text-muted">通用起草模板</strong>。要针对<strong className="text-muted">你手里那张具体的信/罚单</strong>生成个性化抗辩，请交给信件官——它会拍照读懂原件再逐条回。</>
-                    ) : (
-                      <>This is a <strong className="text-muted">generic draft template</strong>. For a personalised response to <strong className="text-muted">the specific letter or fine in your hand</strong>, use the Letter Officer — it reads a photo of the original and replies point by point.</>
-                    )}
+                    {L({ zh: '这是', en: 'This is a ', es: 'Esta es una ', hi: 'यह एक ', vi: 'Đây là ', ar: 'هذا ' })}
+                    <strong className="text-muted">{L({ zh: '通用起草模板', en: 'generic draft template', es: 'plantilla de borrador genérica', hi: 'सामान्य ड्राफ़्ट टेम्पलेट', vi: 'mẫu soạn thảo chung', ar: 'نموذج صياغة عام' })}</strong>
+                    {L({ zh: '。要针对', en: '. For a personalised response to ', es: '. Para una respuesta personalizada a ', hi: ' है। ', vi: '. Để có phản hồi riêng cho ', ar: '. للحصول على ردّ مخصّص على ' })}
+                    <strong className="text-muted">{L({ zh: '你手里那张具体的信/罚单', en: 'the specific letter or fine in your hand', es: 'la carta o multa concreta que tienes en la mano', hi: 'आपके हाथ में मौजूद उसी पत्र या जुर्माने', vi: 'đúng lá thư hoặc giấy phạt bạn đang cầm', ar: 'الرسالة أو المخالفة المحددة التي بين يديك' })}</strong>
+                    {L({ zh: '生成个性化抗辩，请交给信件官——它会拍照读懂原件再逐条回。', en: ', use the Letter Officer — it reads a photo of the original and replies point by point.', es: ', usa Letter Officer: lee una foto del original y responde punto por punto.', hi: ' का व्यक्तिगत जवाब पाने के लिए Letter Officer का उपयोग करें — यह मूल पत्र की फ़ोटो पढ़कर हर बिंदु का जवाब देता है।', vi: ', hãy dùng Letter Officer — nó đọc ảnh bản gốc và trả lời từng điểm.', ar: '، استخدم Letter Officer — فهو يقرأ صورة الأصل ويردّ نقطةً بنقطة.' })}
                   </p>
                   <button
                     onClick={() => onOpenLetterOfficer?.()}
                     disabled={!onOpenLetterOfficer}
                     className="cta-3d inline-flex items-center gap-1.5 px-5 py-2.5 text-sm font-semibold shrink-0 disabled:opacity-40 disabled:shadow-none"
                   >
-                    {isZh ? '用信件官个性化这封信' : 'Personalise with Letter Officer'} <ArrowRight size={16} />
+                    {L({ zh: '用信件官个性化这封信', en: 'Personalise with Letter Officer', es: 'Personalizar con Letter Officer', hi: 'Letter Officer से व्यक्तिगत बनाएँ', vi: 'Cá nhân hóa với Letter Officer', ar: 'خصّصها عبر Letter Officer' })} <ArrowRight size={16} />
                   </button>
                 </div>
               </div>
