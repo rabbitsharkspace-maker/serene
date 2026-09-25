@@ -1,4 +1,5 @@
 import React from 'react';
+import { pickLang } from '../lib/i18n';
 
 export function renderDocumentHTML(
   type: 'fine' | 'coe' | 'bond' | 'plagiarism' | 'noise' | 'utility',
@@ -20,7 +21,7 @@ export function renderDocumentHTML(
     return (
       <span 
         className="bg-neutral-950 text-white font-mono rounded px-1.5 py-0.5 font-bold border border-neutral-900 select-none animate-pulse inline-block"
-        title={language === 'zh' ? `🛡️ ${category} 已由隐私脱敏盾打码` : `🛡️ ${category} redacted by Privacy Shield`}
+        title={pickLang({ zh: `🛡️ ${category} 已由隐私脱敏盾打码`, en: `🛡️ ${category} redacted by Privacy Shield`, es: `🛡️ ${category} ocultado por el Escudo de privacidad`, hi: `🛡️ ${category} गोपनीयता कवच द्वारा छिपाया गया`, vi: `🛡️ ${category} đã được Lá chắn quyền riêng tư che đi`, ar: `🛡️ ${category} حُجب بواسطة درع الخصوصية` }, language)}
       >
         [REDACTED_{category}]
       </span>

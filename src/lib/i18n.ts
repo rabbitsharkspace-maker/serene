@@ -1227,3 +1227,17 @@ export function useT() {
     return out;
   };
 }
+
+// Inline strings that live next to their component instead of in STRINGS (demo content,
+// long copy). zh and en are required; other languages fall back to en, since non-Chinese
+// readers can't read the zh text.
+export type Localized = { zh: string; en: string } & Partial<Record<Exclude<Lang, 'zh' | 'en'>, string>>;
+
+export function pickLang(l: Localized, language: string): string {
+  return (l as Partial<Record<Lang, string>>)[language as Lang] ?? (language === 'zh' ? l.zh : l.en);
+}
+
+export function useL() {
+  const { language } = useLocale();
+  return (l: Localized): string => pickLang(l, language);
+}
