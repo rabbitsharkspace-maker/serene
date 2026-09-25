@@ -5,7 +5,7 @@
 // Join is login-free: a friend scans the QR (…/?meetup=CODE) and subscribes to the same room.
 // Every call is wrapped so a denied/offline Firestore never crashes the planner — the UI
 // falls back to local-only mode and keeps working.
-import { db } from './firebase';
+import { getDb } from './firebase';
 import {
   doc, getDoc, setDoc, deleteDoc, onSnapshot, collection, serverTimestamp,
 } from 'firebase/firestore';
@@ -26,9 +26,9 @@ function warnOnce(tag: string, e: unknown) {
   console.warn(`[meetup] ${tag} (local-only fallback):`, e);
 }
 
-const roomRef = (code: string) => doc(db, 'meetups', code);
-const partsRef = (code: string) => collection(db, 'meetups', code, 'participants');
-const partRef = (code: string, id: string) => doc(db, 'meetups', code, 'participants', id);
+const roomRef = (code: string) => doc(getDb(), 'meetups', code);
+const partsRef = (code: string) => collection(getDb(), 'meetups', code, 'participants');
+const partRef = (code: string, id: string) => doc(getDb(), 'meetups', code, 'participants', id);
 
 // Stable per-device identity so a person edits/owns their own participant across refreshes.
 export function getClientId(): string {

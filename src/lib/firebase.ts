@@ -1,14 +1,29 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, User, signOut as firebaseSignOut } from 'firebase/auth';
-import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
+import { getAuth, Auth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, User, signOut as firebaseSignOut } from 'firebase/auth';
+import { getFirestore, Firestore, doc, getDocFromServer } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json'; // adjust path to project root
 
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+// firebase-applet-config.json ships as an empty template. Without it the app runs in local
+// mode: no sign-in or cloud sync, everything stays in localStorage.
+export const isFirebaseConfigured = Boolean(firebaseConfig.apiKey && firebaseConfig.projectId);
+
+const app = isFirebaseConfigured ? initializeApp(firebaseConfig) : null;
+export const auth: Auth | null = app ? getAuth(app) : null;
+const db: Firestore | null = app ? getFirestore(app, firebaseConfig.firestoreDatabaseId || '(default)') : null;
+
+// Throws in local mode; every caller already catches and falls back to localStorage.
+export function getDb(): Firestore {
+  if (!db) throw new Error('Firebase is not configured (local mode)');
+  return db;
+}
+
+if (!isFirebaseConfigured) {
+  console.info('[Serene] Firebase not configured — running in local mode (no sign-in / cloud sync).');
+}
 
 // Validate connection to Firestore
 async function testConnection() {
+  if (!db) return;
   try {
     await getDocFromServer(doc(db, 'test', 'connection'));
   } catch (error) {
@@ -45,11 +60,11 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   const errInfo: FirestoreErrorInfo = {
     error: error instanceof Error ? error.message : String(error),
     authInfo: {
-      userId: auth.currentUser?.uid,
-      email: auth.currentUser?.email,
-      emailVerified: auth.currentUser?.emailVerified,
-      isAnonymous: auth.currentUser?.isAnonymous,
-      tenantId: auth.currentUser?.tenantId,
+      userId: auth?.currentUser?.uid,
+      email: auth?.currentUser?.email,
+      emailVerified: auth?.currentUser?.emailVerified,
+      isAnonymous: auth?.currentUser?.isAnonymous,
+      tenantId: auth?.currentUser?.tenantId,
     },
     operationType,
     path
@@ -69,6 +84,10 @@ export const initAuth = (
   onAuthSuccess?: (user: User, token: string) => void,
   onAuthFailure?: () => void
 ) => {
+  if (!auth) {
+    if (onAuthFailure) onAuthFailure();
+    return () => {};
+  }
   return onAuthStateChanged(auth, async (user: User | null) => {
     if (user) {
       if (cachedAccessToken) {
@@ -85,6 +104,9 @@ export const initAuth = (
 };
 
 export const googleSignIn = async (): Promise<{ user: User; accessToken: string } | null> => {
+  if (!auth) {
+    throw new Error('Google sign-in is unavailable: Firebase is not configured (fill in firebase-applet-config.json).');
+  }
   try {
     isSigningIn = true;
     const result = await signInWithPopup(auth, provider);
@@ -117,6 +139,7 @@ export const googleSignIn = async (): Promise<{ user: User; accessToken: string 
 
 // Call once on app load: if we just came back from a redirect sign-in, capture the token.
 export const consumeRedirectResult = async (): Promise<{ user: User; accessToken: string } | null> => {
+  if (!auth) return null;
   try {
     const result = await getRedirectResult(auth);
     if (!result) return null;
@@ -135,6 +158,6 @@ export const getAccessToken = async (): Promise<string | null> => {
 };
 
 export const logout = async () => {
-  await firebaseSignOut(auth);
+  if (auth) await firebaseSignOut(auth);
   cachedAccessToken = null;
 };

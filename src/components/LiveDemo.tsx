@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Camera, Send, CheckCircle2, ArrowRight, Mail, AlignLeft, ExternalLink, Info, X, Eye, FileText, Globe, Calendar, Settings, Smile, UserCheck, Plus, Trash2, Shield, BellRing, LogIn, LogOut } from 'lucide-react';
 import { renderDocumentHTML } from './DocumentRenderer';
 import { User } from 'firebase/auth';
-import { db } from '../lib/firebase';
+import { getDb } from '../lib/firebase';
 import { saveExtractedTasks, KanbanTask } from '../lib/kanbanService';
 import { showToast } from '../lib/toast';
 import Markdown from 'react-markdown';
@@ -247,7 +247,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
       if (user) {
         try {
           const { doc, getDoc } = await import('firebase/firestore');
-          const docRef = doc(db, 'userProfiles', user.uid);
+          const docRef = doc(getDb(), 'userProfiles', user.uid);
           const docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
             const data = docSnap.data();
@@ -317,7 +317,7 @@ export default function LiveDemo({ user, accessToken, onLogin, onLogout, onSendE
     if (user) {
       try {
         const { doc, setDoc } = await import('firebase/firestore');
-        const docRef = doc(db, 'userProfiles', user.uid);
+        const docRef = doc(getDb(), 'userProfiles', user.uid);
         await setDoc(docRef, profileData);
         console.log("Profile synchronized with Firestore successfully.");
       } catch (error) {
